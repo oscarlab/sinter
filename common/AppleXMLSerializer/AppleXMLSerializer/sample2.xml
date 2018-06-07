@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<sinter>
+    <header service_code="21" timestamp="2016-10-16 05:20:21">
+        <screen screen_height="1024" screen_width="1280"/>
+    </header>
+    <applications>
+        <entity unique_id="" name="" value="" type="button" states="0" top="0" left="0" height="0" width="0" child_count="0">
+            <children>
+                <entity unique_id="" name="" value="" type="textbox" states="0" top="0" left="0" height="0" width="0" child_count="0">
+                    <children>
+                        <entity unique_id="" name="" value="" type="radio1" states="0" top="0" left="0" height="0" width="0" child_count="0"/>
+                        <entity unique_id="" name="" value="" type="radio2" states="0" top="0" left="0" height="0" width="0" child_count="0"/>
+                    </children>
+                </entity>
+            </children>
+        </entity>
+        <entity unique_id="" name="" value="" type="textbox" states="0" top="0" left="0" height="0" width="0" child_count="0">
+                <children>
+                    <entity unique_id="" name="" value="" type="radio1" states="0" top="0" left="0" height="0" width="0" child_count="0"/>
+                    <entity unique_id="" name="" value="" type="radio2" states="0" top="0" left="0" height="0" width="0" child_count="0"/>
+                </children>
+        </entity>
+    </applications>
+</sinter>

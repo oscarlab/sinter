@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sinter>
+    <AXWindow type = "System.Windows.Forms.Form">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "name" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+        <method    name = "show"   params= "" />
+    </AXWindow>
+    <AXButton type = "System.Windows.Forms.Button">
+        <property name = "Text"   type = "System.String" xmlName = "name" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXButton>
+      <AXButton2 type = "System.Windows.Forms.ToolStripButton">
+        <property name = "Text"   type = "System.String" xmlName = "name" />
+    </AXButton2>
+    <dialog type = "System.Windows.Forms.Panel">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </dialog>
+    <menuitemradio type = "System.Windows.Forms.RadioButton">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "name" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </menuitemradio>    
+    <combobox type = "System.Windows.Forms.ComboBox">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "name" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </combobox> 
+    <AXStaticText type = "System.Windows.Forms.Label">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXStaticText>
+    <AXGroup2 type = "System.Windows.Forms.GroupBox">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXGroup2>
+    <AXOutline type = "System.Windows.Forms.TreeView">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXOutline>
+    <AXList type = "System.Windows.Forms.ListView">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXList>
+    <AXTextField type = "System.Windows.Forms.TextBox">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXTextField>
+    <AXTextField2 type = "System.Windows.Forms.ToolStripTextBox">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+    </AXTextField2>
+    <AXMenuBar type = "System.Windows.Forms.MenuStrip">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXMenuBar>
+
+    <TreeNode type = "System.Windows.Forms.TreeView">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </TreeNode>
+
+    <AXToolbar2 type = "System.Windows.Forms.ToolStrip">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXToolbar2>
+
+    <AXMenuButton type = "System.Windows.Forms.Button">
+        <property name = "Name"   type = "System.String" xmlName = "name" />
+        <property name = "Text"   type = "System.String" xmlName = "value" />
+        <property name = "Left"   type = "System.Int32" xmlName = "left" />
+        <property name = "Top"    type = "System.Int32" xmlName = "top"  />
+        <property name = "Width"  type = "System.Int32" xmlName = "width"  />
+        <property name = "Height" type = "System.Int32" xmlName = "height" />
+    </AXMenuButton>
+
+    </sinter>
