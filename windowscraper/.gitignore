@@ -1,0 +1,11 @@
+﻿/.vs
+/WindowsScrapperLib/bin
+/WindowsScrapperLib/obj
+/WindowsServer/bin
+/WindowsServer/obj
+/UIAComWrapper/UIAComWrapper/obj
+/UIAComWrapper/UIAComWrapper/bin
+/UIAComWrapper/.vs
+/WindowsScraper/WindowsScraper/bin
+/WindowsScraper/.vs/WindowsScraper
+/WindowsScraper/WindowsScraper/obj

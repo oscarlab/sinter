@@ -1,0 +1,638 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6C19C01DB7B742004DFB3F /* Scraper.m */; };
+		0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */; };
+		0DB4CA4C20D75AE200FFFD23 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */; };
+		0DB4CA4F20D75B0D00FFFD23 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4E20D75B0D00FFFD23 /* Serializer.m */; };
+		0DB4CA5220D75B2C00FFFD23 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5020D75B2C00FFFD23 /* GDataXMLNode.m */; };
+		0DB4CA5F20D75B4A00FFFD23 /* MouseOrCaret.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5320D75B4900FFFD23 /* MouseOrCaret.m */; };
+		0DB4CA6020D75B4A00FFFD23 /* Header.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5420D75B4900FFFD23 /* Header.m */; };
+		0DB4CA6120D75B4A00FFFD23 /* Screen.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5720D75B4900FFFD23 /* Screen.m */; };
+		0DB4CA6220D75B4A00FFFD23 /* KbdOrAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5820D75B4900FFFD23 /* KbdOrAction.m */; };
+		0DB4CA6320D75B4A00FFFD23 /* Entity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5C20D75B4900FFFD23 /* Entity.m */; };
+		0DB4CA6420D75B4A00FFFD23 /* Sinter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5E20D75B4900FFFD23 /* Sinter.m */; };
+		0DB4CA6720D75B7B00FFFD23 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA6620D75B7B00FFFD23 /* Config.m */; };
+		7BC447CA1AA390B0006C2146 /* Keymapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BC447C91AA390B0006C2146 /* Keymapping.m */; };
+		9CFA67771AA01865007E84ED /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFA67761AA01865007E84ED /* Cocoa.framework */; };
+		9CFA67811AA01865007E84ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9CFA677F1AA01865007E84ED /* InfoPlist.strings */; };
+		9CFA67831AA01865007E84ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA67821AA01865007E84ED /* main.m */; };
+		9CFA67871AA01865007E84ED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9CFA67851AA01865007E84ED /* Credits.rtf */; };
+		9CFA678A1AA01865007E84ED /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA67891AA01865007E84ED /* AppDelegate.m */; };
+		9CFA678D1AA01865007E84ED /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9CFA678B1AA01865007E84ED /* MainMenu.xib */; };
+		9CFA678F1AA01865007E84ED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CFA678E1AA01865007E84ED /* Images.xcassets */; };
+		9CFA67961AA01865007E84ED /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFA67951AA01865007E84ED /* XCTest.framework */; };
+		9CFA67971AA01865007E84ED /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFA67761AA01865007E84ED /* Cocoa.framework */; };
+		9CFA679F1AA01865007E84ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9CFA679D1AA01865007E84ED /* InfoPlist.strings */; };
+		9CFA67A11AA01865007E84ED /* OSXScraperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA67A01AA01865007E84ED /* OSXScraperTests.m */; };
+		9CFA67AF1AA018D1007E84ED /* ScraperServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA67AD1AA018D1007E84ED /* ScraperServer.m */; };
+		9CFE59581BCB00D100BEAC79 /* documentation.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9CFE59551BCB00D100BEAC79 /* documentation.rtf */; };
+		9CFE59591BCB00D100BEAC79 /* AccAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE59571BCB00D100BEAC79 /* AccAPI.m */; };
+		9CFE595B1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9CFA67981AA01865007E84ED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9CFA676B1AA01864007E84ED /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9CFA67721AA01864007E84ED;
+			remoteInfo = OSXScraper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0D6C19BF1DB7B742004DFB3F /* Scraper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scraper.h; sourceTree = "<group>"; };
+		0D6C19C01DB7B742004DFB3F /* Scraper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scraper.m; sourceTree = "<group>"; };
+		0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = RoleMapping.plist; sourceTree = "<group>"; };
+		0DB4CA4A20D75AE200FFFD23 /* ClientHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClientHandler.h; path = ../common/AppleConnection/AppleConnection/ClientHandler.h; sourceTree = "<group>"; };
+		0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ClientHandler.m; path = ../common/AppleConnection/AppleConnection/ClientHandler.m; sourceTree = "<group>"; };
+		0DB4CA4D20D75B0D00FFFD23 /* Serializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serializer.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.h; sourceTree = "<group>"; };
+		0DB4CA4E20D75B0D00FFFD23 /* Serializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Serializer.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.m; sourceTree = "<group>"; };
+		0DB4CA5020D75B2C00FFFD23 /* GDataXMLNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GDataXMLNode.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.m; sourceTree = "<group>"; };
+		0DB4CA5120D75B2C00FFFD23 /* GDataXMLNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GDataXMLNode.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.h; sourceTree = "<group>"; };
+		0DB4CA5320D75B4900FFFD23 /* MouseOrCaret.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MouseOrCaret.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.m; sourceTree = "<group>"; };
+		0DB4CA5420D75B4900FFFD23 /* Header.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Header.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.m; sourceTree = "<group>"; };
+		0DB4CA5520D75B4900FFFD23 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Header.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.h; sourceTree = "<group>"; };
+		0DB4CA5620D75B4900FFFD23 /* MouseOrCaret.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MouseOrCaret.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.h; sourceTree = "<group>"; };
+		0DB4CA5720D75B4900FFFD23 /* Screen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Screen.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.m; sourceTree = "<group>"; };
+		0DB4CA5820D75B4900FFFD23 /* KbdOrAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KbdOrAction.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.m; sourceTree = "<group>"; };
+		0DB4CA5920D75B4900FFFD23 /* Sinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sinter.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.h; sourceTree = "<group>"; };
+		0DB4CA5A20D75B4900FFFD23 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entity.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.h; sourceTree = "<group>"; };
+		0DB4CA5B20D75B4900FFFD23 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Screen.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.h; sourceTree = "<group>"; };
+		0DB4CA5C20D75B4900FFFD23 /* Entity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Entity.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.m; sourceTree = "<group>"; };
+		0DB4CA5D20D75B4900FFFD23 /* KbdOrAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KbdOrAction.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.h; sourceTree = "<group>"; };
+		0DB4CA5E20D75B4900FFFD23 /* Sinter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Sinter.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.m; sourceTree = "<group>"; };
+		0DB4CA6520D75B7B00FFFD23 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Config.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.h; sourceTree = "<group>"; };
+		0DB4CA6620D75B7B00FFFD23 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Config.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.m; sourceTree = "<group>"; };
+		7B718B3C1AAA733900AC0791 /* ControlTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlTypes.h; sourceTree = "<group>"; };
+		7BC447C81AA39075006C2146 /* KeyMapping.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyMapping.h; sourceTree = "<group>"; };
+		7BC447C91AA390B0006C2146 /* Keymapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keymapping.m; sourceTree = "<group>"; };
+		9CFA67731AA01864007E84ED /* OSXScraper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OSXScraper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CFA67761AA01865007E84ED /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		9CFA67791AA01865007E84ED /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		9CFA677A1AA01865007E84ED /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		9CFA677B1AA01865007E84ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		9CFA677E1AA01865007E84ED /* OSXScraper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OSXScraper-Info.plist"; sourceTree = "<group>"; };
+		9CFA67801AA01865007E84ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9CFA67821AA01865007E84ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9CFA67841AA01865007E84ED /* OSXScraper-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OSXScraper-Prefix.pch"; sourceTree = "<group>"; };
+		9CFA67861AA01865007E84ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		9CFA67881AA01865007E84ED /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		9CFA67891AA01865007E84ED /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9CFA678C1AA01865007E84ED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		9CFA678E1AA01865007E84ED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		9CFA67941AA01865007E84ED /* OSXScraperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OSXScraperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CFA67951AA01865007E84ED /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		9CFA679C1AA01865007E84ED /* OSXScraperTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OSXScraperTests-Info.plist"; sourceTree = "<group>"; };
+		9CFA679E1AA01865007E84ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9CFA67A01AA01865007E84ED /* OSXScraperTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSXScraperTests.m; sourceTree = "<group>"; };
+		9CFA67AC1AA018D1007E84ED /* ScraperServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScraperServer.h; sourceTree = "<group>"; };
+		9CFA67AD1AA018D1007E84ED /* ScraperServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScraperServer.m; sourceTree = "<group>"; };
+		9CFE59551BCB00D100BEAC79 /* documentation.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = documentation.rtf; sourceTree = "<group>"; };
+		9CFE59561BCB00D100BEAC79 /* AccAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccAPI.h; sourceTree = "<group>"; };
+		9CFE59571BCB00D100BEAC79 /* AccAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccAPI.m; sourceTree = "<group>"; };
+		9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = AccessibilityDefinitions.plist; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9CFA67701AA01864007E84ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFA67771AA01865007E84ED /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFA67911AA01865007E84ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFA67971AA01865007E84ED /* Cocoa.framework in Frameworks */,
+				9CFA67961AA01865007E84ED /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0D6C19CC1DB7DB60004DFB3F /* AppleXMLSerializer */ = {
+			isa = PBXGroup;
+			children = (
+				0DB4CA6520D75B7B00FFFD23 /* Config.h */,
+				0DB4CA6620D75B7B00FFFD23 /* Config.m */,
+				0DB4CA5A20D75B4900FFFD23 /* Entity.h */,
+				0DB4CA5C20D75B4900FFFD23 /* Entity.m */,
+				0DB4CA5520D75B4900FFFD23 /* Header.h */,
+				0DB4CA5420D75B4900FFFD23 /* Header.m */,
+				0DB4CA5D20D75B4900FFFD23 /* KbdOrAction.h */,
+				0DB4CA5820D75B4900FFFD23 /* KbdOrAction.m */,
+				0DB4CA5620D75B4900FFFD23 /* MouseOrCaret.h */,
+				0DB4CA5320D75B4900FFFD23 /* MouseOrCaret.m */,
+				0DB4CA5B20D75B4900FFFD23 /* Screen.h */,
+				0DB4CA5720D75B4900FFFD23 /* Screen.m */,
+				0DB4CA5920D75B4900FFFD23 /* Sinter.h */,
+				0DB4CA5E20D75B4900FFFD23 /* Sinter.m */,
+				0DB4CA5120D75B2C00FFFD23 /* GDataXMLNode.h */,
+				0DB4CA5020D75B2C00FFFD23 /* GDataXMLNode.m */,
+				0DB4CA4D20D75B0D00FFFD23 /* Serializer.h */,
+				0DB4CA4E20D75B0D00FFFD23 /* Serializer.m */,
+			);
+			name = AppleXMLSerializer;
+			sourceTree = "<group>";
+		};
+		0DAF71111DB81018002BE0A1 /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				0DB4CA4A20D75AE200FFFD23 /* ClientHandler.h */,
+				0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */,
+			);
+			name = Connection;
+			sourceTree = "<group>";
+		};
+		9CFA676A1AA01864007E84ED = {
+			isa = PBXGroup;
+			children = (
+				0DAF71111DB81018002BE0A1 /* Connection */,
+				0D6C19CC1DB7DB60004DFB3F /* AppleXMLSerializer */,
+				9CFA677C1AA01865007E84ED /* OSXScraper */,
+				9CFA679A1AA01865007E84ED /* OSXScraperTests */,
+				9CFA67751AA01864007E84ED /* Frameworks */,
+				9CFA67741AA01864007E84ED /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9CFA67741AA01864007E84ED /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA67731AA01864007E84ED /* OSXScraper.app */,
+				9CFA67941AA01865007E84ED /* OSXScraperTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9CFA67751AA01864007E84ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA67761AA01865007E84ED /* Cocoa.framework */,
+				9CFA67951AA01865007E84ED /* XCTest.framework */,
+				9CFA67781AA01865007E84ED /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9CFA67781AA01865007E84ED /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA67791AA01865007E84ED /* AppKit.framework */,
+				9CFA677A1AA01865007E84ED /* CoreData.framework */,
+				9CFA677B1AA01865007E84ED /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		9CFA677C1AA01865007E84ED /* OSXScraper */ = {
+			isa = PBXGroup;
+			children = (
+				0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */,
+				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
+				9CFE59551BCB00D100BEAC79 /* documentation.rtf */,
+				9CFE59561BCB00D100BEAC79 /* AccAPI.h */,
+				9CFE59571BCB00D100BEAC79 /* AccAPI.m */,
+				7B718B3C1AAA733900AC0791 /* ControlTypes.h */,
+				7BC447C81AA39075006C2146 /* KeyMapping.h */,
+				7BC447C91AA390B0006C2146 /* Keymapping.m */,
+				9CFA67AC1AA018D1007E84ED /* ScraperServer.h */,
+				9CFA67AD1AA018D1007E84ED /* ScraperServer.m */,
+				9CFA67881AA01865007E84ED /* AppDelegate.h */,
+				9CFA67891AA01865007E84ED /* AppDelegate.m */,
+				9CFA678B1AA01865007E84ED /* MainMenu.xib */,
+				9CFA678E1AA01865007E84ED /* Images.xcassets */,
+				9CFA677D1AA01865007E84ED /* Supporting Files */,
+				0D6C19BF1DB7B742004DFB3F /* Scraper.h */,
+				0D6C19C01DB7B742004DFB3F /* Scraper.m */,
+			);
+			path = OSXScraper;
+			sourceTree = "<group>";
+		};
+		9CFA677D1AA01865007E84ED /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA677E1AA01865007E84ED /* OSXScraper-Info.plist */,
+				9CFA677F1AA01865007E84ED /* InfoPlist.strings */,
+				9CFA67821AA01865007E84ED /* main.m */,
+				9CFA67841AA01865007E84ED /* OSXScraper-Prefix.pch */,
+				9CFA67851AA01865007E84ED /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		9CFA679A1AA01865007E84ED /* OSXScraperTests */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA67A01AA01865007E84ED /* OSXScraperTests.m */,
+				9CFA679B1AA01865007E84ED /* Supporting Files */,
+			);
+			path = OSXScraperTests;
+			sourceTree = "<group>";
+		};
+		9CFA679B1AA01865007E84ED /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9CFA679C1AA01865007E84ED /* OSXScraperTests-Info.plist */,
+				9CFA679D1AA01865007E84ED /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9CFA67721AA01864007E84ED /* OSXScraper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CFA67A41AA01865007E84ED /* Build configuration list for PBXNativeTarget "OSXScraper" */;
+			buildPhases = (
+				9CFA676F1AA01864007E84ED /* Sources */,
+				9CFA67701AA01864007E84ED /* Frameworks */,
+				9CFA67711AA01864007E84ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OSXScraper;
+			productName = OSXScraper;
+			productReference = 9CFA67731AA01864007E84ED /* OSXScraper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9CFA67931AA01865007E84ED /* OSXScraperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CFA67A71AA01865007E84ED /* Build configuration list for PBXNativeTarget "OSXScraperTests" */;
+			buildPhases = (
+				9CFA67901AA01865007E84ED /* Sources */,
+				9CFA67911AA01865007E84ED /* Frameworks */,
+				9CFA67921AA01865007E84ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9CFA67991AA01865007E84ED /* PBXTargetDependency */,
+			);
+			name = OSXScraperTests;
+			productName = OSXScraperTests;
+			productReference = 9CFA67941AA01865007E84ED /* OSXScraperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9CFA676B1AA01864007E84ED /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "Stony Brook University";
+				TargetAttributes = {
+					9CFA67931AA01865007E84ED = {
+						TestTargetID = 9CFA67721AA01864007E84ED;
+					};
+				};
+			};
+			buildConfigurationList = 9CFA676E1AA01864007E84ED /* Build configuration list for PBXProject "OSXScraper" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9CFA676A1AA01864007E84ED;
+			productRefGroup = 9CFA67741AA01864007E84ED /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9CFA67721AA01864007E84ED /* OSXScraper */,
+				9CFA67931AA01865007E84ED /* OSXScraperTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9CFA67711AA01864007E84ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFA67811AA01865007E84ED /* InfoPlist.strings in Resources */,
+				9CFA678F1AA01865007E84ED /* Images.xcassets in Resources */,
+				9CFA67871AA01865007E84ED /* Credits.rtf in Resources */,
+				9CFE595B1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist in Resources */,
+				9CFA678D1AA01865007E84ED /* MainMenu.xib in Resources */,
+				0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */,
+				9CFE59581BCB00D100BEAC79 /* documentation.rtf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFA67921AA01865007E84ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFA679F1AA01865007E84ED /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9CFA676F1AA01864007E84ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0DB4CA6320D75B4A00FFFD23 /* Entity.m in Sources */,
+				9CFA678A1AA01865007E84ED /* AppDelegate.m in Sources */,
+				0DB4CA6220D75B4A00FFFD23 /* KbdOrAction.m in Sources */,
+				9CFA67AF1AA018D1007E84ED /* ScraperServer.m in Sources */,
+				0DB4CA6720D75B7B00FFFD23 /* Config.m in Sources */,
+				0DB4CA5F20D75B4A00FFFD23 /* MouseOrCaret.m in Sources */,
+				0DB4CA4C20D75AE200FFFD23 /* ClientHandler.m in Sources */,
+				0DB4CA6420D75B4A00FFFD23 /* Sinter.m in Sources */,
+				0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */,
+				0DB4CA5220D75B2C00FFFD23 /* GDataXMLNode.m in Sources */,
+				0DB4CA4F20D75B0D00FFFD23 /* Serializer.m in Sources */,
+				7BC447CA1AA390B0006C2146 /* Keymapping.m in Sources */,
+				9CFE59591BCB00D100BEAC79 /* AccAPI.m in Sources */,
+				0DB4CA6020D75B4A00FFFD23 /* Header.m in Sources */,
+				9CFA67831AA01865007E84ED /* main.m in Sources */,
+				0DB4CA6120D75B4A00FFFD23 /* Screen.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFA67901AA01865007E84ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFA67A11AA01865007E84ED /* OSXScraperTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9CFA67991AA01865007E84ED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9CFA67721AA01864007E84ED /* OSXScraper */;
+			targetProxy = 9CFA67981AA01865007E84ED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9CFA677F1AA01865007E84ED /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFA67801AA01865007E84ED /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		9CFA67851AA01865007E84ED /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFA67861AA01865007E84ED /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		9CFA678B1AA01865007E84ED /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFA678C1AA01865007E84ED /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		9CFA679D1AA01865007E84ED /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFA679E1AA01865007E84ED /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		9CFA67A21AA01865007E84ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		9CFA67A31AA01865007E84ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		9CFA67A51AA01865007E84ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = "$(SRCROOT)/OSXScraper/OSXScraper-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lxml2";
+				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		9CFA67A61AA01865007E84ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = "$(SRCROOT)/OSXScraper/OSXScraper-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lxml2";
+				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		9CFA67A81AA01865007E84ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/OSXScraper.app/Contents/MacOS/OSXScraper";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "OSXScraperTests/OSXScraperTests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		9CFA67A91AA01865007E84ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/OSXScraper.app/Contents/MacOS/OSXScraper";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
+				INFOPLIST_FILE = "OSXScraperTests/OSXScraperTests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9CFA676E1AA01864007E84ED /* Build configuration list for PBXProject "OSXScraper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFA67A21AA01865007E84ED /* Debug */,
+				9CFA67A31AA01865007E84ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9CFA67A41AA01865007E84ED /* Build configuration list for PBXNativeTarget "OSXScraper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFA67A51AA01865007E84ED /* Debug */,
+				9CFA67A61AA01865007E84ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9CFA67A71AA01865007E84ED /* Build configuration list for PBXNativeTarget "OSXScraperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFA67A81AA01865007E84ED /* Debug */,
+				9CFA67A91AA01865007E84ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9CFA676B1AA01864007E84ED /* Project object */;
+}

@@ -1,0 +1,45 @@
+Sinter is dual-licensed under the LGPL (see LICENSE.LGPL.txt) and a commercial license.
+
+In layman's terms, this means that anyone may use the code for free,
+subject to the terms of the LGPL.  However, the authors and their
+institutions (The University of North Carolina at Chapel Hill and
+Stony Brook University, hereafter "the institutions"), reserve the
+right to offer commercial licenses for this software, should this be
+in the interest of getting the technology into the hands of more
+users.  For this reason, any contributors to the project must agree to
+allow the institutions to license their contributions as part of this
+code base for commercial purposes.
+
+Sinter also includes two third-party libraries, both of which have permissive licenses:
+
+1) A modified version of PlistCS (https://github.com/animetrics/PlistCS), license terms follow:
+
+
+	PlistCS Property List (plist) serialization and parsing library.
+	
+	https://github.com/animetrics/PlistCS
+
+	Copyright (c) 2011 Animetrics Inc. (marc@animetrics.com)
+	 
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+
+2) Log4j - https://logging.apache.org/log4j/1.2/license.html - Apache 2.0 License
+
+3) A portion of Google's Data APIs (XML) - https://github.com/google/gdata-objectivec-client
+- Apache 2.0 License

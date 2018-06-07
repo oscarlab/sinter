@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "FD8AAA489B15893CDEB24C8011C937966AD3EF61",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "D7C3692984A07F01E7A49B2C03F779A721E5ACF8" : 9223372036854775807,
+    "FD8AAA489B15893CDEB24C8011C937966AD3EF61" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "BD450A71-63F1-460D-A4EE-9A0A8DAB98A2",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "D7C3692984A07F01E7A49B2C03F779A721E5ACF8" : "",
+    "FD8AAA489B15893CDEB24C8011C937966AD3EF61" : "AppleXMLSerializer\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "AppleXMLSerializer",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "AppleXMLSerializer.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "bitbucket.org:nvrdp_team\/common.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D7C3692984A07F01E7A49B2C03F779A721E5ACF8"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "bitbucket.org:nvrdp_team\/applexmlserializer.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FD8AAA489B15893CDEB24C8011C937966AD3EF61"
+    }
+  ]
+}
