@@ -82,6 +82,8 @@
     <integer>811</integer>
 		<key>action_foreground</key>
 		<integer>812</integer>
+    <key>action_expand_and_select</key>
+    <integer>813</integer>
     <key>listener</key>
     <integer>9</integer>
     <key>listener_register</key>
@@ -545,6 +547,85 @@
     <string>Unknown</string>
     <key>Window</key>
     <string>Window</string>
+  </dict>
+  <key>send_key_codes</key>
+  <dict>
+	<key>8</key>
+	<string>{BS}</string>
+	<key>9</key>
+	<string>{TAB}</string>
+	<key>13</key>
+	<string>{ENTER}</string>
+	<key>16</key>
+	<string>{+}</string>
+	<key>17</key>
+	<string>{^}</string>
+	<key>18</key>
+	<string>{%}</string>
+	<key>19</key>
+	<string>{BREAK}</string>
+	<key>20</key>
+	<string>{CAPSLOCK}</string>
+	<key>27</key>
+	<string>{ESC}</string>
+	<key>33</key>
+	<string>{PGUP}</string>
+	<key>34</key>
+	<string>{PGDN}</string>
+	<key>35</key>
+	<string>{END}</string>
+	<key>36</key>
+	<string>{HOME}</string>
+	<key>37</key>
+	<string>{LEFT}</string>
+	<key>38</key>
+	<string>{UP}</string>
+	<key>39</key>
+	<string>{RIGHT}</string>
+	<key>40</key>
+	<string>{DOWN}</string>
+	<key>45</key>
+	<string>{INSERT}</string>
+	<key>46</key>
+	<string>{DEL}</string>
+	<key>47</key>
+	<string>{HELP}</string>
+	<key>106</key>
+	<string>{MULTIPLY}</string>
+	<key>107</key>
+	<string>{ADD}</string>
+	<key>109</key>
+	<string>{SUBTRACT}</string>
+	<key>111</key>
+	<string>{DIVIDE}</string>
+	<key>112</key>
+	<string>{F1}</string>
+	<key>113</key>
+	<string>{F2}</string>
+	<key>114</key>
+	<string>{F3}</string>
+	<key>115</key>
+	<string>{F4}</string>
+	<key>116</key>
+	<string>{F5}</string>
+	<key>117</key>
+	<string>{F6}</string>
+	<key>118</key>
+	<string>{F7}</string>
+	<key>119</key>
+	<string>{F8}</string>
+	<key>120</key>
+	<string>{F9}</string>
+	<key>121</key>
+	<string>{F10}</string>
+	<key>122</key>
+	<string>{F11}</string>
+	<key>123</key>
+	<string>{F12}</string>
+	<key>144</key>
+	<string>{NUMLOCK}</string>
+	<key>145</key>
+	<string>{SCROLLLOCK}</string>
   </dict>
 </dict>
 </plist>
