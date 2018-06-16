@@ -44,6 +44,9 @@ project.  By contributing code to this project, you are also agreeing
 that your code may be distributed under _both_ the GPL and a
 commercial license without compensation.
 
+Pull Requests must pass our unit tests (CI coming soon), and be approved by
+at least one maintainer before merging.
+
 ## 5. Contact
 
 For help, please file bug reports on the github page using the issue tracker.

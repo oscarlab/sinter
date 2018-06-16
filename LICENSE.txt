@@ -1,0 +1,11 @@
+Sinter is dual-licensed under the GPL (see LICENSE.GPL.txt) and a commercial license.
+
+In layman's terms, this means that anyone may use the code for free,
+subject to the terms of the GPL.  However, the authors and their
+institutions (The University of North Carolina at Chapel Hill and
+Stony Brook University, hereafter "the institutions"), reserve the
+right to offer commercial licenses for this software, should this be
+in the interest of getting the technology into the hands of more
+users.  For this reason, any contributors to the project must agree to
+allow the institutions to license their contributions as part of this
+code base for commercial purposes.
