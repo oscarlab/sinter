@@ -1,0 +1,23 @@
+* {
+	background-color: aqua;
+	font-family: sans-serif;
+	margin-left: 6%;
+	margin-right: 6%;
+}
+
+.introduction {
+	text-align: center;
+	color: black;
+	display: block;
+}
+
+.description {
+	color: black;
+	text-decoration: none;
+	text-align: justify;
+	display: block;
+}
+
+.description a:hover {
+	color: blue;
+}
