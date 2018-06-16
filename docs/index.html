@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Sinter</title>
+		<title>Sinter: Accessible, Cross-Platform Remote
+		Desktop System</title>
 		<link rel="stylesheet" href="./style.css"/>
 	</head>
 	<body>
@@ -17,20 +18,77 @@
 			<div class="whatIsSinter">
 				<h4>What is Sinter?</h4>
 				<p>
-					Sinter is an innovative platform that allows a user to be able to access programs on different operating systems. For example, a Windows's user can access programs on MacOS using Sinter. Sinter works by setting up a connection between a Client on the user's OS and a Server on the OS that the user is accessing a program from. Upon request, the Server will send over the elements of the program and the Client will reassemble them for the user.
+					Sinter is an innovative
+					platform for remote access
+					that supports screen readers
+					and other assistive software.
+					Sinter is portable across
+					operating systems (currently
+					Mac and Windows).  For
+					example, a Mac user can
+					connect to a Windows remote
+					desktop
+					and read remote Windows apps
+					using VoiceOver (the default
+					screen reader for Mac OS X).
 				</p>
 			</div>
 			<div class="whySinter">
 				<h4>Why Sinter?</h4>
 				<p>
-					A large problem with programmers with visual impairments has been the ability to access programs remotely. Traditional screen readers are unable to process the elements on the remote application. With Sinter's ability to recreate the remote application, these screen readers will now be able to read those remote applications since they are now present on the user's computer.
+					A large problem for users with
+					visual impairments has been
+					the ability to access programs
+					remotely. Traditional screen
+					readers are unable to process
+					the elements on the remote
+					application over protocols
+					like RDP and VNC.
 				</p>
 			</div>
+
+			<div class="howSinter">
+				<h4>How Does Sinter Work?</h4>
+				<p>
+					Sinter works by extracting the
+					UI graph from the remote
+					system (e.g., buttons,
+					windows, menus, text boxes),
+					and creating a client
+					application, using similar,
+					but native widgets, that
+					mirrors the remote application.
+					The client application's
+					events (e.g., mouse clicks and
+					keystrokes)
+					are replayed to the remote application.
+					The client application in
+					sinter does not look identical
+					to the remote, but is
+					indistinguishable to the
+					screen reader from a local application.
+				</p>
+			</div>
+
 			<div class="release">
 				<h4>When Will I Get to Use Sinter?</h4>
 				<p>
-					The alpha release is coming soon! Be aware that the software is still a work in progress and bugs may be present in the application.
+					The alpha release is coming
+					soon! For now, if you are
+					particularly adventurous, you
+					can compile the code from
+					source
+					at <a href="https://github.com/oscarlab/sinter">https://github.com/oscarlab/sinter</a>.
+					Be aware that the software is still a work in progress and bugs may be present in the application.
 				</p>
+				<h4>How Can I Get Help With
+				  Sinter?</h4>
+				<p>
+				  We will be adding documentation to
+				  this page over time..  You can also
+				  report an issue here
+				  <a href="https://github.com/oscarlab/sinter/issues"</a>.
+				     </p>
 			</div>
 			<div class="publications">
 				<h4>Publications</h4>
@@ -38,6 +96,49 @@
 					View a list of publications about Sinter <a href="https://oscarlab.github.io/projects/sinter/">here</a>.
 				</p>
 			</div>
+			<div class="contributors">
+				<h4>Contributors</h4>
+				<p>
+					Sinter is the work of several
+					contributors, including:
+					<ul>
+					  <li> Syed Masum Billah</li>
+					  <li> Neil Davis</li>
+					  <li> Grant Miller</li>
+					  <li> Don Porter</li>
+					  <li> I.V. Ramakrishnan</li>
+				  </ul>
+				</p>
+				<p>We are always looking for help!
+				Contribute code to the project and
+				see your name on this list!</p>
+			</div>
+
+			<div class="sponsors">
+				<h4>Sponsors</h4>
+				<p>
+					This work is supported in part
+					by the National Institutes of
+					Health, grant R01 EY026621;
+					National Science Foundation
+					Grants IIS-1218570,  IIS-1447549,
+					CNS-1149229,  CNS-1161541,
+					CNS-1228839, CNS-1405641,
+					CNS-1408695, and CNS-1526707;
+					and VMware.
+				</p>
+				<p>
+				  Any opinions, findings, and
+				  conclusions or recommendations
+				  expressed in this material are those
+				  of the author(s) and do not
+				  necessarily reflect the views of the
+				  National Institutes of Health, the
+				  National Science Foundation, or
+				  VMware.
+				  </p>
+			</div>
+			
 		</div>
 	</body>
 </html>
