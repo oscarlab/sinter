@@ -58,11 +58,16 @@ Sinter consists of two major entities:
 * After loading the project in Xcode, choose `Build` from `Product` menu.
 
 ### Building `osxproxy`
-XXX
+* Go to `sinter/osxproxy` directory and open the project `OSXProxy.xcodeproj` in Xcode
+* After loading the project in Xcode, choose `Build` from `Product` menu.
 
 ## How to run an application over Sinter?
 
-XXXX Write instructions here
+* In your remote machine, run the scraper. If the remote machine is a Mac, choose  `osxscraper`;  if it is a Windows, then `windowscraper`. 
+* In your local machine,  run the proxy ( `osxproxy` for Mac,  `windowscraper` for Windows). But before running the proxy, you need to provide the IP address of the remote machine in the config file (In `osxproxy`,  the name of the config file is `sinter/osxproxy/OSXProxy/Settings.plist`; in `windowscraper`, it is `sinter/windowsproxy/src/config.xml`).
+* When the proxy application is running, click on `Connect` button to connect with the remote machine.
+* After successful connection, you need to click on the `Load Processes` button to get a list of applications running in the remote machine. This list is rendered as a List-View in the proxy application.
+* To run any of those remote application locally, double click on the application's name in the list.
 
 ## How is Sinter Licensed?
 
