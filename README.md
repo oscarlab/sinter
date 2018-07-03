@@ -50,7 +50,7 @@ at least one maintainer before merging.
 ## 5. Contact
 
 For help, please file bug reports on the github page using the issue tracker.
-        <https://github.com/oscarlab/graphene/issues>
+        <https://github.com/oscarlab/sinter/issues>
 
 We will also be adding additional documentation on the project wiki and website
 over time.
