@@ -13,7 +13,9 @@
 @property (nonatomic, retain) NSString* target_id;
 @property (nonatomic, retain) NSString* generic_data;
 
+- (id) initWithTarget:(NSString*) target_id;
 - (id) initWithTarget:(NSString*) target_id andData:(NSString*) data;
+
 
 + (NSArray *) getSerializableProperties;
 

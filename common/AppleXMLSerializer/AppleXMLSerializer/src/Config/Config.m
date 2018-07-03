@@ -86,5 +86,4 @@ static NSDictionary * config;
     return [config objectForKey:key];
 }
 
-
 @end

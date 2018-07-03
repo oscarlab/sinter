@@ -33,7 +33,9 @@ static NSDictionary * classLookup;
 
 
 +(void) serializeObj:(id) obj havingParent:(GDataXMLElement *) parent {
-    
+    if (!obj) {
+        return;
+    }
     NSArray* props = [[obj class] getSerializableProperties];
     
     for (NSString* prop in props) {
@@ -171,8 +173,8 @@ static NSDictionary * classLookup;
                 baby_obj = [self deSerialize:baby targetClass:NSClassFromString(baby_class)];
                 [babies addObject:baby_obj];
             }
-            
-            [obj setValue:babies forKey:prop_name];
+            if([babies count])
+                [obj setValue:babies forKey:prop_name];
             //[entity setChild_count:[NSNumber numberWithInt:i]];
         }
     }

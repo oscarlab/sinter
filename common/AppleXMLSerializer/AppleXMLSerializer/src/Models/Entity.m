@@ -30,6 +30,28 @@ static NSArray * props;
     return self;
 }
 
+
+-(void) setName:(NSString *)name {
+    _name = [NSString stringWithString:name];
+}
+
+-(void) setValue:(NSString *)value {
+    _value = [NSString stringWithString:value];
+}
+
+-(void) setType:(NSString *)type {
+    _type = [NSString stringWithString:type];
+}
+
+-(void) setUnique_id:(NSString *)unique_id {
+    _unique_id = [NSString stringWithString:unique_id];
+}
+
+-(void) setProcess_id:(NSString *)process_id {
+    _process_id = [NSString stringWithString:process_id];
+
+}
+
 -(void) setStates:(NSString *) states {
     _states = [NSNumber numberWithUnsignedInteger:[states intValue]];
 }

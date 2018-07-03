@@ -10,15 +10,11 @@
 
 @interface Config : NSObject
 
-+ (NSArray *)      getProperties:(NSString *) className;
++ (NSArray *) getProperties:(NSString *) className;
 + (NSDictionary *) getClasses;
-
++ (NSString *) convertCamelCase2Underscores: (NSString *) input;
 + (NSDictionary *) getServiceCodes;
 + (NSDictionary *) getRoleMappings;
 + (NSDictionary *) getDictFromKey:(NSString *) key;
-
-// utility methods
-+ (NSString *)     convertCamelCase2Underscores: (NSString *) input;
-
 
 @end

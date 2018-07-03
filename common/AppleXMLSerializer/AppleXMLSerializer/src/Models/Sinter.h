@@ -21,6 +21,10 @@
 - (id) initWithEntity;
 - (id) initWithApplications;
 - (id) initWithUpdates;
+- (id) initWithServiceCode:(NSNumber * ) serviceCode ;
+- (id) initWithServiceCode:(NSNumber * ) serviceCode andKbdOrActionWithTarget:(NSString *) targetId andData:(NSString *) data ;
+- (id) initWithServiceCode:(NSNumber * ) serviceCode andMouseWithX:(int) x andY:(int) y andButton:(int) button;
+- (id) initWithServiceCode:(NSNumber * ) serviceCode andCaret:(int) location andLength:(int) ending andTarget:(NSString*) targetId;
 
 + (NSArray *) getSerializableProperties;
 

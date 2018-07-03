@@ -7,17 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0DAF71191DB82525002BE0A1 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71181DB82525002BE0A1 /* Config.m */; };
-		0DAF712C1DB82586002BE0A1 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF711C1DB82586002BE0A1 /* GDataXMLNode.m */; };
-		0DAF712D1DB82586002BE0A1 /* Entity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF711E1DB82586002BE0A1 /* Entity.m */; };
-		0DAF712E1DB82586002BE0A1 /* Header.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71201DB82586002BE0A1 /* Header.m */; };
-		0DAF712F1DB82586002BE0A1 /* KbdOrAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71221DB82586002BE0A1 /* KbdOrAction.m */; };
-		0DAF71301DB82586002BE0A1 /* MouseOrCaret.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71241DB82586002BE0A1 /* MouseOrCaret.m */; };
-		0DAF71311DB82586002BE0A1 /* Screen.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71261DB82586002BE0A1 /* Screen.m */; };
-		0DAF71321DB82586002BE0A1 /* Sinter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71281DB82586002BE0A1 /* Sinter.m */; };
-		0DAF71331DB82586002BE0A1 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF712A1DB82586002BE0A1 /* Serializer.m */; };
-		0DAF71371DB825F6002BE0A1 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DAF71361DB825F6002BE0A1 /* ClientHandler.m */; };
-		0DAF71391DB82743002BE0A1 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DAF71381DB82743002BE0A1 /* RoleMapping.plist */; };
 		0DB105901DBC2E18004289E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB1058E1DBC2E18004289E7 /* AppDelegate.m */; };
 		0DB105921DBC2E30004289E7 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105911DBC2E30004289E7 /* Settings.plist */; };
 		0DB105941DBC2FB4004289E7 /* RemoteExplorerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105931DBC2FB4004289E7 /* RemoteExplorerWindowController.xib */; };
@@ -51,35 +40,24 @@
 		0DB105E31DBC31EC004289E7 /* MegaWordRibbon.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105DE1DBC31EC004289E7 /* MegaWordRibbon.m */; };
 		0DB105E41DBC31EC004289E7 /* MegaWordRibbon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105DF1DBC31EC004289E7 /* MegaWordRibbon.xib */; };
 		0DB105E91DBC3497004289E7 /* CustomWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105E51DBC3497004289E7 /* CustomWindowController.xib */; };
+		0DB4CA6A20D7761400FFFD23 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA6920D7761400FFFD23 /* ClientHandler.m */; };
+		0DB4CA6C20D7768200FFFD23 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB4CA6B20D7768100FFFD23 /* RoleMapping.plist */; };
+		0DB4CA6F20D776CB00FFFD23 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA6E20D776CB00FFFD23 /* Config.m */; };
+		0DB4CA7220D776E100FFFD23 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7020D776E100FFFD23 /* GDataXMLNode.m */; };
+		0DB4CA8120D776F600FFFD23 /* KbdOrAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7320D776F400FFFD23 /* KbdOrAction.m */; };
+		0DB4CA8220D776F600FFFD23 /* Sinter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7420D776F400FFFD23 /* Sinter.m */; };
+		0DB4CA8320D776F600FFFD23 /* Entity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7620D776F500FFFD23 /* Entity.m */; };
+		0DB4CA8420D776F600FFFD23 /* MouseOrCaret.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7720D776F500FFFD23 /* MouseOrCaret.m */; };
+		0DB4CA8520D776F600FFFD23 /* Header.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7820D776F500FFFD23 /* Header.m */; };
+		0DB4CA8620D776F600FFFD23 /* Screen.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7B20D776F500FFFD23 /* Screen.m */; };
+		0DB4CA8720D776F600FFFD23 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7D20D776F600FFFD23 /* Word.m */; };
+		0DB4CA8A20D7773300FFFD23 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA8920D7773200FFFD23 /* Serializer.m */; };
 		0DFEA7CB1DBC353B009CE3B0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105E71DBC3497004289E7 /* MainMenu.xib */; };
-		0DFEA7CE1DBC3E23009CE3B0 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DFEA7CD1DBC3E23009CE3B0 /* Word.m */; };
-		9C3975DB19DD8AB300B2067F /* notepad.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9C3975D219DD8AB300B2067F /* notepad.xml */; };
 		9C3975E019DD8AB300B2067F /* explorer3.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C3975D819DD8AB300B2067F /* explorer3.png */; };
 		9C93FD3B198ADBD700227E47 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C93FD3A198ADBD700227E47 /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0DAF71171DB82525002BE0A1 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Config.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.h; sourceTree = "<group>"; };
-		0DAF71181DB82525002BE0A1 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Config.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.m; sourceTree = "<group>"; };
-		0DAF711B1DB82586002BE0A1 /* GDataXMLNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GDataXMLNode.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.h; sourceTree = "<group>"; };
-		0DAF711C1DB82586002BE0A1 /* GDataXMLNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GDataXMLNode.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.m; sourceTree = "<group>"; };
-		0DAF711D1DB82586002BE0A1 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entity.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.h; sourceTree = "<group>"; };
-		0DAF711E1DB82586002BE0A1 /* Entity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Entity.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.m; sourceTree = "<group>"; };
-		0DAF711F1DB82586002BE0A1 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Header.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.h; sourceTree = "<group>"; };
-		0DAF71201DB82586002BE0A1 /* Header.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Header.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.m; sourceTree = "<group>"; };
-		0DAF71211DB82586002BE0A1 /* KbdOrAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KbdOrAction.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.h; sourceTree = "<group>"; };
-		0DAF71221DB82586002BE0A1 /* KbdOrAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KbdOrAction.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.m; sourceTree = "<group>"; };
-		0DAF71231DB82586002BE0A1 /* MouseOrCaret.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MouseOrCaret.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.h; sourceTree = "<group>"; };
-		0DAF71241DB82586002BE0A1 /* MouseOrCaret.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MouseOrCaret.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.m; sourceTree = "<group>"; };
-		0DAF71251DB82586002BE0A1 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Screen.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.h; sourceTree = "<group>"; };
-		0DAF71261DB82586002BE0A1 /* Screen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Screen.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.m; sourceTree = "<group>"; };
-		0DAF71271DB82586002BE0A1 /* Sinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sinter.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.h; sourceTree = "<group>"; };
-		0DAF71281DB82586002BE0A1 /* Sinter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Sinter.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.m; sourceTree = "<group>"; };
-		0DAF71291DB82586002BE0A1 /* Serializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serializer.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.h; sourceTree = "<group>"; };
-		0DAF712A1DB82586002BE0A1 /* Serializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Serializer.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.m; sourceTree = "<group>"; };
-		0DAF71351DB825F6002BE0A1 /* ClientHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClientHandler.h; path = Common/AppleConnection/AppleConnection/ClientHandler.h; sourceTree = "<group>"; };
-		0DAF71361DB825F6002BE0A1 /* ClientHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ClientHandler.m; path = Common/AppleConnection/AppleConnection/ClientHandler.m; sourceTree = "<group>"; };
-		0DAF71381DB82743002BE0A1 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = RoleMapping.plist; path = Common/RoleMapping.plist; sourceTree = "<group>"; };
 		0DB1058E1DBC2E18004289E7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = OSXProxy/AppDelegate.m; sourceTree = "<group>"; };
 		0DB1058F1DBC2E18004289E7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = OSXProxy/AppDelegate.h; sourceTree = "<group>"; };
 		0DB105911DBC2E30004289E7 /* Settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Settings.plist; path = OSXProxy/Settings.plist; sourceTree = "<group>"; };
@@ -133,8 +111,31 @@
 		0DB105DF1DBC31EC004289E7 /* MegaWordRibbon.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MegaWordRibbon.xib; sourceTree = SOURCE_ROOT; };
 		0DB105E61DBC3497004289E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = OSXProxy/Base.lproj/CustomWindowController.xib; sourceTree = "<group>"; };
 		0DB105E81DBC3497004289E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = OSXProxy/Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		0DFEA7CC1DBC3E23009CE3B0 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Word.h; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.h; sourceTree = "<group>"; };
-		0DFEA7CD1DBC3E23009CE3B0 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Word.m; path = Common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.m; sourceTree = "<group>"; };
+		0DB4CA6820D7761400FFFD23 /* ClientHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClientHandler.h; path = ../common/AppleConnection/AppleConnection/ClientHandler.h; sourceTree = "<group>"; };
+		0DB4CA6920D7761400FFFD23 /* ClientHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ClientHandler.m; path = ../common/AppleConnection/AppleConnection/ClientHandler.m; sourceTree = "<group>"; };
+		0DB4CA6B20D7768100FFFD23 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = RoleMapping.plist; path = ../common/RoleMapping.plist; sourceTree = "<group>"; };
+		0DB4CA6D20D776CB00FFFD23 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Config.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.h; sourceTree = "<group>"; };
+		0DB4CA6E20D776CB00FFFD23 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Config.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Config/Config.m; sourceTree = "<group>"; };
+		0DB4CA7020D776E100FFFD23 /* GDataXMLNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GDataXMLNode.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.m; sourceTree = "<group>"; };
+		0DB4CA7120D776E100FFFD23 /* GDataXMLNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GDataXMLNode.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/GDataXMLNode.h; sourceTree = "<group>"; };
+		0DB4CA7320D776F400FFFD23 /* KbdOrAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KbdOrAction.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.m; sourceTree = "<group>"; };
+		0DB4CA7420D776F400FFFD23 /* Sinter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Sinter.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.m; sourceTree = "<group>"; };
+		0DB4CA7520D776F400FFFD23 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Screen.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.h; sourceTree = "<group>"; };
+		0DB4CA7620D776F500FFFD23 /* Entity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Entity.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.m; sourceTree = "<group>"; };
+		0DB4CA7720D776F500FFFD23 /* MouseOrCaret.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MouseOrCaret.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.m; sourceTree = "<group>"; };
+		0DB4CA7820D776F500FFFD23 /* Header.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Header.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.m; sourceTree = "<group>"; };
+		0DB4CA7920D776F500FFFD23 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Header.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Header.h; sourceTree = "<group>"; };
+		0DB4CA7A20D776F500FFFD23 /* MouseOrCaret.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MouseOrCaret.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/MouseOrCaret.h; sourceTree = "<group>"; };
+		0DB4CA7B20D776F500FFFD23 /* Screen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Screen.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Screen.m; sourceTree = "<group>"; };
+		0DB4CA7C20D776F500FFFD23 /* Sinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sinter.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Sinter.h; sourceTree = "<group>"; };
+		0DB4CA7D20D776F600FFFD23 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Word.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.m; sourceTree = "<group>"; };
+		0DB4CA7E20D776F600FFFD23 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entity.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Entity.h; sourceTree = "<group>"; };
+		0DB4CA7F20D776F600FFFD23 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Word.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.h; sourceTree = "<group>"; };
+		0DB4CA8020D776F600FFFD23 /* KbdOrAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KbdOrAction.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/KbdOrAction.h; sourceTree = "<group>"; };
+		0DB4CA8820D7773200FFFD23 /* Serializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serializer.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.h; sourceTree = "<group>"; };
+		0DB4CA8920D7773200FFFD23 /* Serializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Serializer.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.m; sourceTree = "<group>"; };
+		0DB4CA8B20D7793500FFFD23 /* OSXProxy-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSXProxy-Prefix.pch"; path = "OSXProxy/OSXProxy-Prefix.pch"; sourceTree = "<group>"; };
+		0DB4CA8E20D77AED00FFFD23 /* OSXProxy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "OSXProxy-Info.plist"; path = "OSXProxy/OSXProxy-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9C3975D119DD8AB300B2067F /* AccessibilityCocoa.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AccessibilityCocoa.pdf; sourceTree = "<group>"; };
 		9C3975D219DD8AB300B2067F /* notepad.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = notepad.xml; sourceTree = "<group>"; };
 		9C3975D319DD8AB300B2067F /* useful links.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "useful links.txt"; sourceTree = "<group>"; };
@@ -233,26 +234,26 @@
 		0D6C19831DB70E55004DFB3F /* AppleXMLSerializer */ = {
 			isa = PBXGroup;
 			children = (
-				0DFEA7CC1DBC3E23009CE3B0 /* Word.h */,
-				0DFEA7CD1DBC3E23009CE3B0 /* Word.m */,
-				0DAF711B1DB82586002BE0A1 /* GDataXMLNode.h */,
-				0DAF711C1DB82586002BE0A1 /* GDataXMLNode.m */,
-				0DAF711D1DB82586002BE0A1 /* Entity.h */,
-				0DAF711E1DB82586002BE0A1 /* Entity.m */,
-				0DAF711F1DB82586002BE0A1 /* Header.h */,
-				0DAF71201DB82586002BE0A1 /* Header.m */,
-				0DAF71211DB82586002BE0A1 /* KbdOrAction.h */,
-				0DAF71221DB82586002BE0A1 /* KbdOrAction.m */,
-				0DAF71231DB82586002BE0A1 /* MouseOrCaret.h */,
-				0DAF71241DB82586002BE0A1 /* MouseOrCaret.m */,
-				0DAF71251DB82586002BE0A1 /* Screen.h */,
-				0DAF71261DB82586002BE0A1 /* Screen.m */,
-				0DAF71271DB82586002BE0A1 /* Sinter.h */,
-				0DAF71281DB82586002BE0A1 /* Sinter.m */,
-				0DAF71291DB82586002BE0A1 /* Serializer.h */,
-				0DAF712A1DB82586002BE0A1 /* Serializer.m */,
-				0DAF71171DB82525002BE0A1 /* Config.h */,
-				0DAF71181DB82525002BE0A1 /* Config.m */,
+				0DB4CA8820D7773200FFFD23 /* Serializer.h */,
+				0DB4CA8920D7773200FFFD23 /* Serializer.m */,
+				0DB4CA7E20D776F600FFFD23 /* Entity.h */,
+				0DB4CA7620D776F500FFFD23 /* Entity.m */,
+				0DB4CA7920D776F500FFFD23 /* Header.h */,
+				0DB4CA7820D776F500FFFD23 /* Header.m */,
+				0DB4CA8020D776F600FFFD23 /* KbdOrAction.h */,
+				0DB4CA7320D776F400FFFD23 /* KbdOrAction.m */,
+				0DB4CA7A20D776F500FFFD23 /* MouseOrCaret.h */,
+				0DB4CA7720D776F500FFFD23 /* MouseOrCaret.m */,
+				0DB4CA7520D776F400FFFD23 /* Screen.h */,
+				0DB4CA7B20D776F500FFFD23 /* Screen.m */,
+				0DB4CA7C20D776F500FFFD23 /* Sinter.h */,
+				0DB4CA7420D776F400FFFD23 /* Sinter.m */,
+				0DB4CA7F20D776F600FFFD23 /* Word.h */,
+				0DB4CA7D20D776F600FFFD23 /* Word.m */,
+				0DB4CA7120D776E100FFFD23 /* GDataXMLNode.h */,
+				0DB4CA7020D776E100FFFD23 /* GDataXMLNode.m */,
+				0DB4CA6D20D776CB00FFFD23 /* Config.h */,
+				0DB4CA6E20D776CB00FFFD23 /* Config.m */,
 			);
 			name = AppleXMLSerializer;
 			sourceTree = "<group>";
@@ -260,8 +261,8 @@
 		0DAF71341DB825A5002BE0A1 /* Connection */ = {
 			isa = PBXGroup;
 			children = (
-				0DAF71351DB825F6002BE0A1 /* ClientHandler.h */,
-				0DAF71361DB825F6002BE0A1 /* ClientHandler.m */,
+				0DB4CA6820D7761400FFFD23 /* ClientHandler.h */,
+				0DB4CA6920D7761400FFFD23 /* ClientHandler.m */,
 			);
 			name = Connection;
 			sourceTree = "<group>";
@@ -305,13 +306,14 @@
 		9C93FD2E198ADBD700227E47 = {
 			isa = PBXGroup;
 			children = (
+				0DB4CA8B20D7793500FFFD23 /* OSXProxy-Prefix.pch */,
+				0DB4CA6B20D7768100FFFD23 /* RoleMapping.plist */,
 				0DB105E51DBC3497004289E7 /* CustomWindowController.xib */,
 				0DB105E71DBC3497004289E7 /* MainMenu.xib */,
 				0DB105951DBC2FDC004289E7 /* Images.xcassets */,
 				0DB105911DBC2E30004289E7 /* Settings.plist */,
 				0DB1058E1DBC2E18004289E7 /* AppDelegate.m */,
 				0DB1058F1DBC2E18004289E7 /* AppDelegate.h */,
-				0DAF71381DB82743002BE0A1 /* RoleMapping.plist */,
 				0DAF71341DB825A5002BE0A1 /* Connection */,
 				0D6C19831DB70E55004DFB3F /* AppleXMLSerializer */,
 				9C3975CF19DD8AB300B2067F /* Documentation */,
@@ -351,6 +353,7 @@
 		9C93FD40198ADBD700227E47 /* OSXProxy */ = {
 			isa = PBXGroup;
 			children = (
+				0DB4CA8E20D77AED00FFFD23 /* OSXProxy-Info.plist */,
 				0D15B1851C5DA865001A0EEF /* Unused */,
 				0D15B1841C5DA7DB001A0EEF /* XIBs */,
 				0D15B1831C5DA723001A0EEF /* Headers */,
@@ -417,7 +420,7 @@
 		9C93FD2F198ADBD700227E47 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Stony Brook University";
 			};
 			buildConfigurationList = 9C93FD32198ADBD700227E47 /* Build configuration list for PBXProject "OSXProxy" */;
@@ -450,15 +453,14 @@
 				0DB105941DBC2FB4004289E7 /* RemoteExplorerWindowController.xib in Resources */,
 				0DB1059C1DBC3066004289E7 /* iconName.txt in Resources */,
 				0DB105A81DBC3082004289E7 /* left_arrow.png in Resources */,
-				0DAF71391DB82743002BE0A1 /* RoleMapping.plist in Resources */,
 				0DB105E41DBC31EC004289E7 /* MegaWordRibbon.xib in Resources */,
-				9C3975DB19DD8AB300B2067F /* notepad.xml in Resources */,
 				0DB105921DBC2E30004289E7 /* Settings.plist in Resources */,
 				0DB105AA1DBC3082004289E7 /* up_arrow.png in Resources */,
 				0DB105A41DBC3082004289E7 /* down_arrow_large.png in Resources */,
 				0DB105A71DBC3082004289E7 /* down_arrow_tiny.png in Resources */,
 				0DB105A61DBC3082004289E7 /* down_arrow_small.png in Resources */,
 				0DB105A91DBC3082004289E7 /* right_arrow.png in Resources */,
+				0DB4CA6C20D7768200FFFD23 /* RoleMapping.plist in Resources */,
 				9C3975E019DD8AB300B2067F /* explorer3.png in Resources */,
 				0DB105A51DBC3082004289E7 /* down_arrow_medium.png in Resources */,
 			);
@@ -471,36 +473,36 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DB4CA8320D776F600FFFD23 /* Entity.m in Sources */,
 				0DB105E11DBC31EC004289E7 /* WordCustomRibbon.m in Sources */,
-				0DAF712E1DB82586002BE0A1 /* Header.m in Sources */,
+				0DB4CA7220D776E100FFFD23 /* GDataXMLNode.m in Sources */,
 				0DB105D61DBC3198004289E7 /* KeyMapping.m in Sources */,
-				0DAF71301DB82586002BE0A1 /* MouseOrCaret.m in Sources */,
+				0DB4CA8520D776F600FFFD23 /* Header.m in Sources */,
 				0DB105CD1DBC3166004289E7 /* CustomPathControl.m in Sources */,
-				0DFEA7CE1DBC3E23009CE3B0 /* Word.m in Sources */,
 				0DB105D71DBC3198004289E7 /* XMLTags.m in Sources */,
-				0DAF71311DB82586002BE0A1 /* Screen.m in Sources */,
-				0DAF71321DB82586002BE0A1 /* Sinter.m in Sources */,
-				0DAF71371DB825F6002BE0A1 /* ClientHandler.m in Sources */,
+				0DB4CA8120D776F600FFFD23 /* KbdOrAction.m in Sources */,
 				0DB105C71DBC3166004289E7 /* CustomWindowController.m in Sources */,
 				0DB105CE1DBC3166004289E7 /* CustomSearchField.m in Sources */,
 				0DB105AC1DBC30D0004289E7 /* main.m in Sources */,
 				0DB105C81DBC3166004289E7 /* DrawUI.m in Sources */,
-				0DAF712F1DB82586002BE0A1 /* KbdOrAction.m in Sources */,
+				0DB4CA8220D776F600FFFD23 /* Sinter.m in Sources */,
 				0DB105B11DBC3122004289E7 /* Model.m in Sources */,
 				0DB105D01DBC3166004289E7 /* CustomWindow.m in Sources */,
 				0DB105E31DBC31EC004289E7 /* MegaWordRibbon.m in Sources */,
-				0DAF712D1DB82586002BE0A1 /* Entity.m in Sources */,
+				0DB4CA6A20D7761400FFFD23 /* ClientHandler.m in Sources */,
+				0DB4CA6F20D776CB00FFFD23 /* Config.m in Sources */,
 				0DB105CF1DBC3166004289E7 /* CustomTextField.m in Sources */,
+				0DB4CA8720D776F600FFFD23 /* Word.m in Sources */,
 				0DB105901DBC2E18004289E7 /* AppDelegate.m in Sources */,
 				0DB105B21DBC3122004289E7 /* MsWordTextElement.m in Sources */,
 				0DB105E01DBC31EC004289E7 /* RemoteExplorerWindowController.m in Sources */,
 				0DB105CB1DBC3166004289E7 /* CustomTableView.m in Sources */,
-				0DAF712C1DB82586002BE0A1 /* GDataXMLNode.m in Sources */,
+				0DB4CA8A20D7773300FFFD23 /* Serializer.m in Sources */,
+				0DB4CA8420D776F600FFFD23 /* MouseOrCaret.m in Sources */,
 				0DB105C91DBC3166004289E7 /* CustomOutlineView.m in Sources */,
-				0DAF71331DB82586002BE0A1 /* Serializer.m in Sources */,
 				0DB105CA1DBC3166004289E7 /* CustomTextView.m in Sources */,
-				0DAF71191DB82525002BE0A1 /* Config.m in Sources */,
 				0DB105CC1DBC3166004289E7 /* CustomLabel.m in Sources */,
+				0DB4CA8620D776F600FFFD23 /* Screen.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,12 +556,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -586,7 +590,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -604,12 +608,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -630,7 +636,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				SDKROOT = macosx;
 			};
 			name = Release;

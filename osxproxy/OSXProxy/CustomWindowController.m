@@ -295,13 +295,13 @@ int L, mask;
             [self setUpConnectionAndListener];
             
             // render DOM
-            renderer = [[DrawUI alloc] initWithProcessID:process_id
-                                              andIDTable:idTable
-                                             idToUITable:idToUITable
-                                           screenMapTable: screenMapTable
-                                      havingRemoteRootUI:rmUiRoot
+            self->renderer = [[DrawUI alloc] initWithProcessID:self->process_id
+                                                    andIDTable:self->idTable
+                                                   idToUITable:self->idToUITable
+                                                screenMapTable: self->screenMapTable
+                                            havingRemoteRootUI:self->rmUiRoot
                                                andWindow:[self window]];
-            [self renderDOM:rmUiRoot anchor:self.window.contentView];
+            [self renderDOM:self->rmUiRoot anchor:self.window.contentView];
 
             // callback for show window
             //dispatch_async(dispatch_get_main_queue(), ^{ // 2
@@ -311,7 +311,7 @@ int L, mask;
                 
                 //[self.window.menu setDelegate:self];
                 //[remoteMenu setMenuChangedMessagesEnabled:TRUE];
-                [[NSApplication sharedApplication] setMainMenu:remoteMenu];
+            [[NSApplication sharedApplication] setMainMenu:self->remoteMenu];
                 //NSLog(@"finish initial rendering:");
                 
                 //time-log
@@ -644,7 +644,7 @@ bool isHeader = FALSE;
     }
     else if ([current.type isEqualToString:@"tree"]) {
        dispatch_async(dispatch_get_main_queue(), ^{ // 2
-        [renderer drawTree:current frame:uiFrame anchor:anchor];
+           [self->renderer drawTree:current frame:uiFrame anchor:anchor];
         [self printElapsedTimeWith:@"tree"];
        });
     }

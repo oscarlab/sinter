@@ -11,6 +11,7 @@
 #import "Screen.h"
 #import "MouseOrCaret.h"
 #import "KbdOrAction.h"
+#import "Header.h"
 
 @interface Header : NSObject 
 
@@ -24,7 +25,9 @@
 
 
 - (id) init;
-- (id) initWithServiceCode:(int) service_code;
+- (id) initWithServiceCodeInt:(int) service_code;
+- (id) initWithServiceCode:(NSNumber *) service_code;
+- (id) initWithServiceCode:(NSNumber *) service_code andProcessId:(NSString *) process_id;
 
 - (NSDate *) getNSDate;
 

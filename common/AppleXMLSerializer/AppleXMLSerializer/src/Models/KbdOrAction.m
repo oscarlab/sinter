@@ -21,6 +21,13 @@ static NSArray * props;
     return props;
 }
 
+- (id) initWithTarget:(NSString*) target_id {
+    if ( self = [super init] ) {
+        _target_id    = [NSString stringWithString:target_id];
+    }
+    return self;
+}
+
 - (id) initWithTarget:(NSString*) target_id andData:(NSString*) data {
     if ( self = [super init] ) {
         _target_id    = [NSString stringWithString:target_id];

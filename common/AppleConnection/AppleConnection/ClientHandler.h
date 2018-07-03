@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <CFNetwork/CFSocketStream.h>
-
 #import "Sinter.h"
 
 @interface ClientHandler : NSObject<NSStreamDelegate> {
@@ -18,7 +17,7 @@
     NSRange pieces;
     long sublengh;
     NSDateFormatter* formatter;
-    NSRunLoopMode runLoopMode;
+    NSString *runLoopMode;
 }
 
 // to discriminate between server vs. client client
@@ -35,7 +34,6 @@
 @property bool isConnected;
 
 
-
 // xml frame detection
 @property (nonatomic, retain) NSData *header, *trailer;
 @property bool hasMoreXML; //is reached to the end of XML
@@ -49,13 +47,31 @@
 - (void) initForClientSocket;
 - (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier ;
 - (void) dispatchMessage:(NSMutableData *) part;
-
+- (void) close;
 
 // primary send-receive methods
 - (void) sendSinter : (Sinter *)  sinter;
 - (void) sendMessage: (NSString *) message;
 - (void) sendMessageWithData: (NSData *) data;
 
-- (void) close;
+
+// utility method for sending message
+- (void) sendListRemoteApp;
+- (void) sendDomRemoteApp:(NSString*) appId;
+- (void) sendActionAt:(NSString *) uniqueId;
+- (void) sendActionAt:(NSString *) uniqueId actionName:(NSString*) action;
+- (void) sendBtingFG:(NSString*) uniqueId;
+- (void) sendFocusAt:(NSString*) uniqueId;
+- (void) sendFocusAt:(NSString*) uniqueId andSyncUsingHash:(NSString*) hash;
+
+- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text;
+- (void) appendTextAt:(NSString*) uniqueId text:(NSString*) text;
+
+- (void) sendKeystorkesAt:(NSString*) processId strokes:(NSString*) strokes;
+- (void) sendMouseMoveAt:(NSString*) processId andX:(int) x andY:(int) y;
+- (void) sendMouseClickAt:(NSString*) processId andX:(int) x andY:(int) y andButton:(int) button;
+- (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length;
+- (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat;
+
 
 @end

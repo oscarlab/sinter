@@ -27,8 +27,8 @@ Sinter consists of two major entities:
 |:------:|:--------:|:-------:|:---------------:|:--------------:|
 |       1| Windows  | Windows | `windowscraper` |`windowsproxy`  |
 |       2| Windows  | Mac     | `windowscraper` |`osxproxy`      |
-|       3| Mac      | Mac     | `osxserver`     |`osxproxy`      |
-|       4| Mac      | Windows | `osxserver`     |`windowsproxy`  |
+|       3| Mac      | Mac     | `osxscraper`     |`osxproxy`      |
+|       4| Mac      | Windows | `osxscraper`     |`windowsproxy`  |
 
 ### Requirements for `windowscraper` and `windowsproxy`
 * *Windows 7* or later
@@ -48,13 +48,14 @@ Sinter consists of two major entities:
 * Build the entire solution by choosing `Build Solution` from the `Build` menu.
 * In `Solution Explorer`, right-click on `WindowsProxy` project and choose "Set as Startup Project", if it is not set already.
 
-### Requirements for `osxserver` and `osxproxy`
+### Requirements for `osxscraper` and `osxproxy`
 
 * *Mac OS 10.10* or later
 * *Xcode 9.0* IDE or later
 
-### Building `osxserver`
-XXX
+### Building `osxscraper`
+* Go to `sinter/osxscraper` directory and open the project `OSXScraper.xcodeproj` in Xcode
+* After loading the project in Xcode, choose `Build` from `Product` menu.
 
 ### Building `osxproxy`
 XXX

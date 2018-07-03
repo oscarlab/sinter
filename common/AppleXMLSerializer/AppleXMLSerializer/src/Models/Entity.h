@@ -3,7 +3,7 @@
 //  testReflection
 //
 //  Created by Syed Masum Billah on 10/14/16.
-//  Copyright © 2016 Syed Masum Billah. All rights reserved.
+//  Copyright Â© 2016 Syed Masum Billah. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

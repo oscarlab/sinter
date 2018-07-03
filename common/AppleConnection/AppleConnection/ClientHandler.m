@@ -152,7 +152,8 @@ static NSDictionary * serviceCodes = nil;
 
         int service_code = [sinter.header.service_code intValue];
         if(service_code == [[serviceCodes objectForKey:@"ls_res"] intValue] ||
-           service_code == [[serviceCodes objectForKey:@"ls_l_res"] intValue]) {
+           service_code == [[serviceCodes objectForKey:@"ls_l_res"] intValue] ||
+           service_code == [[serviceCodes objectForKey:@"window_closed"] intValue]) {
             notificationName = @"AppDelegate";
         } else {
             notificationName = sinter.header.process_id;
@@ -286,5 +287,81 @@ static NSDictionary * serviceCodes = nil;
 }
 
 
+// utility method for sending message
+- (void) sendListRemoteApp {
+    Sinter * sinter = [[Sinter alloc] init];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:@"ls_req"]];
+    [self sendSinter:sinter];
+}
+
+- (void) sendDomRemoteApp:(NSString*) appId {
+    Sinter * sinter = [[Sinter alloc] init];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:@"ls_l_req"]];
+    sinter.header.process_id = appId;
+    [self sendSinter:sinter];
+}
+
+
+- (void) sendActionAt:(NSString *) uniqueId {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"default_action"] andKbdOrActionWithTarget:uniqueId andData:@""];
+    [self sendSinter:sinter];
+}
+
+- (void) sendActionAt:(NSString *) uniqueId actionName:(NSString*) action {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"action"] andKbdOrActionWithTarget:uniqueId andData:action];
+    [self sendSinter:sinter];
+}
+
+- (void) sendFocusAt:(NSString*) uniqueId {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"focus"] andKbdOrActionWithTarget:uniqueId andData:@""];
+    [self sendSinter:sinter];
+}
+
+- (void) sendBtingFG:(NSString*) uniqueId {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"foreground"] andKbdOrActionWithTarget:uniqueId andData:@""];
+    [self sendSinter:sinter];
+}
+
+
+- (void) sendFocusAt:(NSString*) uniqueId andSyncUsingHash:(NSString*) hash {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"focus"] andKbdOrActionWithTarget:uniqueId andData:hash];
+    [self sendSinter:sinter];
+}
+
+- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"settext"] andKbdOrActionWithTarget:uniqueId andData:text];
+    [self sendSinter:sinter];
+}
+
+- (void) appendTextAt:(NSString*) uniqueId text:(NSString*) text {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"appendtext"] andKbdOrActionWithTarget:uniqueId andData:text];
+    [self sendSinter:sinter];
+}
+
+- (void) sendKeystorkesAt:(NSString*) processId strokes:(NSString*) strokes {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd"] andKbdOrActionWithTarget:processId andData:strokes];
+    [self sendSinter:sinter];
+}
+
+- (void) sendMouseMoveAt:(NSString*) processId andX:(int) x andY:(int) y {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"mouse"] andMouseWithX:x andY:y andButton:-1];
+    [self sendSinter:sinter];
+}
+
+- (void) sendMouseClickAt:(NSString*) processId andX:(int) x andY:(int) y andButton:(int) button {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"mouse"] andMouseWithX:x andY:y andButton:button];
+    [self sendSinter:sinter];
+}
+
+- (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length {
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"caret"] andCaret:(int)location andLength:(int)length andTarget:runtimeId];
+    [self sendSinter:sinter];
+}
+
+- (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat {
+    //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd_shortcut"] andKbdOrActionWithTarget:key andData:@(repeat).stringValue];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd_shortcut"] andKbdOrActionWithTarget:key andData:key];
+    [self sendSinter:sinter];
+}
 
 @end
