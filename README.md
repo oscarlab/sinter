@@ -2,6 +2,8 @@
 
 * An Accessible, Cross-Platform Remote Desktop Protocol
 
+**Warning: This is alpha software - it is released for testing and development purposes, but is not ready for end-user adoption.  Use at your own risk!**
+
 ## What is Sinter?
 
 Sinter is an innovative platform for remote access that supports
