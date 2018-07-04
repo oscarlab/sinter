@@ -53,7 +53,6 @@
 		0DB4CA8720D776F600FFFD23 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA7D20D776F600FFFD23 /* Word.m */; };
 		0DB4CA8A20D7773300FFFD23 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA8920D7773200FFFD23 /* Serializer.m */; };
 		0DFEA7CB1DBC353B009CE3B0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105E71DBC3497004289E7 /* MainMenu.xib */; };
-		9C3975E019DD8AB300B2067F /* explorer3.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C3975D819DD8AB300B2067F /* explorer3.png */; };
 		9C93FD3B198ADBD700227E47 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C93FD3A198ADBD700227E47 /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -136,17 +135,6 @@
 		0DB4CA8920D7773200FFFD23 /* Serializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Serializer.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.m; sourceTree = "<group>"; };
 		0DB4CA8B20D7793500FFFD23 /* OSXProxy-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSXProxy-Prefix.pch"; path = "OSXProxy/OSXProxy-Prefix.pch"; sourceTree = "<group>"; };
 		0DB4CA8E20D77AED00FFFD23 /* OSXProxy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "OSXProxy-Info.plist"; path = "OSXProxy/OSXProxy-Info.plist"; sourceTree = SOURCE_ROOT; };
-		9C3975D119DD8AB300B2067F /* AccessibilityCocoa.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AccessibilityCocoa.pdf; sourceTree = "<group>"; };
-		9C3975D219DD8AB300B2067F /* notepad.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = notepad.xml; sourceTree = "<group>"; };
-		9C3975D319DD8AB300B2067F /* useful links.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "useful links.txt"; sourceTree = "<group>"; };
-		9C3975D519DD8AB300B2067F /* cal2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = cal2.xml; sourceTree = "<group>"; };
-		9C3975D619DD8AB300B2067F /* explorer2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = explorer2.png; sourceTree = "<group>"; };
-		9C3975D719DD8AB300B2067F /* explorer2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = explorer2.xml; sourceTree = "<group>"; };
-		9C3975D819DD8AB300B2067F /* explorer3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = explorer3.png; sourceTree = "<group>"; };
-		9C3975D919DD8AB300B2067F /* explorer3.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = explorer3.xml; sourceTree = "<group>"; };
-		9C5B88261A09721A0054B6EA /* notepad.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = notepad.xml; sourceTree = "<group>"; };
-		9C5B88271A09721A0054B6EA /* word.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = word.xml; sourceTree = "<group>"; };
-		9C5B883B1A0972FC0054B6EA /* word.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = word.png; sourceTree = "<group>"; };
 		9C93FD37198ADBD700227E47 /* OSXProxy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OSXProxy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C93FD3A198ADBD700227E47 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9C93FD3D198ADBD700227E47 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -154,7 +142,6 @@
 		9C93FD3F198ADBD700227E47 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9C93FD44198ADBD700227E47 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9C93FD4A198ADBD700227E47 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		9CD2DBB51C1380EE00DAD949 /* Sample Messages.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Sample Messages.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,42 +254,6 @@
 			name = Connection;
 			sourceTree = "<group>";
 		};
-		9C3975CF19DD8AB300B2067F /* Documentation */ = {
-			isa = PBXGroup;
-			children = (
-				9C3975D019DD8AB300B2067F /* doc */,
-				9C3975D419DD8AB300B2067F /* xmls */,
-			);
-			name = Documentation;
-			path = Remote;
-			sourceTree = "<group>";
-		};
-		9C3975D019DD8AB300B2067F /* doc */ = {
-			isa = PBXGroup;
-			children = (
-				9C3975D119DD8AB300B2067F /* AccessibilityCocoa.pdf */,
-				9C3975D219DD8AB300B2067F /* notepad.xml */,
-				9C3975D319DD8AB300B2067F /* useful links.txt */,
-				9CD2DBB51C1380EE00DAD949 /* Sample Messages.txt */,
-			);
-			path = doc;
-			sourceTree = "<group>";
-		};
-		9C3975D419DD8AB300B2067F /* xmls */ = {
-			isa = PBXGroup;
-			children = (
-				9C5B883B1A0972FC0054B6EA /* word.png */,
-				9C5B88261A09721A0054B6EA /* notepad.xml */,
-				9C5B88271A09721A0054B6EA /* word.xml */,
-				9C3975D519DD8AB300B2067F /* cal2.xml */,
-				9C3975D619DD8AB300B2067F /* explorer2.png */,
-				9C3975D719DD8AB300B2067F /* explorer2.xml */,
-				9C3975D819DD8AB300B2067F /* explorer3.png */,
-				9C3975D919DD8AB300B2067F /* explorer3.xml */,
-			);
-			path = xmls;
-			sourceTree = "<group>";
-		};
 		9C93FD2E198ADBD700227E47 = {
 			isa = PBXGroup;
 			children = (
@@ -316,7 +267,6 @@
 				0DB1058F1DBC2E18004289E7 /* AppDelegate.h */,
 				0DAF71341DB825A5002BE0A1 /* Connection */,
 				0D6C19831DB70E55004DFB3F /* AppleXMLSerializer */,
-				9C3975CF19DD8AB300B2067F /* Documentation */,
 				9C93FD40198ADBD700227E47 /* OSXProxy */,
 				9C93FD39198ADBD700227E47 /* Frameworks */,
 				9C93FD38198ADBD700227E47 /* Products */,
@@ -461,7 +411,6 @@
 				0DB105A61DBC3082004289E7 /* down_arrow_small.png in Resources */,
 				0DB105A91DBC3082004289E7 /* right_arrow.png in Resources */,
 				0DB4CA6C20D7768200FFFD23 /* RoleMapping.plist in Resources */,
-				9C3975E019DD8AB300B2067F /* explorer3.png in Resources */,
 				0DB105A51DBC3082004289E7 /* down_arrow_medium.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
