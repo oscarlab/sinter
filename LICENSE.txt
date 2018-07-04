@@ -40,3 +40,6 @@ Sinter also includes two third-party libraries, both of which have permissive li
 	THE SOFTWARE.
 
 2) Log4j - https://logging.apache.org/log4j/1.2/license.html - Apache 2.0 License
+
+3) A portion of Google's Data APIs (XML) - https://github.com/google/gdata-objectivec-client
+- Apache 2.0 License
