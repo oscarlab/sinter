@@ -435,6 +435,7 @@ namespace WindowsProxy
     private void Form_Closed(object sender, EventArgs e)
     {
       Console.WriteLine("Form closed\n");
+      this.form = null;
       root.Remove_Dict_Item(requestedProcessId);
     }
 
@@ -523,6 +524,15 @@ namespace WindowsProxy
 
     public void execute_event(Sinter sinter) {
 
+      //server send this msg to indicate app is closed in server side
+      if (this.form != null)
+      {
+        this.form.Invoke(new Action(() => this.form.Close()));
+      }
+      this.form = null;
+
+      //re-load the list from server
+      this.execute_ls_req(null);
     }
 
     // client related calls
