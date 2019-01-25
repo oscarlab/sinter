@@ -19,6 +19,8 @@
 
 using System;
 using System.Windows.Forms;
+using System.Drawing;
+
 namespace WindowsProxy
 {
     partial class RootForm
@@ -49,6 +51,7 @@ namespace WindowsProxy
         /// </summary>
         private void InitializeComponent()
         {
+      this.Font = new Font("Segoe UI", 9);
       this.ls_button = new System.Windows.Forms.Button();
       this.remoteProcessesView = new System.Windows.Forms.DataGridView();
       this.Process = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -60,10 +63,10 @@ namespace WindowsProxy
       // 
       // ls_button
       // 
-      this.ls_button.Location = new System.Drawing.Point(32, 124);
-      this.ls_button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+      this.ls_button.ImageAlign = System.Drawing.ContentAlignment.TopRight;
+      this.ls_button.Location = new System.Drawing.Point(24, 101);
       this.ls_button.Name = "ls_button";
-      this.ls_button.Size = new System.Drawing.Size(119, 49);
+      this.ls_button.Size = new System.Drawing.Size(89, 40);
       this.ls_button.TabIndex = 8;
       this.ls_button.Text = "Show Remote Processes";
       this.ls_button.UseVisualStyleBackColor = true;
@@ -75,11 +78,10 @@ namespace WindowsProxy
       this.remoteProcessesView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.remoteProcessesView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Process});
-      this.remoteProcessesView.Location = new System.Drawing.Point(179, 37);
-      this.remoteProcessesView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+      this.remoteProcessesView.Location = new System.Drawing.Point(134, 30);
       this.remoteProcessesView.Name = "remoteProcessesView";
       this.remoteProcessesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.remoteProcessesView.Size = new System.Drawing.Size(547, 284);
+      this.remoteProcessesView.Size = new System.Drawing.Size(410, 231);
       this.remoteProcessesView.TabIndex = 9;
       this.remoteProcessesView.Visible = false;
       this.remoteProcessesView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LoadRemoteProcess);
@@ -96,17 +98,16 @@ namespace WindowsProxy
       this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
       this.menuStrip1.Location = new System.Drawing.Point(0, 0);
       this.menuStrip1.Name = "menuStrip1";
-      this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-      this.menuStrip1.Size = new System.Drawing.Size(741, 24);
+      this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 1, 0, 1);
+      this.menuStrip1.Size = new System.Drawing.Size(556, 24);
       this.menuStrip1.TabIndex = 10;
       this.menuStrip1.Text = "menuStrip1";
       // 
       // connect_button
       // 
-      this.connect_button.Location = new System.Drawing.Point(32, 37);
-      this.connect_button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+      this.connect_button.Location = new System.Drawing.Point(24, 30);
       this.connect_button.Name = "connect_button";
-      this.connect_button.Size = new System.Drawing.Size(119, 33);
+      this.connect_button.Size = new System.Drawing.Size(89, 27);
       this.connect_button.TabIndex = 11;
       this.connect_button.Text = "Connect";
       this.connect_button.UseVisualStyleBackColor = true;
@@ -114,10 +115,10 @@ namespace WindowsProxy
       // 
       // disconnect_button
       // 
-      this.disconnect_button.Location = new System.Drawing.Point(32, 289);
-      this.disconnect_button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+      this.disconnect_button.Enabled = false;
+      this.disconnect_button.Location = new System.Drawing.Point(24, 235);
       this.disconnect_button.Name = "disconnect_button";
-      this.disconnect_button.Size = new System.Drawing.Size(119, 32);
+      this.disconnect_button.Size = new System.Drawing.Size(89, 26);
       this.disconnect_button.TabIndex = 12;
       this.disconnect_button.Text = "Disconnect";
       this.disconnect_button.UseVisualStyleBackColor = true;
@@ -125,16 +126,15 @@ namespace WindowsProxy
       // 
       // RootForm
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(741, 354);
+      this.ClientSize = new System.Drawing.Size(556, 287);
       this.Controls.Add(this.disconnect_button);
       this.Controls.Add(this.connect_button);
       this.Controls.Add(this.remoteProcessesView);
       this.Controls.Add(this.ls_button);
       this.Controls.Add(this.menuStrip1);
       this.MainMenuStrip = this.menuStrip1;
-      this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
       this.MaximizeBox = false;
       this.Name = "RootForm";
       this.Text = "Sinter Proxy";

@@ -89,15 +89,18 @@ namespace WindowsProxy {
         proxy = new WindowsProxy(this);
         client_handle = new ClientHandler(proxy, client , "WinProxy Client");
 
-        // hide some controls
+        // hide/show some controls
         ls_button.Visible = true;
-        remoteProcessesView.Visible = true;
+        remoteProcessesView.Visible = false;
+        connect_button.Enabled = false;
+        disconnect_button.Enabled = true;
       }
     }
 
     private void FetchRemoteProcesses(object sender, EventArgs e)
     {
       proxy.execute_ls_req(null);
+      this.remoteProcessesView.Visible = true;
     }
 
     private void LoadRemoteProcess(object sender , DataGridViewCellEventArgs e) {
@@ -131,9 +134,13 @@ namespace WindowsProxy {
     {
       if (client_handle != null)
         client_handle.StopHandling();
+      client.Close();
 
       ls_button.Visible = false;
       remoteProcessesView.Visible = false;
+      connect_button.Enabled = true;
+      disconnect_button.Enabled = false;
+      proxy.close_forms();
     }
   }
 }

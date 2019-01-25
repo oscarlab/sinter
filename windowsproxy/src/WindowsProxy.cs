@@ -330,6 +330,7 @@ namespace WindowsProxy
 
       // manual adjustment
       AdjustProperties(root_entity, ref control);
+      form.Font = new Font("Segoe UI", 8);
 
       // potential fixes:
       //Rectangle screenRectangle = RectangleToScreen(this.ClientRectangle);
@@ -339,6 +340,7 @@ namespace WindowsProxy
       form.Height += 25;
 
       //register event listener and delegate
+      //form.ControlBox = false; //hide the exit button on the rendered form
       form.FormClosing += Form_Closed;
       form.delegateKeyPresses = ProcessKeyPress;
 
@@ -432,6 +434,15 @@ namespace WindowsProxy
     #endregion
 
     #region AppForm handler/helper
+    public void close_forms()
+    {
+      if (this.form != null)
+      {
+        this.form.Invoke(new Action(() => this.form.Close()));
+      }
+      this.form = null;
+    }
+
     private void Form_Closed(object sender, EventArgs e)
     {
       Console.WriteLine("Form closed\n");
