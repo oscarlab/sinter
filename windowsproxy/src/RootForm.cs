@@ -23,12 +23,27 @@ using System.Windows.Forms;
 using System.Collections.Concurrent;
 using System.Xml;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+
 using Sintering;
 
 namespace WindowsProxy {
+
   public partial class RootForm : Form {
 
     ConcurrentDictionary<int , object> form_table;
+    string server_ip;
+    int server_port;
+
+    TcpClient client;
+    ClientHandler client_handle;
+    WindowsProxy proxy;
+    SslStream sslStream;
+    public String passcode;
+    const SslPolicyErrors acceptedSslPolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch // we do not check server host name
+                                                  | SslPolicyErrors.RemoteCertificateChainErrors; // for test certificate we ignore chain error
 
     // constructor
     public RootForm() {
@@ -74,26 +89,111 @@ namespace WindowsProxy {
       }
     }
 
-    string server_ip;
-    int server_port;
 
-    TcpClient client;
-    ClientHandler client_handle;
-    WindowsProxy proxy;
+    public void ShowConnected()
+    {
+      /* Before rendering check whether we are in the UI thread */
+      if (InvokeRequired)
+      {
+        BeginInvoke(new MethodInvoker(() => ShowConnected()));
+        return;
+      }
+
+      try
+      {
+        this.ls_button.Visible = true;
+        this.remoteProcessesView.Visible = false;
+        this.connect_button.Enabled = false;
+        this.disconnect_button.Enabled = true;
+        this.textBoxPasscode.Enabled = false;
+        this.textBoxIP.Enabled = false;
+        this.textBoxPort.Enabled = false;
+        
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e.ToString());
+      }
+    }
+
+    // The following method is invoked by the RemoteCertificateValidationDelegate.
+    public static bool ValidateServerCertificate(
+          object sender,
+          X509Certificate certificate,
+          X509Chain chain,
+          SslPolicyErrors sslPolicyErrors)
+    {
+
+      Console.WriteLine("SSL Certificate validate results: {0}({1})", (int)sslPolicyErrors, sslPolicyErrors);
+      Console.WriteLine("SSL acceptedSslPolicyErrors:      {0}", acceptedSslPolicyErrors);
+
+      if ((sslPolicyErrors &(~acceptedSslPolicyErrors)) == 0)
+        return true;
+
+      // Do not allow this client to communicate with unauthenticated servers.
+      return false;
+    }
 
     private void Connect(object sender , EventArgs e) {
       // connect
-      client = new TcpClient(server_ip , server_port);
+      try
+      {
+        server_ip = this.textBoxIP.Text;
+        server_port = int.Parse(textBoxPort.Text);
+        Console.WriteLine("connecting to server {0}:{1}", server_ip, server_port);
+        client = new TcpClient(server_ip, server_port);
+      }
+      catch (SocketException ex)
+      {
+        Console.WriteLine("SocketException: {0}", ex);
+        MessageBox.Show("Not able to reach sinter server");
+        return;
+      }
 
       if (client != null) {
         proxy = new WindowsProxy(this);
-        client_handle = new ClientHandler(proxy, client , "WinProxy Client");
+        
 
-        // hide/show some controls
-        ls_button.Visible = true;
-        remoteProcessesView.Visible = false;
-        connect_button.Enabled = false;
-        disconnect_button.Enabled = true;
+        /* implements SSL */
+        sslStream = new SslStream(
+                client.GetStream(),
+                false,
+                new RemoteCertificateValidationCallback(ValidateServerCertificate),
+                null
+                );
+        try
+        {
+          sslStream.AuthenticateAsClient(@"SinterServer"); 
+        }
+        catch (AuthenticationException ee)
+        {
+          Console.WriteLine("SSL AuthenticationException: {0}", ee.Message);
+          if (ee.InnerException != null)
+          {
+            Console.WriteLine("SSL Inner exception: {0}", ee.InnerException.Message);
+          }
+          Console.WriteLine("SSL Authentication failed - closing the connection.");
+          client.Close();
+          return;
+        }
+        catch (InvalidOperationException ee)
+        {
+          Console.WriteLine("InvalidOperationException: {0}", ee.Message);
+          if (ee.InnerException != null)
+          {
+            Console.WriteLine("InvalidOperationException Inner exception: {0}", ee.InnerException.Message);
+          }
+          Console.WriteLine("closing the connection.");
+          client.Close();
+          return;
+        }
+        Console.WriteLine("SSL Authentication successful!!");
+
+        //client_handle = new ClientHandler(proxy, client, "WinProxy Client");
+        client_handle = new ClientHandler(proxy, client, "WinProxy Client", sslStream);
+
+        passcode = this.textBoxPasscode.Text;
+        proxy.execute_verify_passcode_req(null);
       }
     }
 
@@ -117,8 +217,10 @@ namespace WindowsProxy {
         reader.ReadToFollowing("server");
         reader.MoveToFirstAttribute();
         server_ip = reader.Value;
+        this.textBoxIP.Text = server_ip.ToString();
         reader.MoveToNextAttribute();
         server_port = int.Parse(reader.Value);
+        this.textBoxPort.Text = server_port.ToString();
       }
     }
 
@@ -130,17 +232,35 @@ namespace WindowsProxy {
       form_table.TryRemove(key, out object dummy);
     }
 
-    private void Disconnect(object sender, EventArgs e)
+    public void Disconnect(object sender, EventArgs e)
     {
-      if (client_handle != null)
-        client_handle.StopHandling();
-      client.Close();
+      /* Before rendering check whether we are in the UI thread */
+      if (InvokeRequired)
+      {
+        BeginInvoke(new MethodInvoker(() => Disconnect(sender, e)));
+        return;
+      }
 
-      ls_button.Visible = false;
-      remoteProcessesView.Visible = false;
-      connect_button.Enabled = true;
-      disconnect_button.Enabled = false;
-      proxy.close_forms();
+      try
+      {
+        if (client_handle != null)
+          client_handle.StopHandling();
+
+        this.ls_button.Visible = false;
+        this.remoteProcessesView.Visible = false;
+        this.connect_button.Enabled = true;
+        this.disconnect_button.Enabled = false;
+        this.textBoxPasscode.Enabled = true;
+        this.textBoxIP.Enabled = true;
+        this.textBoxPort.Enabled = true;
+
+        this.proxy.close_forms();
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.ToString());
+      }
     }
+
   }
 }

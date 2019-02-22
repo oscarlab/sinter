@@ -24,12 +24,17 @@ namespace Sintering {
     // common parts
     ConnectionHandler connection { get; set; }
 
+    bool bPasscodeVerified { get; }
+
     void execute_stop_scraping();
+
+    void execute_verify_passcode_req(Sinter sinter);
+    void execute_verify_passcode_res(Sinter sinter);
 
     // server related calls
     void execute_ls_req(Sinter sinter);
     void execute_ls_l_req(Sinter sinter);
-    void execute_delta(Sinter sinter) ;
+    void execute_delta(Sinter sinter);
     void execute_event(Sinter sinter);
 
     // client related calls

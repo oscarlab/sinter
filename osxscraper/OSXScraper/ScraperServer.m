@@ -140,7 +140,7 @@ static void EchoServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType ty
     memset(&addr4, 0, sizeof(addr4));
     addr4.sin_len = sizeof(addr4);
     addr4.sin_family = AF_INET;
-    addr4.sin_port = htons(6832); //0, 6832; //;
+    addr4.sin_port = htons(SERVER_PORT); //0, 6832; //;
     addr4.sin_addr.s_addr = htonl(INADDR_ANY);
     if (kCFSocketSuccess != CFSocketSetAddress(_ipv4socket, (__bridge CFDataRef) [NSData dataWithBytes:&addr4 length:sizeof(addr4)])) {
         [self stop];

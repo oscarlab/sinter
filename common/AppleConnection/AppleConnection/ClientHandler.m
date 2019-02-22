@@ -63,6 +63,7 @@ static NSDictionary * serviceCodes = nil;
 - (id) init {
     if (self = [super init]) {
         isConnected = false;
+        _isSelfSignedCertAccepted = true;
 
         msgs = [[NSMutableArray alloc] init];
         formatter = [[NSDateFormatter alloc] init];
@@ -89,10 +90,23 @@ static NSDictionary * serviceCodes = nil;
     
     runLoopMode = NSRunLoopCommonModes;
     
+    NSDictionary *settings = @{ (NSString *) kCFStreamSSLLevel                    : NSStreamSocketSecurityLevelTLSv1,
+                                (NSString *) kCFStreamSSLValidatesCertificateChain : (id) kCFBooleanFalse,
+                                (NSString *) kCFStreamSSLPeerName                  : (NSNull *) kCFNull,
+                                };
+    
+    [self.inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+    [self.inputStream setProperty:settings forKey:(NSString *) kCFStreamPropertySSLSettings];
+    [self.inputStream setProperty:(id) kCFBooleanTrue forKey:(NSString *) kCFStreamPropertyShouldCloseNativeSocket];
+    
+    [self.outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+    [self.outputStream setProperty:settings forKey:(NSString *) kCFStreamPropertySSLSettings];
+    [self.outputStream setProperty:(id) kCFBooleanTrue forKey:(NSString *) kCFStreamPropertyShouldCloseNativeSocket];
+    
     [self open];
 
     isConnected = false;
-    NSLog(@"connecting to server ...");
+    NSLog(@"connecting to server %@:%i", ipAddress, _port);
 }
 
 - (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier {
@@ -106,6 +120,48 @@ static NSDictionary * serviceCodes = nil;
         outputStream = outStream;
         
         runLoopMode = NSDefaultRunLoopMode;
+        
+        NSString *certificatePath = [[NSBundle mainBundle] pathForResource:@"osxsinter" ofType:@"p12"];
+        NSData *pkcs12data = [NSData dataWithContentsOfFile:certificatePath];
+        CFArrayRef keyref = NULL;
+        OSStatus sanityChesk = SecPKCS12Import((__bridge CFDataRef)pkcs12data,
+                                               (__bridge CFDictionaryRef)[NSDictionary
+                                                dictionaryWithObject:@"osxsinter"
+                                                forKey:(__bridge id)kSecImportExportPassphrase],
+                                               &keyref);
+        if (sanityChesk != noErr) {
+            NSLog(@"Errorcode: %i, while importing pkcs12", sanityChesk);
+        }
+ 
+
+        // Identity
+        CFDictionaryRef identityDict = CFArrayGetValueAtIndex(keyref, 0);
+        SecIdentityRef identityRef = (SecIdentityRef)CFDictionaryGetValue(identityDict,
+                                                                          kSecImportItemIdentity);
+        
+        SecCertificateRef certificate = NULL;
+        OSStatus status = SecIdentityCopyCertificate(identityRef, &certificate);
+        if (status) NSLog(@"SecIdentityCopyCertificate failed.");
+        
+        // the certificates array, containing the identity then the root certificate
+        NSArray *certificates = [NSArray arrayWithObjects:(__bridge id)identityRef, (__bridge id)certificate, nil];
+        
+        NSDictionary *settings = @{ (NSString *) kCFStreamSSLLevel    : NSStreamSocketSecurityLevelTLSv1,
+                                    (NSString *) kCFStreamSSLCertificates: certificates,
+                                    (NSString *) kCFStreamSSLIsServer : (id) kCFBooleanTrue,
+                                };
+        
+        [self.inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+        [self.inputStream setProperty:settings forKey:(NSString *) kCFStreamPropertySSLSettings];
+        [self.inputStream setProperty:(id) kCFBooleanTrue forKey:(NSString *) kCFStreamPropertyShouldCloseNativeSocket];
+        
+        [self.inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+        [self.outputStream setProperty:settings forKey:(NSString *) kCFStreamPropertySSLSettings];
+        [self.outputStream setProperty:(id) kCFBooleanTrue forKey:(NSString *) kCFStreamPropertyShouldCloseNativeSocket];
+        
+        if (certificate) { CFRelease(certificate); }
+		if (identityRef) { CFRelease(identityRef); }
+         
         [self open];
     }
     return self;
@@ -151,7 +207,7 @@ static NSDictionary * serviceCodes = nil;
     [self sendMessage:send_msg];
 }
 
--(void) dispatchMessage:(NSMutableData *) part {
+- (void) dispatchMessage:(NSMutableData *) part {
     // dispatch data to proper listener
     NSString * incoming_data = [[NSString alloc] initWithData:part encoding:NSUTF8StringEncoding];
     
@@ -182,20 +238,53 @@ static NSDictionary * serviceCodes = nil;
 }
 
 
-- (void)stream:(NSStream *) theStream handleEvent:(NSStreamEvent)streamEvent {
-    switch (streamEvent) {
+- (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
+    switch(streamEvent) {
         case NSStreamEventOpenCompleted:
             if ([theStream isKindOfClass:[inputStream class]]) {
                 NSLog(@"Input stream opened");
             }else{
                 NSLog(@"Output stream opened");
             }
-            isConnected = true;
+            //isConnected = true; //moved to where trust is verified
             break;
             
         case NSStreamEventHasSpaceAvailable:
+            if(!_isServerSocket) {
+                //_isServerSocket = no, client side to check server side trust
+                SecTrustRef trust = (__bridge SecTrustRef)[theStream propertyForKey: (__bridge NSString *)kCFStreamPropertySSLPeerTrust];
+                SecTrustResultType trustResult = kSecTrustResultInvalid;
+                OSStatus status = SecTrustEvaluate(trust, &trustResult);
+                if (status != errSecSuccess) {
+                    NSLog(@"[SSL] failed to evaluate");
+                    [self close];
+                    return;
+                    
+                } else {
+                    NSLog(@"[SSL] trustResult = %i", trustResult);
+                    if(trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified)
+                    {
+                        if(_isSelfSignedCertAccepted){
+                            status = SecTrustSetOptions(trust, kSecTrustOptionImplicitAnchors); //Treat properly self-signed certificates as anchors implicitly.
+                            if (status != errSecSuccess) NSLog(@"[SSL] SecTrustSetOptions fails");
+                            status = SecTrustEvaluate(trust, &trustResult);
+                            if (status != errSecSuccess) NSLog(@"[SSL] failed to evaluate 2nd time");
+                            NSLog(@"[SSL] trustResult = %i", trustResult);
+                        }
+                        
+                        if(trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified)
+                        {
+                            /* still fail even if we trust self-signed? */
+                            NSLog(@"[SSL] trust result - not to proceed");
+                            [self close];
+                            return;
+                        }
+                    }
+                }
+            }
+            isConnected = true;
+            NSLog(@"[SSL] Handshake succeed: now set is_connected=true");
             break;
-            
         case NSStreamEventHasBytesAvailable:
             if (theStream == inputStream) {
                 uint8_t buffer[1024];
