@@ -53,12 +53,12 @@
   <ItemGroup>
     <None Include="..\..\RoleMapping.plist">
       <Link>RoleMapping.plist</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
     <None Include="..\..\Windows.plist">
       <Link>Windows.plist</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

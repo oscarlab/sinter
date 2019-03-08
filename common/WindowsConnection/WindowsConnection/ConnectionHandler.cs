@@ -25,12 +25,14 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Net.Sockets;
 using System.Collections.Concurrent;
+using System.Net.Security;
+
 
 namespace Sintering {
 
   public class ConnectionHandler {
-    TcpClient clientSocket;
-    NetworkStream networkStream;
+    public TcpClient clientSocket;
+    public Stream networkStream; //SSL Implementation
     string clientId;
 
     XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
@@ -56,6 +58,25 @@ namespace Sintering {
 
       // initialize xml writer
       ns.Add("" , "");
+      serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
+      serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
+    }
+
+    public ConnectionHandler(TcpClient clientSocket, string clientId, BlockingCollection<Sinter> messageQueue, SslStream sslStream)
+    {
+      this.clientSocket = clientSocket;
+      this.clientId = clientId;
+
+      // get network stream for reading, writing
+      networkStream = sslStream;
+
+      // initiate shared message queue
+      this.messageQueue = messageQueue;
+
+      RequestedProcessId = 0;
+
+      // initialize xml writer
+      ns.Add("", "");
       serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
       serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
     }
@@ -86,7 +107,14 @@ namespace Sintering {
           // serialize
           serializer.Serialize(writer , sinter , ns);
         }
-        networkStream.Write(ms.GetBuffer() , 0 , (int)ms.Length);
+        try
+        {
+          networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine("Exception: {0}", e);
+        }
         networkStream.Flush();
         // Debug statement
         Console.WriteLine("sent: " + (int)ms.Length + " bytes");        

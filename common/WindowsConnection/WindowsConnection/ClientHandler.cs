@@ -19,6 +19,7 @@
 
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using System.Net.Security;
 
 namespace Sintering
 {
@@ -42,6 +43,20 @@ namespace Sintering
        this.actuator = actuator;
      
       connectionHandler = new ConnectionHandler(client , clientId, messageQueue);
+      commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
+
+      this.actuator.connection = connectionHandler;
+
+      connectionHandler.StartConnectionHandling();
+      commandHandler.StartCommandHandling();
+    }
+
+    public ClientHandler(IWinCommands actuator, TcpClient client, string clientId, SslStream sslStream)
+    {
+      messageQueue = new BlockingCollection<Sinter>(_messageQueue);
+      this.actuator = actuator;
+
+      connectionHandler = new ConnectionHandler(client, clientId, messageQueue, sslStream);
       commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
 
       this.actuator.connection = connectionHandler;

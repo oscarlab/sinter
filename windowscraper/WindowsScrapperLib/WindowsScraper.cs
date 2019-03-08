@@ -61,8 +61,14 @@ namespace WindowsScraper
         Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
 
-        public WindowsScraper()
+        private string passcode;
+        public bool bPasscodeVerified { get; private set; }
+
+        public WindowsScraper(string passcode)
         {
+            this.passcode = passcode;
+            this.bPasscodeVerified = false;
+
             // construct DOM tree walker except this application
             Condition condition1 = new PropertyCondition(AutomationElement.ProcessIdProperty, Process.GetCurrentProcess().Id);
             Condition condition2 = new AndCondition(new Condition[] { Automation.RawViewCondition, new NotCondition(condition1) });
@@ -1407,6 +1413,47 @@ namespace WindowsScraper
             bDesktopHookAdded = false;
         }
 
+        public void execute_verify_passcode_req(Sinter sinter)
+        {
+        
+            string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
+            Console.WriteLine("client passcode: {0}", clientPasscode);
+
+
+            bool result = false;
+            if(clientPasscode == this.passcode)
+            {
+              result = true;
+              Console.WriteLine("client passcode match.");
+              this.bPasscodeVerified = true;
+            }
+
+          Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode_res"]);
+          header.ParamsInfo = new Params
+          {
+            Data1 = result.ToString(),
+          };
+
+          Sinter sintermsg = new Sinter()
+          {
+            HeaderNode = header,
+          };
+
+          connection.SendMessage(sintermsg);
+
+          
+          if(result == false)
+          {
+            Console.WriteLine("client passcode not match!");
+            connection.StopConnectionHandling();
+          }
+         
+        }
+
+        public void execute_verify_passcode_res(Sinter _) {
+
+        }
+    
         public void execute_ls_req(Sinter _)
         {
             // demo: only fetch explorer app for now
@@ -1557,6 +1604,7 @@ namespace WindowsScraper
 
                 Win32.SetCursorPos((int)x, (int)y);
                 Win32.mouse_event(mask, x, y, 0, 0);
+
             }
             else if (subCode == serviceCodes["mouse_scroll_up"])
             {

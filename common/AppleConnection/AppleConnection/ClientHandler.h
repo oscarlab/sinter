@@ -50,6 +50,7 @@
 @property (nonatomic, retain) NSString *ipAddress;
 @property int port;
 @property bool isConnected;
+@property bool isSelfSignedCertAccepted;
 
 
 // xml frame detection

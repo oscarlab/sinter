@@ -81,11 +81,22 @@ namespace Sintering {
           Sinter sinter = messageQueue.Take();
           if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
             invoking_method_name = "execute_" + requested_service.Trim();
-            invoking_method = type.GetMethod(invoking_method_name);
-            if (invoking_method != null) {
-              invoking_method.Invoke(actuator , new Sinter [] { sinter });
-            } else {
-              Console.WriteLine("invoke error: " + invoking_method_name + " doesn't exist");
+
+            if (actuator.bPasscodeVerified == true 
+                || requested_service.Equals(@"verify_passcode_req") 
+                || requested_service.Equals(@"verify_passcode_res")) {
+              invoking_method = type.GetMethod(invoking_method_name);
+              if (invoking_method != null)
+              {
+                invoking_method.Invoke(actuator, new Sinter[] { sinter });
+              }
+              else
+              {
+                Console.WriteLine("invoke error: " + invoking_method_name + " doesn't exist");
+              }
+            }
+            else{
+              Console.WriteLine("passcode not verified yet, ignore the msg!");
             }
           } else {
             Console.WriteLine("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");

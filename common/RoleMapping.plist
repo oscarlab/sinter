@@ -4,6 +4,10 @@
 <dict>
 	<key>service_code</key>
 	<dict>
+    <key>verify_passcode_req</key>
+    <integer>9901</integer>
+    <key>verify_passcode_res</key>
+    <integer>9902</integer>
 		<key>ls_req</key>
 		<integer>1</integer>
 		<key>ls_res</key>

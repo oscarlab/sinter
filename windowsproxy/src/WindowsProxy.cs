@@ -70,6 +70,8 @@ namespace WindowsProxy
     Timer timer;
     ConcurrentDictionary<string, Control> hash = new ConcurrentDictionary<string, Control>();
 
+    public bool bPasscodeVerified { get; private set; }
+
     public WindowsProxy(RootForm r) { // Form
       root = r;
       winControls = Config.getConfig("control_types_windows");
@@ -94,6 +96,8 @@ namespace WindowsProxy
         Enabled = false,
       };
       timer.Tick += Timer_Tick;
+
+      this.bPasscodeVerified = false;
     }
 
     private int requestedProcessId = 0;
@@ -330,6 +334,7 @@ namespace WindowsProxy
 
       // manual adjustment
       AdjustProperties(root_entity, ref control);
+      form.Font = new Font("Segoe UI", 8);
 
       // potential fixes:
       //Rectangle screenRectangle = RectangleToScreen(this.ClientRectangle);
@@ -339,6 +344,7 @@ namespace WindowsProxy
       form.Height += 25;
 
       //register event listener and delegate
+      //form.ControlBox = false; //hide the exit button on the rendered form
       form.FormClosing += Form_Closed;
       form.delegateKeyPresses = ProcessKeyPress;
 
@@ -432,9 +438,19 @@ namespace WindowsProxy
     #endregion
 
     #region AppForm handler/helper
+    public void close_forms()
+    {
+      if (this.form != null)
+      {
+        this.form.Invoke(new Action(() => this.form.Close()));
+      }
+      this.form = null;
+    }
+
     private void Form_Closed(object sender, EventArgs e)
     {
       Console.WriteLine("Form closed\n");
+      this.form = null;
       root.Remove_Dict_Item(requestedProcessId);
     }
 
@@ -473,6 +489,39 @@ namespace WindowsProxy
 
     public void execute_stop_scraping() {
 
+    }
+
+    public void execute_verify_passcode_req(Sinter _)
+    {
+      Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode_req"]);
+      header.ParamsInfo = new Params
+      {
+        Data1 = root.passcode,
+      };
+
+      Sinter sinter = new Sinter()
+      {
+        HeaderNode = header,
+      };
+
+      connection.SendMessage(sinter);
+    }
+
+    public void execute_verify_passcode_res(Sinter sinter)
+    {
+      bool res = Boolean.Parse(sinter.HeaderNode.ParamsInfo.Data1);
+      if (res == false)
+      {
+        Console.WriteLine("Passcode not accepted by server - Close Connection");
+        root.Disconnect(null, null);
+        MessageBox.Show("Passcode not correct!");
+      }
+      else
+      {
+        Console.WriteLine("Passcode Verified");
+        this.bPasscodeVerified = true;
+        root.ShowConnected();
+      }
     }
 
     public void execute_ls_req(Sinter _) {
@@ -523,6 +572,15 @@ namespace WindowsProxy
 
     public void execute_event(Sinter sinter) {
 
+      //server send this msg to indicate app is closed in server side
+      if (this.form != null)
+      {
+        this.form.Invoke(new Action(() => this.form.Close()));
+      }
+      this.form = null;
+
+      //re-load the list from server
+      this.execute_ls_req(null);
     }
 
     // client related calls

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		086E2FDD222735E200FD2CFF /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 086E2FDC222735E200FD2CFF /* osxsinter.p12 */; };
 		0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6C19C01DB7B742004DFB3F /* Scraper.m */; };
 		0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */; };
 		0DB4CA4C20D75AE200FFFD23 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */; };
@@ -48,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		086E2FDC222735E200FD2CFF /* osxsinter.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = osxsinter.p12; sourceTree = "<group>"; };
 		0D6C19BF1DB7B742004DFB3F /* Scraper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scraper.h; sourceTree = "<group>"; };
 		0D6C19C01DB7B742004DFB3F /* Scraper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scraper.m; sourceTree = "<group>"; };
 		0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = RoleMapping.plist; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 		9CFA677C1AA01865007E84ED /* OSXScraper */ = {
 			isa = PBXGroup;
 			children = (
+				086E2FDC222735E200FD2CFF /* osxsinter.p12 */,
 				0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */,
 				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
 				9CFE59551BCB00D100BEAC79 /* documentation.rtf */,
@@ -332,6 +335,7 @@
 				9CFA67871AA01865007E84ED /* Credits.rtf in Resources */,
 				9CFE595B1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist in Resources */,
 				9CFA678D1AA01865007E84ED /* MainMenu.xib in Resources */,
+				086E2FDD222735E200FD2CFF /* osxsinter.p12 in Resources */,
 				0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */,
 				9CFE59581BCB00D100BEAC79 /* documentation.rtf in Resources */,
 			);

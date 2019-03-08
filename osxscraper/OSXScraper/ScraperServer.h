@@ -18,6 +18,7 @@
 */
 
 #import <Foundation/Foundation.h>
+#define SERVER_PORT 6832
 
 @interface ScraperServer : NSObject<NSStreamDelegate>{
     CFSocketRef             _ipv4socket;
