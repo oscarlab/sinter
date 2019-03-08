@@ -493,7 +493,7 @@ namespace WindowsProxy
 
     public void execute_verify_passcode_req(Sinter _)
     {
-      Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode_req"]);
+      Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode"], serviceCodes["verify_passcode_req"]);
       header.ParamsInfo = new Params
       {
         Data1 = root.passcode,
@@ -507,8 +507,9 @@ namespace WindowsProxy
       connection.SendMessage(sinter);
     }
 
-    public void execute_verify_passcode_res(Sinter sinter)
+    public void execute_verify_passcode(Sinter sinter)
     {
+      //handles verify_passcode_res
       bool res = Boolean.Parse(sinter.HeaderNode.ParamsInfo.Data1);
       if (res == false)
       {

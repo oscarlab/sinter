@@ -1413,9 +1413,9 @@ namespace WindowsScraper
             bDesktopHookAdded = false;
         }
 
-        public void execute_verify_passcode_req(Sinter sinter)
+        public void execute_verify_passcode(Sinter sinter)
         {
-        
+            /* handles verify_passcode_req */
             string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
             Console.WriteLine("client passcode: {0}", clientPasscode);
 
@@ -1428,30 +1428,26 @@ namespace WindowsScraper
               this.bPasscodeVerified = true;
             }
 
-          Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode_res"]);
-          header.ParamsInfo = new Params
-          {
-            Data1 = result.ToString(),
-          };
+            Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode"], serviceCodes["verify_passcode_res"]);
+            header.ParamsInfo = new Params
+            {
+              Data1 = result.ToString(),
+            };
 
-          Sinter sintermsg = new Sinter()
-          {
-            HeaderNode = header,
-          };
+            Sinter sintermsg = new Sinter()
+            {
+              HeaderNode = header,
+            };
 
-          connection.SendMessage(sintermsg);
+            connection.SendMessage(sintermsg);
 
           
-          if(result == false)
-          {
-            Console.WriteLine("client passcode not match!");
-            connection.StopConnectionHandling();
-          }
+            if(result == false)
+            {
+              Console.WriteLine("client passcode not match!");
+              connection.StopConnectionHandling();
+            }
          
-        }
-
-        public void execute_verify_passcode_res(Sinter _) {
-
         }
     
         public void execute_ls_req(Sinter _)
