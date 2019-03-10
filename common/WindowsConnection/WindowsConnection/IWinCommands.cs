@@ -28,8 +28,7 @@ namespace Sintering {
 
     void execute_stop_scraping();
 
-    void execute_verify_passcode_req(Sinter sinter);
-    void execute_verify_passcode_res(Sinter sinter);
+    void execute_verify_passcode(Sinter sinter);
 
     // server related calls
     void execute_ls_req(Sinter sinter);

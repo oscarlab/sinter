@@ -4,22 +4,18 @@
 <dict>
 	<key>service_code</key>
 	<dict>
-    <key>verify_passcode_req</key>
-    <integer>9901</integer>
-    <key>verify_passcode_res</key>
-    <integer>9902</integer>
-		<key>ls_req</key>
-		<integer>1</integer>
-		<key>ls_res</key>
-		<integer>2</integer>
-		<key>ls_l_req</key>
-		<integer>3</integer>
-		<key>ls_l_res</key>
-		<integer>4</integer>
+    <key>ls_req</key>
+    <integer>1</integer>
+    <key>ls_res</key>
+    <integer>2</integer>
+    <key>ls_l_req</key>
+    <integer>3</integer>
+    <key>ls_l_res</key>
+    <integer>4</integer>
     <key>ls_l_res_dialog</key>
     <integer>401</integer>
-		<key>delta</key>
-		<integer>5</integer>
+    <key>delta</key>
+    <integer>5</integer>
     <key>delta_subtree_add</key>
     <integer>501</integer>
     <key>delta_subtree_replace</key>
@@ -42,12 +38,12 @@
     <integer>510</integer>
     <key>delta_prop_change_value</key>
     <integer>511</integer>
-		<key>kbd</key>
-		<integer>6</integer>
-		<key>kbd_shortcut</key>
-		<integer>601</integer>
-		<key>mouse</key>
-		<integer>7</integer>
+    <key>kbd</key>
+    <integer>6</integer>
+    <key>kbd_shortcut</key>
+    <integer>601</integer>
+    <key>mouse</key>
+    <integer>7</integer>
     <key>mouse_click_left</key>
     <integer>701</integer>
     <key>mouse_click_right</key>
@@ -84,8 +80,8 @@
     <integer>810</integer>
     <key>action_append_text</key>
     <integer>811</integer>
-		<key>action_foreground</key>
-		<integer>812</integer>
+    <key>action_foreground</key>
+    <integer>812</integer>
     <key>listener</key>
     <integer>9</integer>
     <key>listener_register</key>
@@ -100,6 +96,12 @@
     <integer>10</integer>
     <key>event_closed</key>
     <integer>1001</integer>
+    <key>verify_passcode</key>
+    <integer>99</integer>
+    <key>verify_passcode_req</key>
+    <integer>9901</integer>
+    <key>verify_passcode_res</key>
+    <integer>9902</integer>
 	</dict>
 	<key>entity_classes</key>
 	<dict>

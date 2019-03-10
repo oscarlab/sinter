@@ -79,12 +79,12 @@ namespace Sintering {
       while (!_shouldStop) {
         try {
           Sinter sinter = messageQueue.Take();
+          Console.WriteLine("[Sinter received] service code = {0}", sinter.HeaderNode.ServiceCode);
+
           if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
             invoking_method_name = "execute_" + requested_service.Trim();
-
             if (actuator.bPasscodeVerified == true 
-                || requested_service.Equals(@"verify_passcode_req") 
-                || requested_service.Equals(@"verify_passcode_res")) {
+                || requested_service.Equals(@"verify_passcode")) {
               invoking_method = type.GetMethod(invoking_method_name);
               if (invoking_method != null)
               {
