@@ -117,7 +117,8 @@ namespace Sintering {
         }
         networkStream.Flush();
         // Debug statement
-        Console.WriteLine("sent: " + (int)ms.Length + " bytes");        
+        Console.WriteLine("sent: " + (int)ms.Length + " bytes");
+        Console.WriteLine("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
       }
 
       // Debug statement

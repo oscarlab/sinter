@@ -638,7 +638,7 @@ namespace WindowsScraper
             //return;
             //}
 
-            Console.WriteLine("Structure Changed Global");
+            //Console.WriteLine("Structure Changed Global");
             AutomationElement element = (AutomationElement)sender;
             Console.WriteLine("Struct changed global {0}", element.Current.ControlType.ProgrammaticName);
 
@@ -662,7 +662,7 @@ namespace WindowsScraper
             AutomationElementCollection elementCollection = element.FindAll(TreeScope.Children, Condition.TrueCondition);
 
             // Console.WriteLine("Local Structure {0}", element.Current.ControlType);
-            Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+            //Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
 
             if (element.Current.ControlType == ControlType.SplitButton)
             {
@@ -781,8 +781,8 @@ namespace WindowsScraper
                     EntityNode = UIAElement2EntityRecursive(anchor),
                 };
 
-                Console.WriteLine("Chillins");
-                Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
+                //Console.WriteLine("Chillins");
+                //Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
                 PrintChildrenNodes(sinter.EntityNode);
 
                 // send
@@ -1563,8 +1563,7 @@ namespace WindowsScraper
         {
             /* handles verify_passcode_req */
             string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
-            Console.WriteLine("client passcode: {0}", clientPasscode);
-
+            //Console.WriteLine("client passcode: {0}", clientPasscode);
 
             bool result = false;
             if(clientPasscode == this.passcode)
@@ -1809,6 +1808,8 @@ namespace WindowsScraper
             Console.WriteLine("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
             if (sinter.HeaderNode.ParamsInfo != null)
                 runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            else
+                runtimeId = sinter.HeaderNode.Process;  //for example: action_close
 
             if (!serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out _serviceCode))
                 return;
@@ -1820,20 +1821,20 @@ namespace WindowsScraper
             // extract the automation element pointed by runtimeId
             AutomationElement element = null;
 
-            Console.WriteLine("RuntimeID {0}", runtimeId);
+            //Console.WriteLine("RuntimeID {0}", runtimeId);
             try
             {
-                Console.WriteLine("execute_action: Get RuntimeId");
+                //Console.WriteLine("execute_action: Get RuntimeId");
                 if (runtimeId != null && sinter.HeaderNode.SubCode != 813)
                 {
                     element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
                     if (element == null)
                         return;
-                    Console.WriteLine("execute_action: Got element from RuntimeId");
+                    //Console.WriteLine("execute_action: Got element from RuntimeId: {0}", runtimeId);
                 }
 
                 int[] id = element.GetRuntimeId();
-                Console.WriteLine("{0}", id);
+                //Console.WriteLine("{0}", id);
                 if (automationElementTrie.TryGetValue(id, out Entity entity))
                 {
                     //vInfo.version = Util.Version.Updated;
@@ -1887,7 +1888,7 @@ namespace WindowsScraper
                         Console.WriteLine("Case action_expand_and_select");
                         if(sinter.HeaderNode.ParamsInfo.TargetIdList != null)
                         {
-                            Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
+                            //Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
                             UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId.ToString(), uint.Parse(sinter.HeaderNode.ParamsInfo.Data1), sinter.HeaderNode.ParamsInfo.TargetIdList);
                         }
                         break;

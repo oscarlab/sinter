@@ -80,7 +80,6 @@ namespace Sintering {
         try {
           Sinter sinter = messageQueue.Take();
           Console.WriteLine("[Sinter received] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
-
           if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
             invoking_method_name = "execute_" + requested_service.Trim();
             if (actuator.bPasscodeVerified == true 
