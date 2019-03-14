@@ -28,7 +28,9 @@
 
 @implementation Config
 
-static NSDictionary * config;
+static NSDictionary* config;
+NSDictionary* serviceCodes;
+
 
 + (void) initialize {
     NSError *errorDesc;

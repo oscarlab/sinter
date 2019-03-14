@@ -26,6 +26,7 @@
 
 #import "CustomTableView.h"
 #import "ControlTypes.h"
+#import "XMLTags.h"
 
 @implementation CustomTableView
 
@@ -229,7 +230,7 @@
         Model* listItem = list.children[_selected];
         //NSTableCellView *selectedRow = [tableView viewAtColumn:0 row:selected makeIfNecessary:YES];
         //NSLog(@"tableViewSelectionIsChanging  %@",listItem.name);
-        [sharedConnection sendFocusAt:listItem.unique_id];
+        [sharedConnection sendActionMsg:nil targetId:listItem.unique_id actionType:STRActionChangeFocus data:nil];
     }
 }
 

@@ -23,7 +23,7 @@
 
     Created by Syed Masum Billah on 7/21/14.
 */
-
+#import "Config.h"
 #import "CustomWindowController.h"
 #import "Model.h"
 #import "ClientHandler.h"
@@ -78,7 +78,7 @@ int L, mask;
     // if it's closed, then it returns a close-ack in appDelegate
     // AppDelegate sets 'ShoudlClose' to YES.
     if(![self shouldClose] && [sharedConnection isConnected]){
-        [sharedConnection sendActionAt:rmUiRoot.unique_id actionName:@"close"];
+        [sharedConnection sendActionMsg:(rmUiRoot.unique_id) targetId:(rmUiRoot.unique_id) actionType:STRActionClose data:nil];
         return NO;
     }
     [screenMapTable removeAllObjects];
@@ -101,7 +101,7 @@ int L, mask;
     [[NSApplication sharedApplication] setMainMenu:remoteMenu];
     
     //bring this application to foreground remotely
-    [sharedConnection sendBtingFG:process_id];
+    //[sharedConnection sendBtingFG:process_id]; //do we need this? the behavior seems not right 
 }
 
 
@@ -110,12 +110,35 @@ int L, mask;
     
     //register callback
     service_codes = [[NSArray alloc] initWithObjects:[NSString stringWithFormat:@"%i", SERVICE_CODE_DELTA], nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(takeActionForXML:) name:process_id object:nil];
     
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(takeActionForXML:) name:process_id object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivedMessage:) name:process_id object:nil];
+
     //[sharedConnection registerListener:self withPID:rmUiRoot.unique_id forServiceCodes:service_codes];
     
     CustomWindow* window = (CustomWindow*)[self window];
     [window setSharedConnection:sharedConnection];
+}
+
+- (Model *) deltaPropChangeHandler:(NSString* )uniqueID subCode:(NSNumber*)sub_code newValue:(NSString*)value{
+    Model * ui = [idTable objectForKey:uniqueID];
+    if (ui) {// already exists
+        ui.version = UPDATED;
+    }
+    else{
+        NSLog(@"uniqueID %@ empty for sub_code %@", uniqueID, sub_code);
+        return ui;
+    }
+    
+    if([sub_code integerValue] == [[serviceCodes objectForKey:STRDeltaPropNameChanged] integerValue])
+    {
+        ui.name = value;
+    }
+    else if([sub_code integerValue] == [[serviceCodes objectForKey:STRDeltaPropValueChanged] integerValue])
+    {
+        ui.value = value;
+    }
+    return ui;
 }
 
 - (Model *) populateValuesFrom:(Entity *) node addToCache:(BOOL) _addToCache updateType: (NSString*) updateType{
@@ -136,7 +159,7 @@ int L, mask;
         ui.version          = STALE_OR_NEW;
     }
     
-    if ([updateType isEqualToString: updateTypeNameChanged]){
+  /*  if ([updateType isEqualToString: updateTypeNameChanged]){
         ui.name             = node.name; // [attrs objectForKey:nameTag];
         ui.states           = [node.states longLongValue];
     }
@@ -144,7 +167,8 @@ int L, mask;
         ui.value            = node.value;
         ui.states           = [node.states longLongValue];
     }
-    else {
+    else */
+    {
         // populate data
         ui.type             = node.type;
         ui.width            = [node.width intValue];
@@ -656,6 +680,7 @@ bool isHeader = FALSE;
     
     NSRect uiFrame = [renderer getLocalFrameForRemoteFrame:current];
     NSView* current_view = nil;
+    current.type = [current.type lowercaseString];
     if ([current.type isEqualToString:@"list"]) {
         current_view = [renderer drawList:current frame:uiFrame parentView:anchor];
         [self printElapsedTimeWith:@"list"];
@@ -695,6 +720,10 @@ bool isHeader = FALSE;
     }
     else if ([current.type isEqualToString:@"menuitem"]) {
         [renderer drawMenu:current anchor:remoteMenu];
+        NSLog(@"menuitem rendered");
+        for (Model* child in current.children) {
+            [self renderDOM:child anchor:anchor];
+        }
     }
     else if ([current.type isEqualToString:@"searchbox"]) {
         [renderer drawSearchField:current frame:uiFrame parentView:anchor];
@@ -724,12 +753,12 @@ bool isHeader = FALSE;
     else if ([current.type isEqualToString:@"progressbar"]) {//composite, complex
         [renderer drawProgressBar:current frame:uiFrame parentView:anchor];
         // go over each child, i.e., breadcrumb, toolbar, combobox
-        for (int i=0; i< current.child_count; i++) {
-            Model* ui =  current.children[i];
-            [self renderDOM:ui anchor:anchor];
+        for (Model* child in current.children) {
+            [self renderDOM:child anchor:anchor];
         }
     }
     else { // go down recursively for children
+        NSLog(@"type not rendered: %@", current.type);
         for (Model* child in current.children) {
             [self renderDOM:child anchor:anchor];
         }
@@ -746,24 +775,60 @@ bool isHeader = FALSE;
 
 
 // MARK: consume updates
-- (void) takeActionForXML:(Sinter *) xmlDoc {
+- (void) receivedMessage:(NSNotification *) notification {
+    NSLog(@"Notification name = %@", [notification name]);
+    NSDictionary *userInfo = notification.userInfo;
+    if(userInfo) {
+        Sinter *sinter = [userInfo objectForKey:@"sinter"];
+        [self takeActionForXML:sinter];
+    }
+}
+
+- (void) takeActionForXML:(Sinter *) sinter {
     //NSLog(@" receive-at %f", CACurrentMediaTime());
     //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{ // 1
-
-    if([xmlDoc.header.service_code integerValue] != SERVICE_CODE_DELTA) {
+    
+    if([sinter.header.service_code integerValue] != [[serviceCodes objectForKey:STRDelta] integerValue]) {
         return;
     }
 
-    NSString *anchorId, *updateType;
-    if(xmlDoc.header.kbd_or_action) {
-        anchorId = xmlDoc.header.kbd_or_action.target_id;
-        updateType = xmlDoc.header.kbd_or_action.generic_data;
-    }
-
-    // now read the next nodes
     Model* ui;
-    NSArray * nodes = xmlDoc.updates;
+    
+    if(sinter.header.params != nil){
+        //delta_prop_change_name, delta_prop_change_value
+        ui = [self deltaPropChangeHandler:sinter.header.params.target_id
+                                         subCode:sinter.header.sub_code
+                                        newValue:sinter.header.params.data2];
+        if(ui){
+            if (ui && ui.version && [ui.type hasPrefix:@"Menu"]) {
+                [self renderDOM:ui anchor:remoteMenu];
+            } else {
+                [self renderDOM:ui anchor:self.window.contentView];
+            }
+            return;
+        }
+    }
+    else if(sinter.entity != nil && ([sinter.header.sub_code integerValue] == [[serviceCodes objectForKey:STRDeltaSubtreeExpand] integerValue])){
+        Entity * node = sinter.entity;
+        ui = [self populateValuesFrom:node addToCache:YES updateType:updateTypeNodeExpanded];
+        if(ui){
+            [self parseXMLDocument:node havingUI:ui updateType:updateTypeNodeExpanded];
+            if (ui && ui.version && [ui.type hasPrefix:@"Menu"]) {
+                [self renderDOM:ui anchor:remoteMenu];
+            } else {
+                [self renderDOM:ui anchor:self.window.contentView];
+            }
+            return;
+        }
+    }
+    
+    //following codes need to be revised to handle
+    NSLog(@"Following Not handled yet!!!");
+    
+    NSString *anchorId, *updateType;
+    NSArray * nodes = sinter.entities;
     Entity * node;
+    // now read the next nodes
     for (int i = 1 ; i < [nodes count] ; i++ ){
         node = nodes[i];
         ui = nil;
@@ -804,10 +869,10 @@ bool isHeader = FALSE;
     //close opened menu
     if (renderer && renderer.selectedMenuModel) {
         do{
-            [sharedConnection sendActionAt:renderer.selectedMenuModel.unique_id actionName:@"collapse"];
+            [sharedConnection sendActionMsg:process_id targetId:(renderer.selectedMenuModel.unique_id) actionType:STRActionCollpase data:nil];
             renderer.selectedMenuModel = renderer.selectedMenuModel.parent;
-        } while (renderer.selectedMenuModel && ([renderer.selectedMenuModel.type isEqualToString:@"menuitem"] ||
-                                                [renderer.selectedMenuModel.type isEqualToString:@"menu"])) ;
+        } while (renderer.selectedMenuModel && ([renderer.selectedMenuModel.type caseInsensitiveCompare:@"menuitem"] == NSOrderedSame ||
+                                                [renderer.selectedMenuModel.type caseInsensitiveCompare:@"menu"] == NSOrderedSame)) ;
         renderer.selectedMenuModel = nil;
     }
     

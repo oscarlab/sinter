@@ -32,17 +32,16 @@
 @interface Sinter : NSObject
 @property (nonatomic, retain) Header*         header;
 @property (nonatomic, retain) Entity*         entity;
-@property (nonatomic, retain) NSMutableArray* updates;
-@property (nonatomic, retain) NSMutableArray* applications;
+@property (nonatomic, retain) NSMutableArray* entities;
 
 - (id) init;
 - (id) initWithEntity;
-- (id) initWithApplications;
-- (id) initWithUpdates;
+- (id) initWithEntities;
 - (id) initWithServiceCode:(NSNumber * ) serviceCode ;
-- (id) initWithServiceCode:(NSNumber * ) serviceCode andKbdOrActionWithTarget:(NSString *) targetId andData:(NSString *) data ;
-- (id) initWithServiceCode:(NSNumber * ) serviceCode andMouseWithX:(int) x andY:(int) y andButton:(int) button;
-- (id) initWithServiceCode:(NSNumber * ) serviceCode andCaret:(int) location andLength:(int) ending andTarget:(NSString*) targetId;
+- (id) initWithServiceCode:(NSNumber * ) serviceCode andKbdOrActionWithTarget:(NSString *) targetId andData:(NSString *) data ; //deprecated
+- (id) initWithServiceCode:(NSNumber * ) serviceCode subCode:(NSNumber *)subCode processId:(NSString*)processId targetId:(NSString *) targetId data:(NSString *) data;
+//- (id) initWithServiceCode:(NSNumber * ) serviceCode andMouseWithX:(int) x andY:(int) y andButton:(int) button; //not used at all
+- (id) initWithServiceCode:(NSNumber * ) serviceCode andCaret:(int) location andLength:(int) ending andTarget:(NSString*) targetId; //deprecated?
 
 + (NSArray *) getSerializableProperties;
 

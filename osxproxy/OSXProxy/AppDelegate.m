@@ -33,7 +33,6 @@
 
 #import "ClientHandler.h"
 
-static NSDictionary* serviceCodes;
 
 @implementation AppDelegate
 
@@ -46,6 +45,10 @@ static NSDictionary* serviceCodes;
 @synthesize remoteWindowControllers;
 @synthesize ConnectButton;
 @synthesize LoadButton;
+@synthesize DisconnectButton;
+@synthesize ServerIPTextField;
+@synthesize ServerPortTextField;
+@synthesize PasscodeTextField;
 
 
 //CFTimeInterval startTime, elapsedTime;
@@ -86,18 +89,32 @@ static NSDictionary* serviceCodes;
         NSLog(@"Settings.plist file not found, exiting now");
         exit(EXIT_FAILURE);
     }
+    
+    [ServerIPTextField setStringValue:[settings objectForKey:@"server_ip"]];
+    [ServerPortTextField setStringValue:[[settings objectForKey:@"port"] stringValue]];
+    [PasscodeTextField setStringValue:@"123456"];
 
     [[NSNotificationCenter defaultCenter]
         addObserver:self
         selector:@selector(receivedMessage:)
         name:@"AppDelegate"
         object:nil];
+    
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(connectionStatusChanged:)
+     name:@"connectedInd" //Indication of connection established
+     object:nil];
+    
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(connectionStatusChanged:)
+     name:@"disconnectedInd" //Indication of disconnection
+     object:nil];
 
     //shared connection
-    sharedConnection = [ClientHandler sharedConnectionWith:[settings objectForKey:@"server_ip"]
-                                        andPort:[[settings objectForKey:@"port"] intValue]];
-    
-
+    sharedConnection = [ClientHandler sharedConnectionWith:[ServerIPTextField stringValue]
+                                                   andPort:[[ServerPortTextField stringValue] intValue]];
     processModel = nil;
     isLoaded = NO;
     remoteWindowControllers = [[NSMutableDictionary alloc] init];
@@ -114,23 +131,32 @@ static NSDictionary* serviceCodes;
 
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (IBAction) connect:(id)sender{
+    [window makeFirstResponder:nil];
+    
     if (sharedConnection.isConnected) {
         //NSRunAlertPanel(@"Successfully connected to server.", @"Please press the Load Processes button", @"Ok", nil, nil);
         return;
     }
     
     if(!sharedConnection.isConnected){
+        [sharedConnection setIPAndPort:[ServerIPTextField stringValue]
+                           andPort:[[ServerPortTextField stringValue] intValue]];
         [sharedConnection initForClientSocket];
         //usleep(1000000);
         //NSRunAlertPanel(@"Connection request is sent", @"Please press the Load Processes button next", @"Ok", nil, nil);
     }
 }
 
-- (IBAction) disconnect:(id)sender {
+- (void) disconnect {
     if (sharedConnection.isConnected) {
         [sharedConnection close];
     }
-    NSLog(@"received a disconnect message");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"disconnectedInd" object:self];
+}
+
+- (IBAction) disconnectButtonClicked:(id)sender {
+    [self disconnect];
+    NSLog(@"Disconnect by user");
 }
 
 
@@ -226,24 +252,50 @@ static NSDictionary* serviceCodes;
     return nil;
 }
 
+- (void) connectionStatusChanged:(NSNotification *) notification {
+    //NSLog(@"Notification name = %@", [notification name]);
+    if ([[notification name] caseInsensitiveCompare:@"connectedInd"] == NSOrderedSame){
+        ConnectButton.enabled = NO;
+        ServerPortTextField.enabled = NO;
+        ServerIPTextField.enabled = NO;
+        PasscodeTextField.enabled = NO;
+        LoadButton.enabled = YES;
+        DisconnectButton.enabled = YES;
+        [sharedConnection sendPasscodeVerifyReq:[PasscodeTextField stringValue]];
+        [window makeFirstResponder:LoadButton];
+
+    }
+    else if ([[notification name] caseInsensitiveCompare:@"disconnectedInd"] == NSOrderedSame){
+        ConnectButton.enabled = YES;
+        ServerPortTextField.enabled = YES;
+        ServerIPTextField.enabled = YES;
+        PasscodeTextField.enabled = YES;
+        LoadButton.enabled = NO;
+        DisconnectButton.enabled = NO;
+        [self removeAllWindows];
+        [remoteProcesses removeAllObjects];
+        [processTable reloadData];
+        [window makeFirstResponder:ConnectButton];
+  
+    }
+}
+
 - (void) receivedMessage:(NSNotification *) notification {
-    // ([[notification name] isEqualToString:@"TestNotification"])
+    NSLog(@"Notification name = %@", [notification name]);
     NSDictionary *userInfo = notification.userInfo;
     if(userInfo) {
         Sinter *sinter = [userInfo objectForKey:@"sinter"];
         [self takeActionForXML:sinter];
-        NSLog(@"socket client data %i", [sinter.header.service_code intValue]);
     }
 }
-
 
 // MARK: ls (list all remote processes)
 - (void) takeActionForXML:(Sinter *) sinter {
 //- (void) takeActionForXML:(NSXMLDocument*) xmlDoc withServiceCode:(NSString *)service_code{
     NSNumber * service_code = sinter.header.service_code;
     
-    if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_res"]]) {
-        NSArray* apps = sinter.applications;
+    if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]) {
+        NSArray* apps = sinter.entities;
         if (!apps)  return;
         
         remoteProcesses = [[NSMutableArray alloc] initWithCapacity:[apps count]];
@@ -254,14 +306,14 @@ static NSDictionary* serviceCodes;
         [processTable reloadData];
     }
     
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_l_res"]]) {
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongRes]]) {
         NSString * processId = sinter.header.process_id;
         NSString * uniqueId  = sinter.entity.unique_id;
         Entity * entity      = sinter.entity;
         
-        if (![entity.type isEqualToString:@"window"]) {
+        if ([entity.type caseInsensitiveCompare:@"window"] != NSOrderedSame) {
             for(Entity* _entity in entity.children) {
-                if([_entity.type isEqualToString:@"window"]){
+                if([_entity.type caseInsensitiveCompare:@"window"] == NSOrderedSame){
                     entity = _entity;
                     break;
                 }
@@ -275,32 +327,26 @@ static NSDictionary* serviceCodes;
             [self addWindow:rmWinController havingPID:processId];
         }
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"window_closed"]]) {
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
+        NSString* result = sinter.header.params.data1;
+        NSLog(@"verify_passcode_res result = %@", result);
+        
+        if([result caseInsensitiveCompare:@"False"] == NSOrderedSame)
+        {
+            NSAlert *alert = [[NSAlert alloc] init];
+            [alert setMessageText:@"Passcode not correct"];
+            [alert runModal];
+            [self disconnect];
+            NSLog(@"Disconnect due to wrong passcode");
+        }
+    }
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STREvent]]){
+        NSLog(@"sub_code = %@", sinter.header.sub_code);
         NSString * processId      = sinter.header.process_id;
-        NSString * targetId  = [sinter.header.kbd_or_action target_id];
-        // remove
-        [self removeWindowWithPID:processId andUniqueId:targetId];
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"kbd"]]) {
-        
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"mouse"]]) {
-        
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"delta"]]) {
-        //int pid = [sinter.header.process_id intValue];
-        
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"focus"]]) {
-        //int pid = [sinter.header.process_id intValue];
-        
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"default_action"]]) {
-        //int pid = [sinter.header.process_id intValue];
-        
+        [self removeAllWindowsWithPID:processId];
     }
     else {
-        
+        NSLog(@"service code %@ is not handled?", service_code);
     }
     
 //    switch ([xmlDoc.header.service_code intValue]) {
@@ -383,6 +429,9 @@ static NSDictionary* serviceCodes;
         }
         
         // construct a ls_request message
+        [sharedConnection sendDomRemoteApp:[processModel process_id]];
+        
+        /*
         Sinter * sinter = [[Sinter alloc] init];
         Header *header = [[Header alloc] init] ;
         header.service_code = [serviceCodes objectForKey:@"ls_l_req"];
@@ -394,6 +443,7 @@ static NSDictionary* serviceCodes;
         //startTime = CACurrentMediaTime();
         //NSLog(@"[sinter] - :%.0f: window_begin", CACurrentMediaTime()*1000000000);
         [sharedConnection sendSinter:sinter];
+         */
     }
 }
 

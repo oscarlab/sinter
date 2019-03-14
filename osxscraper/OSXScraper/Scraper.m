@@ -29,9 +29,11 @@
 #include "KeyMapping.h"
 #include "Config.h"
 #include "AccAPI.h"
+#import "XMLTags.h"
+#import "ScraperServer.h"
 
 
-static NSDictionary* serviceCodes;
+//static NSDictionary* serviceCodes;
 
 @implementation Scraper
 @synthesize appCache;
@@ -48,6 +50,7 @@ Scraper * refToSelf;
         refToSelf = self;
         [self setIdentifier:identifier];
         [self setClientHandler:clientHandler];
+        _isPasscodeVerified = false;
         
         appCache = [[NSMutableDictionary alloc] init];
         
@@ -67,45 +70,61 @@ Scraper * refToSelf;
     NSDictionary *userInfo = notification.userInfo;
     if(userInfo) {
         Sinter *sinter = [userInfo objectForKey:@"sinter"];
-        NSLog(@"data server socket %i", [sinter.header.service_code intValue]);
-        [self execute:sinter];
+        NSNumber * service_code = sinter.header.service_code;
+        if(_isPasscodeVerified == true || [service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]){
+            [self execute:sinter];
+        }
+        else{
+            //NSLog(@"ignore msgs before passcode verified");
+        }
     }
 }
 
 
-- (void) execute: (Sinter *) command {
-    NSNumber * service_code = command.header.service_code;
+- (void) execute: (Sinter *) cmdSinter {
+    NSNumber * service_code = cmdSinter.header.service_code;
     Sinter * sinter = nil;
-    if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_req"]]) {
+    if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
+        int client_passcode = [cmdSinter.header.params.data1 intValue];
+        if(client_passcode == gPasscode){
+            [_clientHandler sendPasscodeVerifyRes:true];
+            _isPasscodeVerified = true;
+        }
+        else{
+            [_clientHandler sendPasscodeVerifyRes:false];
+            [_clientHandler close];
+        }
+    }
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsReq]]) {
         sinter = [AccAPI getListOfApplications];
     
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_l_req"]]) {
-        int pid = [command.header.process_id intValue];
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongReq]]) {
+        int pid = [cmdSinter.header.process_id intValue];
         sinter = [self handleLSRequestwithPid:pid];
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"kbd"]]) {
-        int pid = [command.header.process_id intValue];
-        if (command.header.kbd_or_action) {
-            [self handleKeyboardInput:pid andValue: command.header.kbd_or_action.generic_data];
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRKeyboard]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        if (cmdSinter.header.kbd_or_action) {
+            [self handleKeyboardInput:pid andValue: cmdSinter.header.kbd_or_action.generic_data];
         }
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"mouse"]]) {
-        int pid = [command.header.process_id intValue];
-        MouseOrCaret * mouse = command.header.mouse_or_caret;
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRMouse]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        MouseOrCaret * mouse = cmdSinter.header.mouse_or_caret;
         if (mouse) {
             [self handleMouseClick:pid andX:mouse.x_or_starting andY:mouse.y_or_ending andButton:mouse.button_type];
         }
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"delta"]]) {
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRDelta]]) {
         //int pid = [sinter.header.process_id intValue];
         
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"focus"]]) {
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRActionChangeFocus]]) {
         //int pid = [sinter.header.process_id intValue];
         
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"default_action"]]) {
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRActionDefault]]) {
         //int pid = [sinter.header.process_id intValue];
     
     }

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08791EBA22331D0C009EB201 /* Params.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB822331D0B009EB201 /* Params.m */; };
+		08866A4B223981B3006F3473 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 08866A49223981B3006F3473 /* XMLTags.m */; };
 		0DB105901DBC2E18004289E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB1058E1DBC2E18004289E7 /* AppDelegate.m */; };
 		0DB105921DBC2E30004289E7 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105911DBC2E30004289E7 /* Settings.plist */; };
 		0DB105941DBC2FB4004289E7 /* RemoteExplorerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105931DBC2FB4004289E7 /* RemoteExplorerWindowController.xib */; };
@@ -33,7 +35,6 @@
 		0DB105CF1DBC3166004289E7 /* CustomTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105C51DBC3166004289E7 /* CustomTextField.m */; };
 		0DB105D01DBC3166004289E7 /* CustomWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105C61DBC3166004289E7 /* CustomWindow.m */; };
 		0DB105D61DBC3198004289E7 /* KeyMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105D31DBC3198004289E7 /* KeyMapping.m */; };
-		0DB105D71DBC3198004289E7 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105D51DBC3198004289E7 /* XMLTags.m */; };
 		0DB105E01DBC31EC004289E7 /* RemoteExplorerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105D91DBC31EC004289E7 /* RemoteExplorerWindowController.m */; };
 		0DB105E11DBC31EC004289E7 /* WordCustomRibbon.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB105DB1DBC31EC004289E7 /* WordCustomRibbon.m */; };
 		0DB105E21DBC31EC004289E7 /* WordCustomRibbon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105DC1DBC31EC004289E7 /* WordCustomRibbon.xib */; };
@@ -57,6 +58,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		08791EB822331D0B009EB201 /* Params.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Params.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.m; sourceTree = "<group>"; };
+		08791EB922331D0B009EB201 /* Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Params.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.h; sourceTree = "<group>"; };
+		08866A49223981B3006F3473 /* XMLTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLTags.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.m; sourceTree = "<group>"; };
+		08866A4A223981B3006F3473 /* XMLTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLTags.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.h; sourceTree = "<group>"; };
 		0DB1058E1DBC2E18004289E7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = OSXProxy/AppDelegate.m; sourceTree = "<group>"; };
 		0DB1058F1DBC2E18004289E7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = OSXProxy/AppDelegate.h; sourceTree = "<group>"; };
 		0DB105911DBC2E30004289E7 /* Settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Settings.plist; path = OSXProxy/Settings.plist; sourceTree = "<group>"; };
@@ -98,8 +103,6 @@
 		0DB105D11DBC3198004289E7 /* ControlTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlTypes.h; path = OSXProxy/ControlTypes.h; sourceTree = SOURCE_ROOT; };
 		0DB105D21DBC3198004289E7 /* KeyMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyMapping.h; path = OSXProxy/KeyMapping.h; sourceTree = SOURCE_ROOT; };
 		0DB105D31DBC3198004289E7 /* KeyMapping.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyMapping.m; path = OSXProxy/KeyMapping.m; sourceTree = SOURCE_ROOT; };
-		0DB105D41DBC3198004289E7 /* XMLTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLTags.h; path = OSXProxy/XMLTags.h; sourceTree = SOURCE_ROOT; };
-		0DB105D51DBC3198004289E7 /* XMLTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLTags.m; path = OSXProxy/XMLTags.m; sourceTree = SOURCE_ROOT; };
 		0DB105D81DBC31EC004289E7 /* RemoteExplorerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RemoteExplorerWindowController.h; path = OSXProxy/RemoteExplorerWindowController.h; sourceTree = SOURCE_ROOT; };
 		0DB105D91DBC31EC004289E7 /* RemoteExplorerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RemoteExplorerWindowController.m; path = OSXProxy/RemoteExplorerWindowController.m; sourceTree = SOURCE_ROOT; };
 		0DB105DA1DBC31EC004289E7 /* WordCustomRibbon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WordCustomRibbon.h; path = OSXProxy/WordCustomRibbon.h; sourceTree = SOURCE_ROOT; };
@@ -189,8 +192,6 @@
 				0DB105D11DBC3198004289E7 /* ControlTypes.h */,
 				0DB105D21DBC3198004289E7 /* KeyMapping.h */,
 				0DB105D31DBC3198004289E7 /* KeyMapping.m */,
-				0DB105D41DBC3198004289E7 /* XMLTags.h */,
-				0DB105D51DBC3198004289E7 /* XMLTags.m */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -221,6 +222,10 @@
 		0D6C19831DB70E55004DFB3F /* AppleXMLSerializer */ = {
 			isa = PBXGroup;
 			children = (
+				08866A4A223981B3006F3473 /* XMLTags.h */,
+				08866A49223981B3006F3473 /* XMLTags.m */,
+				08791EB922331D0B009EB201 /* Params.h */,
+				08791EB822331D0B009EB201 /* Params.m */,
 				0DB4CA8820D7773200FFFD23 /* Serializer.h */,
 				0DB4CA8920D7773200FFFD23 /* Serializer.m */,
 				0DB4CA7E20D776F600FFFD23 /* Entity.h */,
@@ -428,8 +433,8 @@
 				0DB105D61DBC3198004289E7 /* KeyMapping.m in Sources */,
 				0DB4CA8520D776F600FFFD23 /* Header.m in Sources */,
 				0DB105CD1DBC3166004289E7 /* CustomPathControl.m in Sources */,
-				0DB105D71DBC3198004289E7 /* XMLTags.m in Sources */,
 				0DB4CA8120D776F600FFFD23 /* KbdOrAction.m in Sources */,
+				08866A4B223981B3006F3473 /* XMLTags.m in Sources */,
 				0DB105C71DBC3166004289E7 /* CustomWindowController.m in Sources */,
 				0DB105CE1DBC3166004289E7 /* CustomSearchField.m in Sources */,
 				0DB105AC1DBC30D0004289E7 /* main.m in Sources */,
@@ -451,6 +456,7 @@
 				0DB105C91DBC3166004289E7 /* CustomOutlineView.m in Sources */,
 				0DB105CA1DBC3166004289E7 /* CustomTextView.m in Sources */,
 				0DB105CC1DBC3166004289E7 /* CustomLabel.m in Sources */,
+				08791EBA22331D0C009EB201 /* Params.m in Sources */,
 				0DB4CA8620D776F600FFFD23 /* Screen.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -37,6 +37,11 @@
 
 @property (weak) IBOutlet NSButton *ConnectButton;
 @property (weak) IBOutlet NSButton *LoadButton;
+@property (weak) IBOutlet NSButton *DisconnectButton;
+@property (weak) IBOutlet NSTextField *ServerIPTextField;
+@property (weak) IBOutlet NSTextField *ServerPortTextField;
+@property (weak) IBOutlet NSTextField *PasscodeTextField;
+
 
 
 @property (assign) IBOutlet NSWindow *window;
@@ -50,9 +55,11 @@
 @property (assign) IBOutlet NSTableView *processTable;
 
 - (void) selectRemoteProcess:(id) process_id;
+- (void) disconnect;
 - (IBAction) connect:(id) sender;
 - (IBAction) fetchRemoteProcesses:(id) sender;
-- (IBAction) disconnect:(id) sender;
+- (IBAction) disconnectButtonClicked:(id) sender;
+
 
 #pragma mark window-cleaning functions
 - (void) removeWindowWithPID:(NSString*) _pid andUniqueId:(NSString*) _uniqueId;

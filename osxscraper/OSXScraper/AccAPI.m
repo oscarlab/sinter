@@ -23,21 +23,21 @@
 
     Created by Syed Masum Billah on 10/9/15.
 */
-
+#import <Appkit/Appkit.h>
 #import "AccAPI.h"
 #import "ControlTypes.h"
 #import "Sinter.h"
 #import "Config.h"
+#import "XMLTags.h"
+
 //#import "IRTransformation.h"
 
 
-static NSDictionary * serviceCodes;
 static NSDictionary * roleMappings;
 
 @implementation AccAPI
 
 + (void) initialize {
-    serviceCodes = [Config getServiceCodes];
     roleMappings = [Config getRoleMappings];
 }
 
@@ -62,14 +62,21 @@ static NSDictionary * roleMappings;
     Entity * entity = nil;
     AXUIElementRef element = AXUIElementCreateApplication(pid);
     if (!element) {
-        return entity;
+        return nil;
+    }
+    
+    if([[self getRoleOfUIElement:element] isEqualToString:@"application"]){
+        //NSLog(@"pid %i adding to entity", pid);
+    }
+    else{
+        return nil;
     }
     
     entity = [[Entity alloc] init];
     [entity setProcess_id:[NSString stringWithFormat:@"%i", pid]];
     [entity setUnique_id: [self getCompleteIdOfUIElement:element havingIndex:0 andParentID:@""]];
     [entity setType     : [self getRoleOfUIElement:element]];
-    [entity setName     : [self  getTitleOfUIElement:element]];
+    [entity setName     : [self getTitleOfUIElement:element]];
     [entity setValue    : [self getValueOfUIElement:element]];
     
     return entity;
@@ -77,13 +84,20 @@ static NSDictionary * roleMappings;
 
 // ls command
 + (Sinter *) getListOfApplications {
-    Sinter * sinter = [[Sinter alloc] initWithApplications];
-    sinter.header.service_code = [serviceCodes objectForKey:@"ls_res"];
+    Sinter * sinter = [[Sinter alloc] initWithEntities];
+    sinter.header.service_code = [serviceCodes objectForKey:STRLsRes];
+    sinter.header.sub_code = [serviceCodes objectForKey:STRLsRes];
     
+    NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",@"Chrome",@"Finder",nil];
     NSArray * processes =  [self getAllProcessesIDs];
     for ( NSNumber * process_id in processes){
-        [sinter.applications addObject: [self getEntityForApp: (pid_t) [process_id integerValue]]];
+        Entity * e = [self getEntityForApp: (pid_t) [process_id integerValue]];
+        if(e != nil){
+            if([valid_apps containsObject:e.name])
+                [sinter.entities addObject:e];
+        }
     }
+    
     return sinter;
 }
 
@@ -91,7 +105,7 @@ static NSDictionary * roleMappings;
 // ls_l command
 + (Sinter *) getDomOf:(pid_t) pid andReturnRef:(AXUIElementRef*) elemRef withCache:(NSMutableDictionary*) cache {
     Sinter * sinter = [[Sinter alloc] initWithEntity];
-    sinter.header.service_code = [serviceCodes objectForKey:@"ls_l_res"];
+    sinter.header.service_code = [serviceCodes objectForKey:STRLsLongRes];
     sinter.header.process_id = [NSString stringWithFormat:@"%i", (int) pid];
 
     NSRect desktop = [[NSScreen mainScreen] frame];
@@ -143,15 +157,15 @@ static NSDictionary * roleMappings;
     
     if(!hit || !parent) return nil;
     
-    Sinter * sinter = [[Sinter alloc] initWithUpdates];
-    sinter.header.service_code = [serviceCodes objectForKey:@"delta"];
+    Sinter * sinter = [[Sinter alloc] initWithEntities];
+    sinter.header.service_code = [serviceCodes objectForKey:STRDelta];
     sinter.header.process_id = [NSString stringWithFormat:@"%d", pid];
     sinter.header.kbd_or_action = [[KbdOrAction alloc] initWithTarget:parent_key andData:updateType];
     
     
     Entity * body = [self getEntityFroElement:element atIndex:0  havingId:parent_key andParentId:nil withCache:cache updateCache:NO];
     if(body) {
-        [sinter.updates addObject:body];
+        [sinter.entities addObject:body];
     }
     
     return sinter;
@@ -224,6 +238,7 @@ static NSDictionary * roleMappings;
 
 + (NSString *) getRoleOfUIElement:(AXUIElementRef) element {
     NSString *role =  (__bridge NSString*) kAXUnknownRole;
+    
     id data = [self valueOfAttribute:NSAccessibilityRoleAttribute ofUIElement:element];
     if(data){
         role = (NSString *) data;

@@ -28,6 +28,8 @@
 
 @interface Config : NSObject
 
+extern NSDictionary* serviceCodes;
+
 + (NSArray *) getProperties:(NSString *) className;
 + (NSDictionary *) getClasses;
 + (NSString *) convertCamelCase2Underscores: (NSString *) input;

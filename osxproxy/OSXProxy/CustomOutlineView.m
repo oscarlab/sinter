@@ -25,6 +25,7 @@
 */
 
 #import "CustomOutlineView.h"
+#import "XMLTags.h"
 
 @implementation CustomOutlineView
 
@@ -209,7 +210,7 @@
             //NSLog(@"expand %@", ui.name);
         }
         ui.states |= STATE_EXPANDED;
-        [sharedConnection sendActionAt:ui.unique_id actionName:@"expand"];
+        [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionExpand data:nil];
     }
     return YES;
 }
@@ -228,7 +229,7 @@
             //NSLog(@"collapse %@", ui.name);
         }
         ui.states |= STATE_COLLAPSED;
-        [sharedConnection sendActionAt:ui.unique_id actionName:@"collapse"];
+        [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionCollpase data:nil];
     }
     return YES;
 }
@@ -266,7 +267,8 @@
     if(ui){
         ui.states |= STATE_SELECTED;
         //NSLog(@"selection changed %@", ui.name);
-        [sharedConnection sendFocusAt:ui.unique_id];
+        [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionChangeFocus data:nil];
+        
     }
 }
 
@@ -288,7 +290,7 @@
     if (clicked_row >= 0 && clicked_row < [outineView numberOfRows]) {
         Model *ui =  [outineView itemAtRow:clicked_row];
         if (ui) { // KeystorkesAt:process_id strokes:@"{ENTER}"]
-            [sharedConnection sendFocusAt:ui.unique_id];
+            [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionChangeFocus data:nil];
         }
         [outineView selectRowIndexes:[NSIndexSet indexSetWithIndex:clicked_row] byExtendingSelection:NO];
     }

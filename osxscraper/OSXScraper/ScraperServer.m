@@ -33,6 +33,8 @@ static int identifier;
 
 @implementation ScraperServer
 
+int gPasscode;
+
 @synthesize port;
 @synthesize netService;
 @synthesize connections;

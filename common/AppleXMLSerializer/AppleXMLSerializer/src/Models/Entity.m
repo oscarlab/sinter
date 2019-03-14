@@ -42,7 +42,7 @@ static NSArray * props;
 
 - (id) init {
     if ( self = [super init] ) {
-        _unique_id = _name = _value = _type = @"";
+        _unique_id = _name = _value = _type = _raw_type = @"";
         _top = _left = _height = _width = _child_count = _states = [NSNumber numberWithInt:0];
     }
     return self;
