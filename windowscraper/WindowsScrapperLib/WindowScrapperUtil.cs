@@ -317,7 +317,7 @@ namespace WindowsScraper
         }
         catch (Exception ex)
         {
-          Console.WriteLine("Error in getting runtime_id {0}", ex.Message);
+          //Console.WriteLine("Error in getting runtime_id {0}", ex.Message);
         }
 
         return runtimeIdStr;

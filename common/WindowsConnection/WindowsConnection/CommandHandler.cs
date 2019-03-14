@@ -79,8 +79,7 @@ namespace Sintering {
       while (!_shouldStop) {
         try {
           Sinter sinter = messageQueue.Take();
-          Console.WriteLine("[Sinter received] service code = {0}", sinter.HeaderNode.ServiceCode);
-
+          Console.WriteLine("[Sinter received] service code = {0}, sub_code = {1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
           if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
             invoking_method_name = "execute_" + requested_service.Trim();
             if (actuator.bPasscodeVerified == true 

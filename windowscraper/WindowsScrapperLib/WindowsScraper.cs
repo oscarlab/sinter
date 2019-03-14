@@ -1417,8 +1417,7 @@ namespace WindowsScraper
         {
             /* handles verify_passcode_req */
             string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
-            Console.WriteLine("client passcode: {0}", clientPasscode);
-
+            //Console.WriteLine("client passcode: {0}", clientPasscode);
 
             bool result = false;
             if(clientPasscode == this.passcode)
@@ -1651,6 +1650,8 @@ namespace WindowsScraper
 
             if (sinter.HeaderNode.ParamsInfo != null)
                 runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            else
+                runtimeId = sinter.HeaderNode.Process;  //for example: action_close
 
             if (!serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out _serviceCode))
                 return;
