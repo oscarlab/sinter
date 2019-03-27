@@ -65,25 +65,31 @@ namespace Sintering
 
     public static Header BuildHeader(int service_code, int sub_code, string target_id)
     {
-      return BuildHeader(service_code, sub_code, target_id, null, null, null);
+      return BuildHeader(service_code, sub_code, target_id, null, null, null, null);
     }
 
     public static Header BuildHeader(int service_code, int sub_code, string target_id, string data1)
     {
-      return BuildHeader(service_code, sub_code, target_id, data1, null, null);
+      return BuildHeader(service_code, sub_code, target_id, null, data1, null, null);
     }
 
     public static Header BuildHeader(int service_code, int sub_code, string target_id, string data1, string data2)
     {
-      return BuildHeader(service_code, sub_code, target_id, data1, data2, null);
+      return BuildHeader(service_code, sub_code, target_id, null, data1, data2, null);
     }
 
     public static Header BuildHeader(int service_code, int sub_code, string target_id, string data1, string data2, string data3)
+     {
+       return BuildHeader(service_code, sub_code, target_id, null, data1, data2, data3);
+     }
+
+        public static Header BuildHeader(int service_code, int sub_code, string target_id, List<string[]> target_id_list, string data1, string data2, string data3)
     {
       Header header = BuildHeader(service_code, sub_code);
       header.ParamsInfo = new Params
       {
         TargetId = target_id,
+        TargetIdList = target_id_list,
         Data1 = data1,
         Data2 = data2,
         Data3 = data3,
@@ -91,8 +97,7 @@ namespace Sintering
 
       return header;
     }
-
     #endregion
 
-  }
+    }
 }

@@ -1,0 +1,16 @@
+﻿//sample message:ls port:6832
+<sinter>
+    <header>
+        <service_code value="1"></service_code>
+        <timestamp value="2016-02-16 04:58:52"></timestamp>
+    </header>
+</sinter>
+
+// sample: ls_window msg
+<sinter>
+    <header>
+        <service_code value="3"></service_code>
+        <timestamp value="2016-02-16 04:59:09"></timestamp>
+    </header>
+    <application id="2568"></application>
+</sinter>
