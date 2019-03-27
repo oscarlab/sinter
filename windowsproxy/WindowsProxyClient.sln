@@ -14,6 +14,10 @@ EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WindowsProxySetup", "Setup\Setup.vdproj", "{11CA7185-E25E-4E74-A5EE-326794CE9D22}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsProxyTest", "WindowsProxyTest\WindowsProxyTest.csproj", "{89CE87DE-EEFA-4471-A6B9-48DE42D24FEA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AE68649E-A131-484B-88CC-7C4F603A63BC} = {AE68649E-A131-484B-88CC-7C4F603A63BC}
+		{DB484EA6-35A1-4B9A-B03B-FD5671002A6D} = {DB484EA6-35A1-4B9A-B03B-FD5671002A6D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

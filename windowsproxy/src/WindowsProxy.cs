@@ -122,12 +122,19 @@ namespace WindowsProxy
 
             type = GetType();
 
+<<<<<<< HEAD
             // timer to avoid sending mouse click multiple times
             timer = new Timer
             {
                 Interval = 50,
                 Enabled = false,
             };
+=======
+      entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
+      invoking_method_name = string.Format("Render{0}", entity.Type);
+      invoking_method = type.GetMethod(invoking_method_name,
+        BindingFlags.NonPublic | BindingFlags.Instance);
+>>>>>>> b40e473... modification to work with OSX instances
 
             timer.Tick += Timer_Tick;
 
