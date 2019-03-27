@@ -122,6 +122,7 @@ namespace WindowsProxy
     {
       Console.WriteLine("current type {0}", entity.Type);
 
+      entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
       invoking_method_name = string.Format("Render{0}", entity.Type);
       invoking_method = type.GetMethod(invoking_method_name,
         BindingFlags.NonPublic | BindingFlags.Instance);

@@ -415,7 +415,8 @@ namespace WindowsScraper
             string runtimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
             if (automationElementDictionary.ContainsKey(runtimeId))
             {
-                DeltaForClose(runtimeId);
+                //Console.WriteLine("runtimeId" + runtimeId + " " + e.ToString());
+                //DeltaForClose(runtimeId);  //OnWindowClosed is called back not just for application window but all menu etc. should not send to client
                 Console.WriteLine("Window Closed Globally" + runtimeId);
             }
         }
@@ -1705,8 +1706,10 @@ namespace WindowsScraper
                     case "action_change_focus_precise":
                         break;
                     case "action_set_text":
+                        //executeSetText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_append_text":
+                        //executeAppendText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_foreground":
                         break;
