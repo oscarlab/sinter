@@ -229,7 +229,7 @@
             //NSLog(@"collapse %@", ui.name);
         }
         ui.states |= STATE_COLLAPSED;
-        [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionCollpase data:nil];
+        [sharedConnection sendActionMsg:nil targetId:ui.unique_id actionType:STRActionCollapse data:nil];
     }
     return YES;
 }

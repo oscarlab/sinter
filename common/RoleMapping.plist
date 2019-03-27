@@ -262,6 +262,8 @@
 		<string>unknown</string>
 		<key>AXButton</key>
 		<string>button</string>
+		<key>AXRadioGroup</key>
+		<string>radiogroup</string>
 		<key>AXRadioButton</key>
 		<string>radio</string>
 		<key>AXCheckBox</key>

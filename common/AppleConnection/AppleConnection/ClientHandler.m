@@ -467,15 +467,17 @@ static ClientHandler* shared       = nil;
 - (void) sendActionMsg:(NSString *)processId targetId:(NSString*)targetId actionType:(NSString*)action data:(NSString*)data{
     
     if(processId == nil){
-        NSLog(@"process_id == null in action msg?!!");
+        NSLog(@"%@, %@, process_id == null in action msg?!!", [serviceCodes objectForKey:STRAction], [serviceCodes objectForKey:action]);
     }
     
     //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"appendtext"] andKbdOrActionWithTarget:uniqueId andData:text];
+    Params * params = [[Params alloc] init];
+    params.target_id = targetId;
+    params.data1 = data;
     Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRAction]
                                                   subCode:[serviceCodes objectForKey:action]
                                                 processId:processId
-                                                 targetId:targetId
-                                                     data:data];
+                                                   params:params];
     [self sendSinter:sinter];
 }
 
@@ -511,11 +513,13 @@ static ClientHandler* shared       = nil;
  */
 - (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length {
     //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"caret"] andCaret:(int)location andLength:(int)length andTarget:runtimeId];
+    
+    Params * params = [[Params alloc] init];
+    params.target_id = runtimeId;
     Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRMouse]
                                                   subCode:[serviceCodes objectForKey:STRMouseCaret]
-                                                processId:nil
-                                                 targetId:runtimeId
-                                                     data:nil];
+                                                processId:runtimeId
+                                                   params:params];
     NSLog(@"!!empty data inside mouse_caret"); //cannot find the structure in messages.xls, is it still valid?
     [self sendSinter:sinter];
 }

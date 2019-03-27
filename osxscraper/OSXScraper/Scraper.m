@@ -23,7 +23,6 @@
 
     Created by Syed Masum Billah on 10/19/16.
 */
-
 #import "Scraper.h"
 #include "Sinter.h"
 #include "KeyMapping.h"
@@ -83,7 +82,7 @@ Scraper * refToSelf;
 
 - (void) execute: (Sinter *) cmdSinter {
     NSNumber * service_code = cmdSinter.header.service_code;
-    Sinter * sinter = nil;
+    Sinter * sinterToSend = nil;
     if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
         int client_passcode = [cmdSinter.header.params.data1 intValue];
         if(client_passcode == gPasscode){
@@ -96,12 +95,12 @@ Scraper * refToSelf;
         }
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsReq]]) {
-        sinter = [AccAPI getListOfApplications];
+        sinterToSend = [AccAPI getListOfApplications];
     
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongReq]]) {
         int pid = [cmdSinter.header.process_id intValue];
-        sinter = [self handleLSRequestwithPid:pid];
+        sinterToSend = [self handleLSRequestwithPid:pid];
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRKeyboard]]) {
         int pid = [cmdSinter.header.process_id intValue];
@@ -117,26 +116,32 @@ Scraper * refToSelf;
         }
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRDelta]]) {
-        //int pid = [sinter.header.process_id intValue];
         
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRActionChangeFocus]]) {
-        //int pid = [sinter.header.process_id intValue];
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRAction]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        int sub_code = [cmdSinter.header.sub_code intValue];
         
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRActionDefault]]) {
-        //int pid = [sinter.header.process_id intValue];
-    
+        if(sub_code == [[serviceCodes objectForKey:STRActionDefault] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            [AccAPI handleActionDefault:pid targetID:whichUI];
+        }
+        else if(sub_code == [[serviceCodes objectForKey:STRActionExpand] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            sinterToSend = [AccAPI handleActionExpand:pid targetID:whichUI];
+        }
     }
     else {
     
     }
     
     // send sinter response
-    if (sinter) {
-        [_clientHandler sendSinter:sinter];
+    if (sinterToSend) {
+        [_clientHandler sendSinter:sinterToSend];
     }
 }
+
+
 
 
 - (void) handleMouseClick:(int) pid andX:(NSNumber *) x andY:(NSNumber *) y andButton:(NSNumber *) button {
@@ -207,7 +212,7 @@ Scraper * refToSelf;
     AXUIElementRef app_ref;
     Sinter * sinter = [AccAPI getDomOf:pid andReturnRef:&app_ref withCache:cache_pid];
     if (sinter) {
-        //[self registerObserverFor:pid forElementRef:app_ref];
+        [self registerObserverFor:pid forElementRef:app_ref];
     }
     return sinter;
 }
@@ -220,6 +225,8 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
         NSLog(@"Observer registration failed");
         return ;
     }
+    
+    //NSLog(@"notification Name = %@", notificationName);
     
     NSMutableDictionary * pid_cache = [[refToSelf appCache] objectForKey:[NSNumber numberWithInt:pid]] ;
     Sinter * sinter =  [AccAPI getDeltaAt:element havingPID:pid andUpdateType:(__bridge NSString *)(notificationName) withCache:pid_cache];

@@ -39,7 +39,7 @@
 @property (nonatomic, retain) NSString* timestamp;
 @property (nonatomic, retain) NSString* process_id;
 @property (nonatomic, retain) Params* params;
-@property (nonatomic, retain) Screen*       screen;
+//@property (nonatomic, retain) Screen*       screen;
 @property (nonatomic, retain) KbdOrAction*  kbd_or_action;
 @property (nonatomic, retain) MouseOrCaret* mouse_or_caret;
 

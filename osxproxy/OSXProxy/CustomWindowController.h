@@ -97,7 +97,7 @@
 
 @property (assign) BOOL shouldClose;
 
-- (id) initWithWindowNibName:(NSString *)windowNibName fromEntity:(Entity *) entity havingProcessID:(NSString*) processId;
+- (id) initWithWindowNibName:(NSString *)windowNibName fromEntity:(Entity *) entity havingProcessID:(NSString*) processId moreEntities:(NSArray *)entities;
 
 - (NSView *) renderDOM:(Model *) current anchor:(id) anchor;
 

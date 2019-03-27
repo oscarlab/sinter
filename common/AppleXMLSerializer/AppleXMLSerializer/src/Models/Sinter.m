@@ -85,12 +85,10 @@ static NSArray * props;
 }
 /* deprecated */
 
-- (id) initWithServiceCode:(NSNumber * ) serviceCode subCode:(NSNumber *)subCode processId:(NSString*)processId targetId:(NSString *) targetId data:(NSString *) data{
+
+- (id) initWithServiceCode:(NSNumber * ) serviceCode subCode:(NSNumber *)subCode processId:(NSString*)processId params:(Params *) params{
     if ( self = [super init] ) {
-        Params * params = [[Params alloc] init];
-        params.target_id = targetId;
-        params.data1 = data;
-        _header = [[Header alloc] initWithServiceCode:serviceCode subCode:subCode processId:nil parameters:params];
+        _header = [[Header alloc] initWithServiceCode:serviceCode subCode:subCode processId:processId parameters:params];
     }
     return self;
 }

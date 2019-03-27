@@ -272,23 +272,9 @@
 #define STATE_FOCUSABLE   0x100000
 
 
-//////////// SERVICE CODE ////////////////////////
-#define SERVICE_CODE_UNKNOWN                          -1
-#define SERVICE_CODE_LS_REQ                            1
-#define SERVICE_CODE_LS_RES                            2
-#define SERVICE_CODE_LS_WINDOW_REQ                     3
-#define SERVICE_CODE_LS_WINDOW_RES                     4
-#define SERVICE_CODE_DELTA                             5
-#define SERVICE_CODE_EVENT                             15
-#define SERVICE_CODE_CLOSE_WINDOW                      10
-
-#define SERVICE_CODE_BECOME_NAVIGATOR                  21
-#define SERVICE_CODE_STRUCTURE_CHANGE_CHILD_ADD        22
-#define SERVICE_CODE_STRUCTURE_CHANGE_CHILD_REMOVE     23
-#define SERVICE_CODE_STRUCTURE_CHANGE_CHILD_INVALIDATE 24
-#define SERVICE_CODE_STRUCTURE_CHANGE_CHILD_BULKADD    25
 
 ///////////////////// SPECIAL HASH KEY  /////////////////
 #define FOCUSED_VIEW                                  @"__sinter__focued_view__"
 #define FOCUSED_UI                                    @"__sinter__focued_ui__"
+
 #endif

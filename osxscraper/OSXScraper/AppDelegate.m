@@ -51,6 +51,10 @@
         [[NSRunLoop currentRunLoop] run];
     } else {
         NSLog(@"Error starting server");
+        NSString *passcodeStr = @"<Empty>";
+        [passcodeTextField setStringValue:passcodeStr];
+        
+        [[NSRunLoop currentRunLoop] run];
     }
 
 //   // debug

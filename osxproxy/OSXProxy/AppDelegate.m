@@ -291,7 +291,6 @@
 
 // MARK: ls (list all remote processes)
 - (void) takeActionForXML:(Sinter *) sinter {
-//- (void) takeActionForXML:(NSXMLDocument*) xmlDoc withServiceCode:(NSString *)service_code{
     NSNumber * service_code = sinter.header.service_code;
     
     if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]) {
@@ -311,20 +310,11 @@
         NSString * uniqueId  = sinter.entity.unique_id;
         Entity * entity      = sinter.entity;
         
-        if ([entity.type caseInsensitiveCompare:@"window"] != NSOrderedSame) {
-            for(Entity* _entity in entity.children) {
-                if([_entity.type caseInsensitiveCompare:@"window"] == NSOrderedSame){
-                    entity = _entity;
-                    break;
-                }
-            }
-        }
-        
         CustomWindowController *rmWinController = [self getWindowWithPID:processId andUniqueId:uniqueId];
         if (!rmWinController) {
-            rmWinController = [[CustomWindowController alloc]
-               initWithWindowNibName:@"RemoteWindowController" fromEntity:entity havingProcessID:processId];
-            [self addWindow:rmWinController havingPID:processId];
+               rmWinController = [[CustomWindowController alloc]
+                                  initWithWindowNibName:@"RemoteWindowController" fromEntity:entity havingProcessID:processId moreEntities:sinter.entities];
+               [self addWindow:rmWinController havingPID:processId];
         }
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {

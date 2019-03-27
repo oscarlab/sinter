@@ -688,7 +688,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nlG-lF-kPk">
-                        <rect key="frame" x="36" y="160" width="181" height="52"/>
+                        <rect key="frame" x="36" y="141" width="207" height="71"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" title="123456" usesSingleLineMode="YES" id="DSy-Gk-hQE">
                             <font key="font" metaFont="system" size="48"/>

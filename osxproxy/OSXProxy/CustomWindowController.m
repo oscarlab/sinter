@@ -108,14 +108,9 @@ int L, mask;
 - (void) setUpConnectionAndListener{
     sharedConnection = [ClientHandler getConnection];
     
-    //register callback
-    service_codes = [[NSArray alloc] initWithObjects:[NSString stringWithFormat:@"%i", SERVICE_CODE_DELTA], nil];
-    
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(takeActionForXML:) name:process_id object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivedMessage:) name:process_id object:nil];
 
-    //[sharedConnection registerListener:self withPID:rmUiRoot.unique_id forServiceCodes:service_codes];
-    
     CustomWindow* window = (CustomWindow*)[self window];
     [window setSharedConnection:sharedConnection];
 }
@@ -267,15 +262,17 @@ int L, mask;
     return ui;
 }
 
-- (void) setUpWindowFramAndDOM: (Entity *) root {
+- (void) setUpWindowFrame: (Entity *) root {
     if(!root){
         NSLog(@"AppRoot not found, xml parsing error. Exiting...");
         return;
     }
-    rmUiRoot = [self populateValuesFrom:root addToCache:YES updateType:nil];
     
-    rmUiRoot.parent = nil;
-    [self parseXMLDocument:root havingUI:rmUiRoot updateType:nil];
+    //setting window title
+    if ([root.name length]){
+        [self.window setTitle:root.name];
+    }
+    //else [self.window setTitle:@"Untitled"];
     
     /*
     // aspect ratio
@@ -292,13 +289,10 @@ int L, mask;
         _rm_screen_ratio_y = 1.0;
     }
      */
-    //setting window title
-    if ([rmUiRoot.name length])
-        [self.window setTitle:rmUiRoot.name];
-    else
-        [self.window setTitle:@"Untitled"];
+
     
     NSRect frame = [self.window frame];
+    
     frame.size.height = rmUiRoot.height;
     frame.size.width = rmUiRoot.width;
     
@@ -315,15 +309,16 @@ int L, mask;
 
     [self.window autorecalculatesKeyViewLoop];
     [self.window setAutorecalculatesKeyViewLoop:YES];
-
+    
 }
 
 // MARK: Window Init
-- (id) initWithWindowNibName:(NSString *)windowNibName fromEntity:(Entity *) entity havingProcessID:(NSString*) processId {
+- (id) initWithWindowNibName:(NSString *)windowNibName fromEntity:(Entity *) entity havingProcessID:(NSString*) processId moreEntities:(NSArray *)entities {
     CustomWindow* window = [[CustomWindow alloc] init];
     self = [[CustomWindowController alloc] initWithWindow:window];
     
     if(self){
+        
         [self setXmlDOM:entity];
         [self setProcess_id:processId];
         [self setShouldClose:NO];
@@ -332,8 +327,17 @@ int L, mask;
         dispatch_async(dispatch_get_main_queue(), ^{ //
         //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{ // 1
 
-            // init window frame, title, and parse DOM
-            [self setUpWindowFramAndDOM: entity];
+            
+            
+            
+            // parse DOM
+			Entity * window_entity = entity;
+            self.rmUiRoot = [self populateValuesFrom:window_entity addToCache:YES updateType:nil];
+            self.rmUiRoot.parent = nil;
+            [self parseXMLDocument:window_entity havingUI:self.rmUiRoot updateType:nil];
+            
+            // init window frame, title
+            [self setUpWindowFrame: window_entity];
             [self setUpConnectionAndListener];
             
             // render DOM
@@ -344,6 +348,17 @@ int L, mask;
                                             havingRemoteRootUI:self->rmUiRoot
                                                andWindow:[self window]];
             [self renderDOM:self->rmUiRoot anchor:self.window.contentView];
+            
+            /* from OSXScraper, find the menubar */
+            for(Entity* _entity in entities) {
+                if([_entity.type caseInsensitiveCompare:@"menubar"] == NSOrderedSame){
+                    Model * otherUi = [self populateValuesFrom:_entity addToCache:YES updateType:nil];
+                    [self parseXMLDocument:_entity havingUI:otherUi updateType:nil];
+                    otherUi.parent = nil;
+                    [self renderDOM:otherUi anchor:self.window.contentView];
+                    break;
+                }
+            }
 
             // callback for show window
             //dispatch_async(dispatch_get_main_queue(), ^{ // 2
@@ -353,9 +368,9 @@ int L, mask;
                 
                 //[self.window.menu setDelegate:self];
                 //[remoteMenu setMenuChangedMessagesEnabled:TRUE];
-            [[NSApplication sharedApplication] setMainMenu:self->remoteMenu];
+                [[NSApplication sharedApplication] setMainMenu:self->remoteMenu];
                 //NSLog(@"finish initial rendering:");
-                
+            
                 //time-log
                 NSLog(@"[sinter] - :%.0f: window_end", CACurrentMediaTime()*1000000000);
                 //startTime = CACurrentMediaTime();
@@ -366,6 +381,7 @@ int L, mask;
     }
     return nil;
 }
+
 
 - (id) initWithWindow:(NSWindow *)window {
     self = [super initWithWindow:window];
@@ -697,7 +713,8 @@ bool isHeader = FALSE;
             current_view = [self renderDOM:anchor anchor:current];
         }
     }
-    else if ([current.type isEqualToString:@"button"]) {
+    //else if ([current.type isEqualToString:@"button"]) {
+    else if ([current.type rangeOfString:@"button"].location != NSNotFound) {
         current_view = [renderer drawButton:current frame:uiFrame parentView:anchor];
     }
     else if ([current.type isEqualToString:@"radiobutton"]) {
@@ -706,21 +723,27 @@ bool isHeader = FALSE;
     else if ([current.type isEqualToString:@"checkbox"]) {
         current_view = [renderer drawCheckBox:current frame:uiFrame parentView:anchor];
     }
+    else if ([current.type hasPrefix:@"textarea"]) {
+        current_view = [renderer drawEditText:current frame:uiFrame parentView:anchor type:current.type];
+    }
     else if ([current.type hasPrefix:@"text"]) {
         current_view = [renderer drawText:current frame:uiFrame parentView:anchor];
+    }
+    else if ([current.type hasPrefix:@"label"]) {
+        current_view = [renderer drawLabel:current frame:uiFrame parentView:anchor];
     }
     else if ([current.type hasPrefix:@"edit"]) {
         current_view = [renderer drawSimpleEditText:current frame:uiFrame parentView:anchor];
     }
     else if ([current.type isEqualToString:@"document"]) {
-        current_view = [renderer drawEditText:current frame:uiFrame parentView:anchor];
+        current_view = [renderer drawEditText:current frame:uiFrame parentView:anchor type:current.type];
     }
     else if ([current.type isEqualToString:@"menubar"]) {
         [renderer drawMenuBar:current parentView:remoteMenu];
     }
-    else if ([current.type isEqualToString:@"menuitem"]) {
+    else if ([current.type isEqualToString:@"menuitem"] || [current.type isEqualToString:@"menubaritem"]) {
         [renderer drawMenu:current anchor:remoteMenu];
-        NSLog(@"menuitem rendered");
+        NSLog(@"%@ rendered", current.type);
         for (Model* child in current.children) {
             [self renderDOM:child anchor:anchor];
         }
@@ -747,9 +770,11 @@ bool isHeader = FALSE;
     else if ([current.type hasPrefix:@"scrollbar"]) {//scrollbar, ignore
         //ignore
     }
+    /*
     else if ([current.type hasPrefix:@"group"]) {//scrollbar, ignore
         [renderer drawGroup:current frame:uiFrame];
     }
+     */
     else if ([current.type isEqualToString:@"progressbar"]) {//composite, complex
         [renderer drawProgressBar:current frame:uiFrame parentView:anchor];
         // go over each child, i.e., breadcrumb, toolbar, combobox
@@ -776,7 +801,7 @@ bool isHeader = FALSE;
 
 // MARK: consume updates
 - (void) receivedMessage:(NSNotification *) notification {
-    NSLog(@"Notification name = %@", [notification name]);
+    //NSLog(@"Notification name = %@", [notification name]);
     NSDictionary *userInfo = notification.userInfo;
     if(userInfo) {
         Sinter *sinter = [userInfo objectForKey:@"sinter"];
@@ -800,7 +825,8 @@ bool isHeader = FALSE;
                                          subCode:sinter.header.sub_code
                                         newValue:sinter.header.params.data2];
         if(ui){
-            if (ui && ui.version && [ui.type hasPrefix:@"Menu"]) {
+            ui.type = [ui.type lowercaseString];
+            if (ui && ui.version && [ui.type hasPrefix:@"menu"]) {
                 [self renderDOM:ui anchor:remoteMenu];
             } else {
                 [self renderDOM:ui anchor:self.window.contentView];
@@ -813,7 +839,8 @@ bool isHeader = FALSE;
         ui = [self populateValuesFrom:node addToCache:YES updateType:updateTypeNodeExpanded];
         if(ui){
             [self parseXMLDocument:node havingUI:ui updateType:updateTypeNodeExpanded];
-            if (ui && ui.version && [ui.type hasPrefix:@"Menu"]) {
+            ui.type = [ui.type lowercaseString];
+            if (ui && ui.version && [ui.type hasPrefix:@"menu"]) {
                 [self renderDOM:ui anchor:remoteMenu];
             } else {
                 [self renderDOM:ui anchor:self.window.contentView];
@@ -869,7 +896,7 @@ bool isHeader = FALSE;
     //close opened menu
     if (renderer && renderer.selectedMenuModel) {
         do{
-            [sharedConnection sendActionMsg:process_id targetId:(renderer.selectedMenuModel.unique_id) actionType:STRActionCollpase data:nil];
+            [sharedConnection sendActionMsg:process_id targetId:(renderer.selectedMenuModel.unique_id) actionType:STRActionCollapse data:nil];
             renderer.selectedMenuModel = renderer.selectedMenuModel.parent;
         } while (renderer.selectedMenuModel && ([renderer.selectedMenuModel.type caseInsensitiveCompare:@"menuitem"] == NSOrderedSame ||
                                                 [renderer.selectedMenuModel.type caseInsensitiveCompare:@"menu"] == NSOrderedSame)) ;

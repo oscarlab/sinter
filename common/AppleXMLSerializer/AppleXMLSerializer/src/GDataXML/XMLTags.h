@@ -59,7 +59,7 @@ FOUNDATION_EXPORT NSString *const STRActionToggle;
 FOUNDATION_EXPORT NSString *const STRActionSelect;
 FOUNDATION_EXPORT NSString *const STRActionRename;
 FOUNDATION_EXPORT NSString *const STRActionExpand;
-FOUNDATION_EXPORT NSString *const STRActionCollpase;
+FOUNDATION_EXPORT NSString *const STRActionCollapse;
 FOUNDATION_EXPORT NSString *const STRActionClose;
 FOUNDATION_EXPORT NSString *const STRActionChangeFocus;
 FOUNDATION_EXPORT NSString *const STRActionChangeFocusPrecise;

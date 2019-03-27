@@ -526,10 +526,22 @@ static  ClientHandler  * sharedConnection;
 */
 
 #pragma mark NSTextView/EDIT
-- (NSTextView *) drawEditText:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent{
-    //NSTextView *textView = [idToUITable objectForKey:model.unique_id];
+- (NSTextView *) drawEditText:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent type:(NSString*)uiType{
     CustomTextView *textView = [idToUITable objectForKey:model.unique_id];
+    
+    NSString* string = nil;
+    if ([uiType isEqualToString:@"document"]){
+        //window scraper
+        string = model.name;
+    }
+    else{
+        //mac scraper
+        string = model.value;
+    }
+    
     if (textView) {
+        
+        [textView setString: string];
         if (model.version) {
             model.version = 0;
         }
@@ -565,7 +577,7 @@ static  ClientHandler  * sharedConnection;
     [idToUITable setObject:textView forKey:textView.identifier];
 
     
-    [textView setString: model.value]; //stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"]
+    [textView setString: string]; //stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"]
     [scrollview setDocumentView:textView];
     [parent addSubview:scrollview];//
     
@@ -709,15 +721,66 @@ static  ClientHandler  * sharedConnection;
     return label;
 }
 
+-(CustomLabel*) drawLabel:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent{
+    if (model.states & STATE_INVISIBLE) {
+        return nil;
+    }
+    
+    CustomLabel *label = [idToUITable objectForKey:model.unique_id];
+    if (label) {
+        [label setHidden:NO];
+        [label setStrValue:model.value];
+        
+        //[label setLabel:model.name];
+        if (model.version) {
+            model.version = 0;
+        }
+        return label;
+    }
+    label = [[CustomLabel alloc] initWithFrame:frame andConnection:sharedConnection];
+    [label setLabel:model.name];
+    [label setStrValue: model.value];
+    
+    // check if it is not numeric string
+    if (![self isNumericString:model.value]){
+        [label setStrValue: model.name];
+    }
+    
+    [[label window] makeFirstResponder:label];
+    [label setAutoresizesSubviews:TRUE];
+    [parent addSubview:label];
+    
+    [label setIdentifier:model.unique_id];
+    [idToUITable setObject:label forKey:label.identifier];
+    
+    if ([[window title] hasPrefix:@"Calc"]) {
+        if(model.states & STATE_FOCUSED){
+            [label setLabel:@"Result"];
+            [label setNeedsDisplay:YES];
+        }else{
+            [label setHidden:YES];
+        }
+        return label;
+    }
+    
+    [label setNeedsDisplay:YES];
+    return label;
+}
 
 #pragma mark NSTextViewDelegate
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRanges:(NSArray<NSValue *> *)affectedRanges replacementStrings:(nullable NSArray<NSString *> *)replacementStrings {
     
-    //NSRange range = [[affectedRanges firstObject] rangeValue];
+    NSRange range = [[affectedRanges firstObject] rangeValue];
     if (![[replacementStrings firstObject] isEqualToString:@""]) {
         
-        [sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionAppendText data:[replacementStrings firstObject]];
-        //NSLog(@"should change range %lu, %lu , string %@", range.length, range.location, [replacementStrings firstObject]);
+        
+        NSString * oldstring = textView.string;
+        NSString * newstring = [oldstring stringByReplacingCharactersInRange:range
+                                                                  withString:[replacementStrings firstObject]];
+        NSLog(@"should change range lengtg:%lu, location:%lu , string %@", range.length, range.location, [replacementStrings firstObject]);
+        [sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionSetText data:newstring];
+        
+        //[sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionAppendText data:[replacementStrings firstObject]];
         //return YES;
     }
     return YES ;

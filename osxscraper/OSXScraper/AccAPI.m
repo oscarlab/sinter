@@ -29,6 +29,8 @@
 #import "Sinter.h"
 #import "Config.h"
 #import "XMLTags.h"
+#import "Header.h"
+#import "Params.h"
 
 //#import "IRTransformation.h"
 
@@ -79,6 +81,7 @@ static NSDictionary * roleMappings;
     [entity setName     : [self getTitleOfUIElement:element]];
     [entity setValue    : [self getValueOfUIElement:element]];
     
+    CFRelease(element);
     return entity;
 }
 
@@ -88,7 +91,8 @@ static NSDictionary * roleMappings;
     sinter.header.service_code = [serviceCodes objectForKey:STRLsRes];
     sinter.header.sub_code = [serviceCodes objectForKey:STRLsRes];
     
-    NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",@"Chrome",@"Finder",nil];
+    //NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",@"Chrome",@"Finder",nil];
+    NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",nil];
     NSArray * processes =  [self getAllProcessesIDs];
     for ( NSNumber * process_id in processes){
         Entity * e = [self getEntityForApp: (pid_t) [process_id integerValue]];
@@ -109,20 +113,54 @@ static NSDictionary * roleMappings;
     sinter.header.process_id = [NSString stringWithFormat:@"%i", (int) pid];
 
     NSRect desktop = [[NSScreen mainScreen] frame];
-    sinter.header.screen = [[Screen alloc] initWithHeight:(int)desktop.size.height andWidth:(int)desktop.size.width];
+    Params * param = [[Params alloc] init];
+    param.data1 = [NSNumber numberWithInt:(int)desktop.size.width].stringValue;
+    param.data2 = [NSNumber numberWithInt:(int)desktop.size.height].stringValue;
+    sinter.header.params = param;
     
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+        
+    /* instead of sending the whole app in entity, sending frontwindow in entity and rests in entities (such as menubar) */
+    AXUIElementRef frontWindow = NULL;
+    AXError err = AXUIElementCopyAttributeValue(app, (CFStringRef)NSAccessibilityMainWindowAttribute, (CFTypeRef *)&frontWindow );
+    if ( err == kAXErrorSuccess ){
+        //getEntityFroElement is a recursive call by which we got the whole DOM tree under the frontWindow
+        Entity * root_entity = [self getEntityFroElement:frontWindow atIndex:0  havingId:nil andParentId:@"" withCache:cache updateCache:YES];
+        sinter.entity = root_entity;
+    }
+    else{
+        sinter.entity = nil;
+        return sinter;
+    }
+
+
+    int   child_count = [self getNumChildOfUIElement:app];
+    CFArrayRef    children;
+    if(child_count > 1 && AXUIElementCopyAttributeValue(app, (CFStringRef) NSAccessibilityChildrenAttribute, (CFTypeRef *) &children) == kAXErrorSuccess){
+        sinter.entities = [[NSMutableArray alloc] init];
+        for (int i = 0; i < CFArrayGetCount(children); i++){
+            AXUIElementRef child_element = (AXUIElementRef) CFArrayGetValueAtIndex(children, i);
+            
+            CFTypeRef flagIsMainWindow;
+            AXError err = AXUIElementCopyAttributeValue(child_element, (CFStringRef)NSAccessibilityMainAttribute, (CFTypeRef *)&flagIsMainWindow);
+            if(err == kAXErrorSuccess && [(__bridge NSNumber *)flagIsMainWindow boolValue]){
+                NSLog(@"not sending windows again");
+            }
+            else
+            [sinter.entities addObject:
+             [self getEntityFroElement:child_element atIndex:i havingId:nil andParentId:@"/application_0" withCache:cache updateCache:YES]];
+        }
+        CFRelease(children);
+    }
     
-    AXUIElementRef element = AXUIElementCreateApplication(pid);
-    
-    Entity * root_entity = [self getEntityFroElement:element atIndex:0  havingId:nil andParentId:@"" withCache:cache updateCache:YES];
-    sinter.entity = root_entity;
     
     //body = (NSXMLElement *) [IRTransformation performMenuTransfromationOn:body];
     //body = (NSXMLElement *) [IRTransformation performMenuTransfromation2On:body];
     //body = (NSXMLElement *)[IRTransformation lookAlike:body];
     
     //return data and appRef
-    *elemRef = element;
+    *elemRef = app;
+    
     return sinter;
 }
 
@@ -150,25 +188,41 @@ static NSDictionary * roleMappings;
         if([cache objectForKey:parent_key]){
             parent = (__bridge AXUIElementRef)([dict_keys objectForKey: keys[i]]);
             hit    = YES;
-            NSLog(@"got a hit %@ reason:%@ %@", parent_key, updateType, parent);
+            //NSLog(@"got a hit %@ reason:%@ %@", parent_key, updateType, parent);
+            NSLog(@"updateType:%@ for %@", updateType, parent_key);
             break;
         }
     }
     
     if(!hit || !parent) return nil;
     
-    Sinter * sinter = [[Sinter alloc] initWithEntities];
-    sinter.header.service_code = [serviceCodes objectForKey:STRDelta];
-    sinter.header.process_id = [NSString stringWithFormat:@"%d", pid];
-    sinter.header.kbd_or_action = [[KbdOrAction alloc] initWithTarget:parent_key andData:updateType];
+    if([updateType isEqualToString:(NSString*)kAXValueChangedNotification]){
     
-    
-    Entity * body = [self getEntityFroElement:element atIndex:0  havingId:parent_key andParentId:nil withCache:cache updateCache:NO];
-    if(body) {
-        [sinter.entities addObject:body];
+        NSNumber * service_code = [serviceCodes objectForKey:STRDelta];
+        NSNumber * sub_code = [serviceCodes objectForKey:STRDeltaPropValueChanged];
+        Params * params = [[Params alloc] init];
+        params.target_id = parent_key;
+        params.data2 = [self getValueOfUIElement:element];
+        
+        Sinter * sinter = [[Sinter alloc] initWithServiceCode:service_code
+                                                      subCode:sub_code
+                                                    processId:[NSString stringWithFormat:@"%d", pid]
+                                                       params:params];
+        return sinter;
+        
+      
+    }
+    else{
+        NSLog(@"updateType not handled yet");
     }
     
-    return sinter;
+    /*
+     Entity * body = [self getEntityFroElement:element atIndex:0  havingId:parent_key andParentId:nil withCache:cache updateCache:NO];
+     if(body) {
+     [sinter.entities addObject:body];
+     }
+     */
+    return nil;
 }
 
 
@@ -190,10 +244,16 @@ static NSDictionary * roleMappings;
     
     Entity * entity     = [[Entity alloc] init];
     
+    
     [entity setUnique_id: primary_id];
     [entity setType     : [self getRoleOfUIElement:element]];
     [entity setName     : [self getTitleOfUIElement:element]];
     [entity setValue    : [self getValueOfUIElement:element]];
+    if ([entity.type isEqualToString:@"button"]
+        && ([entity.name isEqualToString:@""] || [entity.value isEqualToString:@""])){
+        //NSLog(@"Button without name and value, get label");
+        [entity setValue    : [self getAccessbilityDescriptionAttribute:element]];
+    }
     [entity setStates   : [NSNumber numberWithUnsignedInteger:[self getStatesOfUIElement:element]]];
     
     //NSRect rect   = [self flippedScreenBounds: [self getFrameOfUIElement:element]];
@@ -202,7 +262,6 @@ static NSDictionary * roleMappings;
     entity.left   = [NSNumber numberWithInt: rect.origin.x];
     entity.height = [NSNumber numberWithInt: rect.size.height];
     entity.width  = [NSNumber numberWithInt: rect.size.width];
-    
     
     // children
     int   child_count = [self getNumChildOfUIElement:element];
@@ -220,6 +279,87 @@ static NSDictionary * roleMappings;
         CFRelease(children);
     }
     return entity;
+}
+
++ (AXUIElementRef) findAXUIElement:(NSString *)unique_id root:(AXUIElementRef)root atIndex:(int)index andParentId:(NSString *)parentId {
+    
+    // getting id
+    NSString * primary_id = [self getCompleteIdOfUIElement:root havingIndex:index andParentID:parentId];
+    if([unique_id isEqualToString:primary_id] ){
+        return root;
+    }
+    
+    // children
+    int   child_count = [self getNumChildOfUIElement:root];
+    CFArrayRef    children;
+    if(child_count && AXUIElementCopyAttributeValue(root, (CFStringRef) NSAccessibilityChildrenAttribute, (CFTypeRef *) &children) == kAXErrorSuccess){
+        for (int i = 0; i < CFArrayGetCount(children); i++){
+             AXUIElementRef child_element = (AXUIElementRef) CFArrayGetValueAtIndex(children, i);
+            AXUIElementRef element = [self findAXUIElement:unique_id root:child_element atIndex:i andParentId:primary_id];
+            if(element != nil){
+                return element;
+            }
+        }
+    }
+    return nil;
+}
+
++ (void) handleActionDefault:(int)pid targetID:(NSString*)whichUI {
+    
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+    AXUIElementRef ui = [AccAPI findAXUIElement:whichUI root:app atIndex:0 andParentId:@""];
+    AXError ret = 0;
+    NSString * defaultActionName = nil;
+    
+    /* for development logging: to know which actions are there */
+    CFArrayRef actionNames;
+    ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
+    if(CFArrayGetCount(actionNames) > 0) {
+        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    }
+    
+    /* decide what's the default action for this UI type */
+    NSString * type =[AccAPI getRoleOfUIElement:ui];
+    if([type isEqualToString:@"button"]){
+        defaultActionName = @"AXPress";
+    }
+    
+    ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
+    if(ret != kAXErrorSuccess){
+        NSLog(@"Action %@ result = %d",defaultActionName, ret);
+    }
+    
+    CFRelease(app);
+}
+
++ (Sinter *) handleActionExpand:(int)pid targetID:(NSString*)whichUI {
+    
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+    AXUIElementRef ui = [AccAPI findAXUIElement:whichUI root:app atIndex:0 andParentId:@""];
+    AXError ret = 0;
+    NSString * defaultActionName = nil;
+    
+    /* for development logging: to know which actions are there */
+    CFArrayRef actionNames;
+    ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
+    if(CFArrayGetCount(actionNames) > 0) {
+        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    }
+    
+    /* decide what's the default action for this UI type */
+    NSString * type =[AccAPI getRoleOfUIElement:ui];
+    if([type isEqualToString:@"menubaritem"] ){
+        defaultActionName = @"AXPress";
+    }
+    
+    ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
+    if(ret != kAXErrorSuccess){
+        NSLog(@"Action %@ result = %d",defaultActionName, ret);
+    }
+    
+    CFRelease(app);
+
+    return nil;
 }
 
 + (NSArray *) attributeNamesOfUIElement:(AXUIElementRef)element {
@@ -282,6 +422,7 @@ typedef enum {
     // primary: check if ID field is defined
     if((result = [self valueOfAttribute:NSAccessibilityIdentifierAttribute ofUIElement:element])){
         primary_key = [NSString stringWithFormat:@"%@_%@", role, (NSString*) result];
+        //primary_key = (NSString*) result;  //somehow modify this will cuz main display disappear
         *type = PRIMARY;
         return primary_key;
     }
@@ -306,15 +447,21 @@ typedef enum {
     NSString       *temp;
  
     temp = [self getImmediateIdOfUIElement:element andReturnIdType: &type];
-    if (type == TERTIARY)
+    if (type == TERTIARY){
         key = [NSString stringWithFormat:@"%@/%@_%i",parentID, temp, index];
-    else if(type == SECONDARY)
+    }
+    else if(type == SECONDARY){
         key = [NSString stringWithFormat:@"%@/%@", parentID, temp];
-    else if(type == PRIMARY)
+        NSLog(@"type = %d: unique_id = %@", type, key);
+    }
+    else if(type == PRIMARY){
         key = [NSString stringWithFormat:@"%@", temp];
+    }
     else{
         key = @"invalid id";
     }
+    
+    //NSLog(@"type = %d: unique_id = %@", type, key);
     return key;
 }
 
@@ -414,19 +561,42 @@ typedef enum {
 + (NSString *) getValueOfUIElement:(AXUIElementRef) element {
     NSString *value = @"";
     CFTypeRef result;
+    AXError ret = kAXErrorSuccess;
     
-    if (AXUIElementCopyAttributeValue(element, (__bridge CFStringRef) NSAccessibilityValueAttribute, (CFTypeRef *)&result) == kAXErrorSuccess
-        && result){
+    ret = AXUIElementCopyAttributeValue(element, (__bridge CFStringRef) NSAccessibilityValueAttribute, (CFTypeRef *)&result);
+    //NSLog(@"AXUIElementCopyAttributeValue, NSAccessibilityValueAttribute ret = %d", ret);
+    //if (ret == kAXErrorSuccess && result){
+    if (ret == kAXErrorSuccess && CFGetTypeID(result) == CFStringGetTypeID()){
         value = (__bridge NSString *) result;
         CFRelease( result);
         return value;
     }
-    if (AXUIElementCopyAttributeValue(element, (__bridge CFStringRef) NSAccessibilityValueDescriptionAttribute, (CFTypeRef *)&result) == kAXErrorSuccess
-        && result){
+
+    ret = AXUIElementCopyAttributeValue(element, (__bridge CFStringRef) NSAccessibilityValueDescriptionAttribute, (CFTypeRef *)&result);
+    //NSLog(@"AXUIElementCopyAttributeValue, NSAccessibilityValueDescriptionAttribute ret = %d", ret);
+    if (ret == kAXErrorSuccess && result){
         value = (__bridge NSString *) result;
         CFRelease( result);
         return value;
     }
+    return value;
+}
+
++ (NSString *) getAccessbilityDescriptionAttribute:(AXUIElementRef) element {
+    NSString *value = @"";
+    CFTypeRef result;
+    AXError ret = kAXErrorSuccess;
+    
+    ret = AXUIElementCopyAttributeValue(element, (__bridge CFStringRef) NSAccessibilityDescriptionAttribute, (CFTypeRef *)&result);
+    if (ret == kAXErrorSuccess && result){
+        value = (__bridge NSString *) result;
+        CFRelease( result);
+        return value;
+    }
+    else{
+        //NSLog(@"AXUIElementCopyAttributeValue, NSAccessibilityDescriptionAttribute ret = %d", ret);
+    }
+        
     return value;
 }
 
