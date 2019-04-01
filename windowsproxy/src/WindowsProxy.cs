@@ -951,7 +951,8 @@ namespace WindowsProxy
             execute_kbd(sinter);
         }
 
-        public void ProcessKeyPress(string keypresses) {
+        public void ProcessKeyPress(string keypresses)
+        {
             Sinter sinter = new Sinter {
                 HeaderNode = MsgUtil.BuildHeader(serviceCodes["kbd"]),
             };
@@ -1202,8 +1203,7 @@ namespace WindowsProxy
             this.form = null;
 
             //re-load the list from server
-            this.execute_ls_req(null);
-          }
+            this.execute_ls_req(null);          
         }
 
         // client related calls
