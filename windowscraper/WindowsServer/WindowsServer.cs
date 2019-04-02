@@ -32,7 +32,7 @@ namespace WindowsServer {
 
   public static class ServerConfiguration{
     public const int SERVER_PORT = 6832;
-    public const string CERTIFICATE_FILE = @"WindowsServerCert.cer"; //The path of x.509 certificate file
+    public const string CERTIFICATE_FILE = @"WindowsServer.pfx"; //The path of x.509 certificate file
     public const string DEFAULT_PASSCODE = "123456";
   }
 
@@ -41,7 +41,7 @@ namespace WindowsServer {
     private static int port = ServerConfiguration.SERVER_PORT;
     private static List<ClientHandler> clients = new List<ClientHandler>();
     private static TcpListener serverSocket;
-    private static X509Certificate serverCertificate = X509Certificate.CreateFromCertFile(ServerConfiguration.CERTIFICATE_FILE);
+    private static X509Certificate serverCertificate = new X509Certificate2(ServerConfiguration.CERTIFICATE_FILE, ServerConfiguration.DEFAULT_PASSCODE, X509KeyStorageFlags.MachineKeySet);
 
     public static void StartServer()
     {
