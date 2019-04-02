@@ -263,7 +263,15 @@ namespace WindowsScraper
                         ((ValuePattern)valuePattern).SetValue(text);
                     }
                     else
-                    {//send keystrokes
+                    {   //send keystrokes
+                        // Set focus for input functionality and begin.
+                        element.SetFocus();
+
+                        // Pause before sending keyboard input.
+                        Thread.Sleep(100);
+                        SendKeys.SendWait("^{HOME}");   // Move to start of control
+                        SendKeys.SendWait("^+{END}");   // Select everything
+                        SendKeys.SendWait("{DEL}");     // Delete selection
                         SendKeys.SendWait(text);
                     }
                 }
@@ -429,16 +437,10 @@ namespace WindowsScraper
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-            //int[] runtimeId = e.GetRuntimeId();
 
             if (automationElementTrie.ContainsKey(runtimeId))
             {
-<<<<<<< HEAD
-                DeltaForClose(stringRuntimeId);
-=======
-                //Console.WriteLine("runtimeId" + runtimeId + " " + e.ToString());
-                //DeltaForClose(runtimeId);  //OnWindowClosed is called back not just for application window but all menu etc. should not send to client
->>>>>>> b40e473... modification to work with OSX instances
+                //DeltaForClose(stringRuntimeId); //OnWindowClosed will also called back when menu is closed. do not send to client
                 Console.WriteLine("Window Closed Globally" + runtimeId);
             }
         }
@@ -1870,10 +1872,10 @@ namespace WindowsScraper
                     case "action_change_focus_precise":
                         break;
                     case "action_set_text":
-                        //executeSetText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
+                        executeSetText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_append_text":
-                        //executeAppendText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
+                        executeAppendText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_foreground":
                         break;
