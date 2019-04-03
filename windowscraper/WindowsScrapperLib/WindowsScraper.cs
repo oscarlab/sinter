@@ -522,7 +522,7 @@ namespace WindowsScraper
         {
             AutomationElement element = (AutomationElement)sender;
 
-            Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
+            //Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
 
             // Property: IsOffScreen
             if (e.Property == AutomationElement.IsOffscreenProperty)
@@ -796,7 +796,7 @@ namespace WindowsScraper
             {
                 foreach (Entity child_entity in node.Children)
                 {
-                    Console.WriteLine("{0} {1}", child_entity.Type, child_entity.Name);
+                    Console.WriteLine("PrintChildrenNodes {0} {1}", child_entity.Type, child_entity.Name);
                     PrintChildrenNodes(child_entity);
                 }
             }
@@ -1208,7 +1208,7 @@ namespace WindowsScraper
 
             AutomationElement.AutomationElementInformation current = element.Current;
 
-            Console.WriteLine("Form Entity for {0}", element.Current.Name);
+            //Console.WriteLine("Form Entity for {0}", element.Current.Name);
 
             String uniqueId;
 
@@ -1599,7 +1599,7 @@ namespace WindowsScraper
         public void execute_ls_req(Sinter _)
         {
             // demo: only fetch explorer app for now
-            string[] supportedProcesses = { "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad" };
+            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad"};
 
             Dictionary<string, string> processes = new Dictionary<string, string>();
             foreach (string pname in supportedProcesses)
@@ -1620,9 +1620,13 @@ namespace WindowsScraper
                     if (node == null)
                         continue;
 
-                    if (processes.ContainsKey(node.Process))
+                    if (processes.ContainsKey(node.Process) || processes.ContainsValue(node.Name))
                     {
-                        node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                        //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes. 
+                        if (!(processes.ContainsValue(node.Name))) 
+                        {
+                            node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                        }
                         entityNodes.Add(node);
                     }
                 }
