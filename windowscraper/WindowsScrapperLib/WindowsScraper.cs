@@ -1734,9 +1734,16 @@ namespace WindowsScraper
 	  //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
 	  Thread.Sleep(10);
 	  key = sinter.HeaderNode.ParamsInfo.KeyPress;
-	  string keyPress = key.ToString();
-	  Console.WriteLine(key);
-	  SendKeys.SendWait(keyPress);
+            if (key != 0)
+            {
+                string keyPress = key.ToString();
+                Console.WriteLine(key);
+                SendKeys.SendWait(keyPress);
+            }
+            else{
+                Console.WriteLine(sinter.HeaderNode.ParamsInfo.Data1);
+                SendKeys.SendWait(sinter.HeaderNode.ParamsInfo.Data1);
+            }
     }
 
         public void execute_mouse(Sinter sinter)

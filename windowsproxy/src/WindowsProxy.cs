@@ -318,6 +318,11 @@ namespace WindowsProxy
               control.Tag = entity;
               control.KeyPress += Document_KeyPress;
               control.Click += Text_Click;
+
+            // set default cursor to beginning of the document just like opening a file.
+            text.SelectionStart = 0;
+            text.SelectionLength = 0;
+
               return control;
         }
 
