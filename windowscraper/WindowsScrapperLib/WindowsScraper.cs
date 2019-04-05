@@ -424,23 +424,26 @@ namespace WindowsScraper
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-            //automationElementTrie.ContainsKey(runtimeId);
+
             if (automationElementTrie.ContainsKey(runtimeId))
             {
-                DeltaForClose(stringRuntimeId);
+                //DeltaForClose(stringRuntimeId);
+                DeltaForClose(null); // targetID = 'null' will make client close all windows of the processID. 
+                                     // this is different from OnWindowClosed(), which close only specific targetID.
                 Console.WriteLine("Window Closed Locally " + runtimeId);
             }
         }
 
+        //Every windows under AutomationElement.RootElement will trigger this event. 
         private void OnWindowClosed(object obj, AutomationEventArgs _e)
         {
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-
+     
             if (automationElementTrie.ContainsKey(runtimeId))
             {
-                //DeltaForClose(stringRuntimeId); //OnWindowClosed will also called back when menu is closed. do not send to client
+                DeltaForClose(stringRuntimeId);
                 Console.WriteLine("Window Closed Globally" + runtimeId);
             }
         }
@@ -1091,7 +1094,7 @@ namespace WindowsScraper
         {
             Sinter sinter = new Sinter
             {
-                HeaderNode = MsgUtil.BuildHeader(serviceCodes["event"], serviceCodes["event_closed"]),
+                HeaderNode = MsgUtil.BuildHeader(serviceCodes["event"], serviceCodes["event_closed"], rid),
             };
 
             connection.SendMessage(sinter);

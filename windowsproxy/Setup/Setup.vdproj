@@ -225,7 +225,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_348B43D6AD7D4C97AE231806A5C4CBB4"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\windowsproxy\\src\\config.xml"
+            "SourcePath" = "8:..\\src\\config.xml"
             "TargetName" = "8:config.xml"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
@@ -276,7 +276,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7E12377FDB1145F29E97B936E3FB20E7"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\common\\RoleMapping.plist"
+            "SourcePath" = "8:..\\..\\common\\RoleMapping.plist"
             "TargetName" = "8:RoleMapping.plist"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
@@ -353,7 +353,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E0ADF852D0414519B4858052F67491E6"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\common\\Windows.plist"
+            "SourcePath" = "8:..\\..\\common\\Windows.plist"
             "TargetName" = "8:Windows.plist"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
@@ -949,7 +949,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9114F349EFF743A7B93B93173BAD89DC"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\windowsproxy\\src\\obj\\x86\\Release\\WindowsProxy.exe"
+            "SourcePath" = "8:..\\src\\obj\\x86\\Release\\WindowsProxy.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"

@@ -316,7 +316,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6DEC09D59FA74C1E8B26244C93433469"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\common\\Windows.plist"
+            "SourcePath" = "8:..\\..\\..\\..\\common\\Windows.plist"
             "TargetName" = "8:Windows.plist"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
@@ -336,7 +336,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_70465FAFC4ED4795A4F498B75670A45A"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\common\\RoleMapping.plist"
+            "SourcePath" = "8:..\\..\\..\\..\\common\\RoleMapping.plist"
             "TargetName" = "8:RoleMapping.plist"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
@@ -387,7 +387,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83ECAB3295EC4BA4B989898BA6C9C3F7"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\windowscraper\\WindowsServer\\WindowsServer.pfx"
+            "SourcePath" = "8:..\\..\\..\\WindowsServer\\WindowsServer.pfx"
             "TargetName" = "8:WindowsServer.pfx"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
@@ -1076,7 +1076,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BF6730D36AB941B08464878E25399F54"
             {
-            "SourcePath" = "8:\\\\vmware-host\\Shared Folders\\MainSinter\\windowscraper\\WindowsScraper\\obj\\Release\\WindowsScraper.exe"
+            "SourcePath" = "8:..\\..\\obj\\Release\\WindowsScraper.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
