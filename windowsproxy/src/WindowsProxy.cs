@@ -1131,6 +1131,7 @@ namespace WindowsProxy
                 Console.WriteLine("Type: {0}", sinter.EntityNode.Type);
                 if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem"))
                 {
+                    UpdateMenu(sinter);
                     return;
                 }
 
