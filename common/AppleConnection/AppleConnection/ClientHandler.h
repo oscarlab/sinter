@@ -93,6 +93,7 @@
 - (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length;
 
 - (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat;
+- (void) sendKeystrokes:(NSString *)key processId:(NSString*)processId targetId:(NSString*)targetId;
 
 
 @end

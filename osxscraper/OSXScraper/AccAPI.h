@@ -52,7 +52,8 @@
 
 + (AXUIElementRef) findAXUIElement:(NSString *)unique_id root:(AXUIElementRef)root atIndex:(int)index andParentId:(NSString *)parentId;
 + (void) handleActionDefault:(int)pid targetID:(NSString*)whichUI;
-+ (Sinter *) handleActionExpand:(int)pid targetID:(NSString*)whichUI;
++ (void) handleActionExpand:(int)pid targetID:(NSString*)whichUI;
++ (void) handleActionCollapse:(int)pid targetID:(NSString*)whichUI;
 
 + (NSArray *) attributeNamesOfUIElement:(AXUIElementRef)element;
 + (id) valueOfAttribute:(NSString *)attribute ofUIElement:(AXUIElementRef) element;

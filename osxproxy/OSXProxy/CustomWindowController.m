@@ -31,6 +31,7 @@
 #import "ControlTypes.h"
 
 #import "XMLTags.h"
+#import "Word.h"
 
 
 #import "MegaWordRibbon.h"
@@ -175,6 +176,11 @@ int L, mask;
         ui.name             = node.name;
         ui.value            = node.value;
         ui.states           = [node.states longLongValue];
+    }
+    
+    if( node.words.count > 0 && [ui.type isEqualToString:@"Document"]){
+        Word * word = node.words[0];
+        ui.value = word.text;
     }
     
     // sanity check
@@ -841,7 +847,14 @@ bool isHeader = FALSE;
             [self parseXMLDocument:node havingUI:ui updateType:updateTypeNodeExpanded];
             ui.type = [ui.type lowercaseString];
             if (ui && ui.version && [ui.type hasPrefix:@"menu"]) {
-                [self renderDOM:ui anchor:remoteMenu];
+                if (0) // ([ui.type isEqualToString:@"menubar"])
+                {
+                    //OSXScraper sends the whole menubar, we just render the children of it instead of re-draw the menubar
+                    for (Model* child in ui.children) {
+                        [self renderDOM:child anchor:remoteMenu];
+                    }
+                }
+                else [self renderDOM:ui anchor:remoteMenu];
             } else {
                 [self renderDOM:ui anchor:self.window.contentView];
             }

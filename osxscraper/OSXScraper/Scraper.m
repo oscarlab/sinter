@@ -104,8 +104,8 @@ Scraper * refToSelf;
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRKeyboard]]) {
         int pid = [cmdSinter.header.process_id intValue];
-        if (cmdSinter.header.kbd_or_action) {
-            [self handleKeyboardInput:pid andValue: cmdSinter.header.kbd_or_action.generic_data];
+        if (cmdSinter.header.params) {
+            [self handleKeyboardInput:pid andValue: cmdSinter.header.params.data1];
         }
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRMouse]]) {
@@ -128,7 +128,11 @@ Scraper * refToSelf;
         }
         else if(sub_code == [[serviceCodes objectForKey:STRActionExpand] intValue]){
             NSString * whichUI = cmdSinter.header.params.target_id;
-            sinterToSend = [AccAPI handleActionExpand:pid targetID:whichUI];
+            [AccAPI handleActionExpand:pid targetID:whichUI];
+        }
+        else if(sub_code == [[serviceCodes objectForKey:STRActionCollapse] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            [AccAPI handleActionCollapse:pid targetID:whichUI];
         }
     }
     else {

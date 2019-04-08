@@ -530,14 +530,7 @@ static  ClientHandler  * sharedConnection;
     CustomTextView *textView = [idToUITable objectForKey:model.unique_id];
     
     NSString* string = nil;
-    if ([uiType isEqualToString:@"document"]){
-        //window scraper
-        string = model.name;
-    }
-    else{
-        //mac scraper
-        string = model.value;
-    }
+	string = model.value;
     
     if (textView) {
         
@@ -560,6 +553,7 @@ static  ClientHandler  * sharedConnection;
     //textView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width-2, contentSize.height)];
     textView = [[CustomTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width-2, contentSize.height)
                andConnection:sharedConnection];
+    textView.process_id = process_id;
     
     [textView setMinSize:NSMakeSize(0.0, contentSize.height)];
     [textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
@@ -585,6 +579,10 @@ static  ClientHandler  * sharedConnection;
     //[(NSWindow*) parent setContentView:textView];
     //[(NSWindow*) parent makeKeyAndOrderFront:nil];
     //[(NSWindow*) parent makeFirstResponder:textView];
+
+    //set cursor to beginning just like newly open a file
+    [textView setSelectedRange:(NSRange){0, 0}];
+    [sharedConnection sendKeystrokes:@"^{HOME}" processId:process_id targetId:textView.identifier];
     
     return textView;
     
@@ -702,7 +700,8 @@ static  ClientHandler  * sharedConnection;
 
     [[label window] makeFirstResponder:label];
     [label setAutoresizesSubviews:TRUE];
-    [parent addSubview:label];
+    if (![parent isKindOfClass:[NSMenu class]]) //to avoid exception thrown
+    { [parent addSubview:label]; }
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
@@ -748,7 +747,9 @@ static  ClientHandler  * sharedConnection;
     
     [[label window] makeFirstResponder:label];
     [label setAutoresizesSubviews:TRUE];
-    [parent addSubview:label];
+    if (![parent isKindOfClass:[NSMenu class]]){ // to avoid exception thrown
+        [parent addSubview:label];
+    }
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
@@ -770,17 +771,11 @@ static  ClientHandler  * sharedConnection;
 #pragma mark NSTextViewDelegate
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRanges:(NSArray<NSValue *> *)affectedRanges replacementStrings:(nullable NSArray<NSString *> *)replacementStrings {
     
-    NSRange range = [[affectedRanges firstObject] rangeValue];
     if (![[replacementStrings firstObject] isEqualToString:@""]) {
         
         
-        NSString * oldstring = textView.string;
-        NSString * newstring = [oldstring stringByReplacingCharactersInRange:range
-                                                                  withString:[replacementStrings firstObject]];
-        NSLog(@"should change range lengtg:%lu, location:%lu , string %@", range.length, range.location, [replacementStrings firstObject]);
-        [sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionSetText data:newstring];
-        
-        //[sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionAppendText data:[replacementStrings firstObject]];
+        [sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionAppendText data:[replacementStrings firstObject]];
+        //[sharedConnection sendKeystrokes:[replacementStrings firstObject] processId:process_id targetId:textView.identifier]; //this is what work for mac scraper now
         //return YES;
     }
     return YES ;
@@ -1363,6 +1358,9 @@ static  ClientHandler  * sharedConnection;
         return;
     
     if ([idToUITable objectForKey:menu.title]) {
+        Model* selectedMenu = selectedMenuModel;
+        selectedMenu.version = 1;
+        [self menuNeedsUpdate:menu];
         return;
     }
     
@@ -1391,7 +1389,8 @@ static  ClientHandler  * sharedConnection;
 - (Model *) findSubMenuModelInParentModel:(Model *) parentModel {
     Model * model = parentModel;
     while ([model.type caseInsensitiveCompare:@"menu"] != NSOrderedSame) {
-        if ([model.type caseInsensitiveCompare:@"menuitem"] == NSOrderedSame && model.child_count > 0){
+        if (([model.type caseInsensitiveCompare:@"menuitem"] == NSOrderedSame && model.child_count > 0)
+            || (([model.type caseInsensitiveCompare:@"menubaritem"] == NSOrderedSame && model.child_count > 0))){
             model = [model.children firstObject];
         } else { // unknow model-type
             model = nil;

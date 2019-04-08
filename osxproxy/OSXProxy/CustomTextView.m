@@ -25,9 +25,11 @@
 */
 
 #import "CustomTextView.h"
+#import "XMLTags.h"
 
 @implementation CustomTextView
 @synthesize sharedConnection;
+@synthesize process_id;
 
 -(id) initWithFrame:(NSRect)frameRect andConnection:(ClientHandler*) connection{
     self = [super initWithFrame:frameRect];
@@ -83,7 +85,8 @@
     NSRange range = [self getDeleteRange];
     [self setSelectedRange:range];
     //[sharedConnection sendSpecialStroke:@"BACKSPACE" numRepeat:1];
-    [sharedConnection sendSpecialStroke:@"{BACKSPACE}" numRepeat:1];
+    [sharedConnection sendKeystrokes:@"{BACKSPACE}" processId:self.process_id targetId:self.identifier];
+    //[sharedConnection sendActionMsg:nil targetId:(self.identifier) actionType:STRActionAppendText data:@"{BACKSPACE}"];
     [self delete:nil];
     //[super deleteBackward:sender];
 }
@@ -97,8 +100,36 @@
     [self delete:nil];
 
 }
-//
-////
+
+- (void)keyDown:(NSEvent *)event{
+    [self interpretKeyEvents:[NSArray arrayWithObject:event]];
+    
+    /* https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/HandlingKeyEvents/HandlingKeyEvents.html */
+    /* https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.sendkeys?redirectedfrom=MSDN&view=netframework-4.7.2 */
+    if ([event modifierFlags] & NSNumericPadKeyMask) { // arrow keys have this mask
+        NSString *theArrow = [event charactersIgnoringModifiers];
+        unichar keyChar = 0;
+        if ( [theArrow length] == 0 )
+            return;            // reject dead keys
+        if ( [theArrow length] == 1 ) {
+            keyChar = [theArrow characterAtIndex:0];
+            if ( keyChar == NSLeftArrowFunctionKey ) {
+                [sharedConnection sendKeystrokes:@"{LEFT}" processId:process_id targetId:self.identifier]; //LEFT ARROW key
+            }
+            if ( keyChar == NSRightArrowFunctionKey ) {
+                [sharedConnection sendKeystrokes:@"{RIGHT}" processId:process_id targetId:self.identifier]; //RIGHT ARROW key
+            }
+            if ( keyChar == NSUpArrowFunctionKey ) {
+                [sharedConnection sendKeystrokes:@"{UP}" processId:process_id targetId:self.identifier]; //UP ARROW key
+            }
+            if ( keyChar == NSDownArrowFunctionKey ) {
+                [sharedConnection sendKeystrokes:@"{DOWN}" processId:process_id targetId:self.identifier]; //DOWN ARROW key
+            }
+        }
+    }
+}
+
+
 //- (void)insertText:(id)insertString {
 //
 //    NSLog(@"current position %lu %lu",  [self selectedRange].length , (unsigned long)[self selectedRange].location);

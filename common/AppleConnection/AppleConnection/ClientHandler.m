@@ -527,7 +527,30 @@ static ClientHandler* shared       = nil;
 
 - (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat {
     //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd_shortcut"] andKbdOrActionWithTarget:key andData:@(repeat).stringValue];
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboardShortcut] andKbdOrActionWithTarget:key andData:key];
+    
+    Params * params = [[Params alloc] init];
+    params.target_id = @"";
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboard] subCode:[serviceCodes objectForKey:STRKeyboardShortcut] processId:nil params:params];
+    
+    [self sendSinter:sinter];
+}
+
+- (void) sendKeystrokes:(NSString*)key processId:(NSString*)processId targetId:(NSString*)targetId {
+    Params * params = [[Params alloc] init];
+    params.target_id = targetId;
+    if([key isEqualToString:@"{BACKSPACE}"]){
+        params.keypress = [NSNumber numberWithInt:0x08]; //for windows scraper
+        params.data1 = @"DELETE"; //for osx scraper
+    }
+    else{
+        params.keypress = [NSNumber numberWithInt:0];
+        params.data1 = key;
+    }
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboard]
+                                                  subCode:[serviceCodes objectForKey:STRKeyboardShortcut]
+                                                processId:processId
+                                                   params:params];
+    
     [self sendSinter:sinter];
 }
 

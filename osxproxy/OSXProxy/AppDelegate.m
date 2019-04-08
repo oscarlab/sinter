@@ -196,9 +196,9 @@
     if (!windows)
         return;
     
-    for (int i = 0 ; i < [windows count] ; i++ ) {
+    while([windows count] > 0) {
         [self removeWindowWithPID:_pid
-            andUniqueId:[[windows[i] rmUiRoot] unique_id]];
+            andUniqueId:[[windows[0] rmUiRoot] unique_id]];
     }
 }
 
@@ -333,7 +333,10 @@
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STREvent]]){
         NSLog(@"sub_code = %@", sinter.header.sub_code);
         NSString * processId      = sinter.header.process_id;
-        [self removeAllWindowsWithPID:processId];
+        if(sinter.header.params.target_id == nil)
+            [self removeAllWindowsWithPID:processId];
+        else
+            [self removeWindowWithPID:processId andUniqueId:sinter.header.params.target_id];
     }
     else {
         NSLog(@"service code %@ is not handled?", service_code);

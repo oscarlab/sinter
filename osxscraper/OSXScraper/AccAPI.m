@@ -185,6 +185,7 @@ static NSDictionary * roleMappings;
         if (i == 0) {
             current_key = parent_key;
         }
+        parent_key = [NSString stringWithFormat:@"/%@", parent_key]; //should be "/application_0/menubar_1" instead of "application_0/menubar_1"
         if([cache objectForKey:parent_key]){
             parent = (__bridge AXUIElementRef)([dict_keys objectForKey: keys[i]]);
             hit    = YES;
@@ -212,8 +213,18 @@ static NSDictionary * roleMappings;
         
       
     }
+    else if ([updateType isEqualToString:(NSString*)kAXSelectedChildrenChangedNotification]){
+        NSNumber * service_code = [serviceCodes objectForKey:STRDelta];
+        NSNumber * sub_code = [serviceCodes objectForKey:STRDeltaSubtreeExpand];
+        Sinter * sinter = [[Sinter alloc] initWithServiceCode:service_code
+                                                      subCode:sub_code
+                                                    processId:[NSString stringWithFormat:@"%d", pid]
+                                                       params:nil];
+        sinter.entity = [self getEntityFroElement:element atIndex:0 havingId:parent_key andParentId:nil withCache:cache updateCache:NO];
+        return sinter;
+    }
     else{
-        NSLog(@"updateType not handled yet");
+        NSLog(@"updateType %@ not handled yet", updateType);
     }
     
     /*
@@ -332,7 +343,7 @@ static NSDictionary * roleMappings;
     CFRelease(app);
 }
 
-+ (Sinter *) handleActionExpand:(int)pid targetID:(NSString*)whichUI {
++ (void) handleActionExpand:(int)pid targetID:(NSString*)whichUI {
     
     AXUIElementRef app = AXUIElementCreateApplication(pid);
     AXUIElementRef ui = [AccAPI findAXUIElement:whichUI root:app atIndex:0 andParentId:@""];
@@ -358,8 +369,34 @@ static NSDictionary * roleMappings;
     }
     
     CFRelease(app);
+}
 
-    return nil;
++ (void) handleActionCollapse:(int)pid targetID:(NSString*)whichUI {
+    
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+    AXUIElementRef ui = [AccAPI findAXUIElement:whichUI root:app atIndex:0 andParentId:@""];
+    AXError ret = 0;
+    NSString * defaultActionName = nil;
+    
+    /* for development logging: to know which actions are there */
+    CFArrayRef actionNames;
+    ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
+    if(CFArrayGetCount(actionNames) > 0) {
+        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    }
+    
+    /* decide what's the default action for this UI type */
+    NSString * type =[AccAPI getRoleOfUIElement:ui];
+    if([type isEqualToString:@"menubaritem"] ){
+        defaultActionName = @"AXCancel";
+    }
+    
+    ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
+    if(ret != kAXErrorSuccess){
+        NSLog(@"Action %@ result = %d",defaultActionName, ret);
+    }
+    
+    CFRelease(app);
 }
 
 + (NSArray *) attributeNamesOfUIElement:(AXUIElementRef)element {
@@ -484,7 +521,10 @@ typedef enum {
                 key = [NSString stringWithFormat:@"%@", temp];
         }
         else{
-            key = temp;
+            if (type == TERTIARY)
+                key = [NSString stringWithFormat:@"%@_%i", temp, 0]; //should be application_0 instead of application
+            else
+                key = temp;
         }
         [key_dict setObject:(__bridge id)element forKey:key];
         [*key_list addObject:key];
