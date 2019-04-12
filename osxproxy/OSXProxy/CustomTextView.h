@@ -34,5 +34,6 @@
 -(id) initWithFrame:(NSRect)frameRect andConnection:(ClientHandler*) connection;
 @property (assign, nonatomic) BOOL shouldSendKeyStrokes;
 @property(weak)  ClientHandler  * sharedConnection;
+@property (nonatomic, strong) NSString *process_id;
 
 @end

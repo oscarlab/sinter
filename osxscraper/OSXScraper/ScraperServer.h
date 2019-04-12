@@ -18,7 +18,9 @@
 */
 
 #import <Foundation/Foundation.h>
-#define SERVER_PORT 6832
+#define SERVER_PORT 6833
+
+extern int gPasscode;
 
 @interface ScraperServer : NSObject<NSStreamDelegate>{
     CFSocketRef             _ipv4socket;

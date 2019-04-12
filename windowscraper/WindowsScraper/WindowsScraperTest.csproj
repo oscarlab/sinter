@@ -76,7 +76,6 @@
       <Link>Windows.plist</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>

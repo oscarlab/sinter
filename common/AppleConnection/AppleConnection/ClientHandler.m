@@ -27,12 +27,12 @@
 #import "ClientHandler.h"
 #import "Serializer.h"
 #import "Config.h"
+#import "XMLTags.h"
 
 
 NSString * ClientConnectionDidCloseNotification = @"ClientConnectionDidCloseNotification";
 
 static ClientHandler* shared       = nil;
-static NSDictionary * serviceCodes = nil;
 
 @implementation ClientHandler
 
@@ -43,7 +43,6 @@ static NSDictionary * serviceCodes = nil;
 
 
 +(void) initialize {
-    serviceCodes = [Config getServiceCodes];
 }
 
 + (id) getConnection {
@@ -60,10 +59,15 @@ static NSDictionary * serviceCodes = nil;
     return shared;
 }
 
+- (void) setIPAndPort:(NSString *)_ipAddress andPort:(int)_port{
+    [shared setIpAddress:_ipAddress];
+    [shared setPort:_port];
+}
+
 - (id) init {
     if (self = [super init]) {
         isConnected = false;
-        _isSelfSignedCertAccepted = true;
+        _isSelfSignedCertAccepted = true;  //hard code for now
 
         msgs = [[NSMutableArray alloc] init];
         formatter = [[NSDateFormatter alloc] init];
@@ -113,7 +117,7 @@ static NSDictionary * serviceCodes = nil;
     if (self = [self init]) {
         // set identifier for notification
         [self setIdentifier:identifier];
-
+        
         _isServerSocket = YES;
         
         inputStream = inStream;
@@ -126,14 +130,14 @@ static NSDictionary * serviceCodes = nil;
         CFArrayRef keyref = NULL;
         OSStatus sanityChesk = SecPKCS12Import((__bridge CFDataRef)pkcs12data,
                                                (__bridge CFDictionaryRef)[NSDictionary
-                                                dictionaryWithObject:@"osxsinter"
-                                                forKey:(__bridge id)kSecImportExportPassphrase],
-                                               &keyref);
+                                                                          dictionaryWithObject:@"osxsinter"
+                                                                          forKey:(__bridge id)kSecImportExportPassphrase],
+                                                                          &keyref);
         if (sanityChesk != noErr) {
             NSLog(@"Errorcode: %i, while importing pkcs12", sanityChesk);
         }
- 
-
+        
+        
         // Identity
         CFDictionaryRef identityDict = CFArrayGetValueAtIndex(keyref, 0);
         SecIdentityRef identityRef = (SecIdentityRef)CFDictionaryGetValue(identityDict,
@@ -193,7 +197,7 @@ static NSDictionary * serviceCodes = nil;
     }
     
     last_data = data;
-    NSLog(@" data sent to server");
+    //NSLog(@" data sent to server");
 }
 
 - (void) sendMessageWithData:(NSData *)data {
@@ -204,6 +208,8 @@ static NSDictionary * serviceCodes = nil;
 
 - (void) sendSinter:(Sinter *) sinter {
     NSString * send_msg = [Serializer objectToXml:sinter];
+    NSLog(@"Sinter sent: service_code = %@, sub_code = %@", sinter.header.service_code, sinter.header.sub_code);
+    if(sinter.header.service_code == nil) return; //don't send un-recognized service code to server
     [self sendMessage:send_msg];
 }
 
@@ -214,6 +220,8 @@ static NSDictionary * serviceCodes = nil;
     // deserialize XML
     Sinter * sinter = [Serializer xmlToObject:incoming_data];
     if(!sinter) return;
+    NSLog(@"Sinter received: service_code = %@, service_code = %@", sinter.header.service_code, sinter.header.sub_code);
+
     
     NSString *notificationName = @"";
     if(_isServerSocket) {
@@ -225,9 +233,10 @@ static NSDictionary * serviceCodes = nil;
         // all other messages go to corresponding process_id
 
         int service_code = [sinter.header.service_code intValue];
-        if(service_code == [[serviceCodes objectForKey:@"ls_res"] intValue] ||
-           service_code == [[serviceCodes objectForKey:@"ls_l_res"] intValue] ||
-           service_code == [[serviceCodes objectForKey:@"window_closed"] intValue]) {
+        if(service_code == [[serviceCodes objectForKey:STRLsRes] intValue] ||
+           service_code == [[serviceCodes objectForKey:STRLsLongRes] intValue] ||
+           service_code == [[serviceCodes objectForKey:STRVerifyPasscode] intValue] ||
+           service_code == [[serviceCodes objectForKey:STREvent] intValue]) {
             notificationName = @"AppDelegate";
         } else {
             notificationName = sinter.header.process_id;
@@ -251,39 +260,44 @@ static NSDictionary * serviceCodes = nil;
             
         case NSStreamEventHasSpaceAvailable:
             if(!_isServerSocket) {
-                //_isServerSocket = no, client side to check server side trust
-                SecTrustRef trust = (__bridge SecTrustRef)[theStream propertyForKey: (__bridge NSString *)kCFStreamPropertySSLPeerTrust];
-                SecTrustResultType trustResult = kSecTrustResultInvalid;
-                OSStatus status = SecTrustEvaluate(trust, &trustResult);
-                if (status != errSecSuccess) {
-                    NSLog(@"[SSL] failed to evaluate");
-                    [self close];
-                    return;
+                if(!isConnected){
                     
-                } else {
-                    NSLog(@"[SSL] trustResult = %i", trustResult);
-                    if(trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified)
-                    {
-                        if(_isSelfSignedCertAccepted){
-                            status = SecTrustSetOptions(trust, kSecTrustOptionImplicitAnchors); //Treat properly self-signed certificates as anchors implicitly.
-                            if (status != errSecSuccess) NSLog(@"[SSL] SecTrustSetOptions fails");
-                            status = SecTrustEvaluate(trust, &trustResult);
-                            if (status != errSecSuccess) NSLog(@"[SSL] failed to evaluate 2nd time");
-                            NSLog(@"[SSL] trustResult = %i", trustResult);
-                        }
+             
+                    //_isServerSocket = no, client side to check server side trust
+                    SecTrustRef trust = (__bridge SecTrustRef)[theStream propertyForKey: (__bridge NSString *)kCFStreamPropertySSLPeerTrust];
+                    SecTrustResultType trustResult = kSecTrustResultInvalid;
+                    OSStatus status = SecTrustEvaluate(trust, &trustResult);
+                    if (status != errSecSuccess) {
+                        NSLog(@"[SSL] failed to evaluate");
+                        [self close];
+                        return;
                         
+                    } else {
+                        NSLog(@"[SSL] trustResult = %i", trustResult);
                         if(trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified)
                         {
-                            /* still fail even if we trust self-signed? */
-                            NSLog(@"[SSL] trust result - not to proceed");
-                            [self close];
-                            return;
+                            if(_isSelfSignedCertAccepted){
+                                status = SecTrustSetOptions(trust, kSecTrustOptionImplicitAnchors); //Treat properly self-signed certificates as anchors implicitly.
+                                if (status != errSecSuccess) NSLog(@"[SSL] SecTrustSetOptions fails");
+                                status = SecTrustEvaluate(trust, &trustResult);
+                                if (status != errSecSuccess) NSLog(@"[SSL] failed to evaluate 2nd time");
+                                NSLog(@"[SSL] trustResult = %i", trustResult);
+                            }
+                            
+                            if(trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified)
+                            {
+                                /* still fail even if we trust self-signed? */
+                                NSLog(@"[SSL] trust result - not to proceed");
+                                [self close];
+                                return;
+                            }
                         }
                     }
+                    isConnected = true;
+                    NSLog(@"[SSL] Handshake succeed: isConnected = true");
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"connectedInd" object:self];
                 }
             }
-            isConnected = true;
-            NSLog(@"[SSL] Handshake succeed: now set is_connected=true");
             break;
         case NSStreamEventHasBytesAvailable:
             if (theStream == inputStream) {
@@ -347,8 +361,26 @@ static NSDictionary * serviceCodes = nil;
             
         case NSStreamEventErrorOccurred:
         case NSStreamEventEndEncountered:
+            if(theStream == inputStream){
+                //pop to user, but only for 1 stream is enough
+                if(!_isServerSocket){
+                    /* proxy client */
+                    NSAlert *alert = [[NSAlert alloc] init];
+                    if (!isConnected){
+                        [alert setMessageText:@"Not able to connect to remote server"];
+                    }else{
+                        [alert setMessageText:@"Connection Closed"];
+                    }
+                    [alert runModal];
+                }
+                else{
+                    /* scraper server */
+                    //NSAlert *alert = [[NSAlert alloc] init];
+                    //[alert setMessageText:@"Client Disconnected"];
+                    //[alert runModal];
+                }
+            }
             [self close];
-            isConnected = false;
             break;
             
         default:
@@ -390,84 +422,135 @@ static NSDictionary * serviceCodes = nil;
     if(_isServerSocket) {
         [[NSNotificationCenter defaultCenter] postNotificationName:ClientConnectionDidCloseNotification object:self];
     }
-    NSLog(@"disconnected");
+    if(!_isServerSocket){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"disconnectedInd" object:self];
+    }
+    NSLog(@"Connection closed");
 }
 
 
 // utility method for sending message
+- (void) sendPasscodeVerifyReq:(NSString *) passcode {
+    Sinter * sinter = [[Sinter alloc] init];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRVerifyPasscode]
+                                                subCode:[serviceCodes objectForKey:STRVerifyPasscodeReq] processId:nil parameters:nil];
+    sinter.header.params = [[Params alloc] init];
+    sinter.header.params.data1 = passcode;
+    [self sendSinter:sinter];
+}
+
+- (void) sendPasscodeVerifyRes:(bool) result {
+    Sinter * sinter = [[Sinter alloc] init];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRVerifyPasscode]
+                                                subCode:[serviceCodes objectForKey:STRVerifyPasscodeRes] processId:nil parameters:nil];
+    sinter.header.params = [[Params alloc] init];
+    if(result)
+        sinter.header.params.data1 = @"True";
+    else
+        sinter.header.params.data1 = @"False";
+    [self sendSinter:sinter];
+}
+
 - (void) sendListRemoteApp {
     Sinter * sinter = [[Sinter alloc] init];
-    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:@"ls_req"]];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
     [self sendSinter:sinter];
 }
 
 - (void) sendDomRemoteApp:(NSString*) appId {
     Sinter * sinter = [[Sinter alloc] init];
-    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:@"ls_l_req"]];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsLongReq]];
     sinter.header.process_id = appId;
     [self sendSinter:sinter];
 }
 
-
-- (void) sendActionAt:(NSString *) uniqueId {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"default_action"] andKbdOrActionWithTarget:uniqueId andData:@""];
+- (void) sendActionMsg:(NSString *)processId targetId:(NSString*)targetId actionType:(NSString*)action data:(NSString*)data{
+    
+    if(processId == nil){
+        NSLog(@"%@, %@, process_id == null in action msg?!!", [serviceCodes objectForKey:STRAction], [serviceCodes objectForKey:action]);
+    }
+    
+    //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"appendtext"] andKbdOrActionWithTarget:uniqueId andData:text];
+    Params * params = [[Params alloc] init];
+    params.target_id = targetId;
+    params.data1 = data;
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRAction]
+                                                  subCode:[serviceCodes objectForKey:action]
+                                                processId:processId
+                                                   params:params];
     [self sendSinter:sinter];
 }
 
-- (void) sendActionAt:(NSString *) uniqueId actionName:(NSString*) action {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"action"] andKbdOrActionWithTarget:uniqueId andData:action];
-    [self sendSinter:sinter];
-}
 
-- (void) sendFocusAt:(NSString*) uniqueId {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"focus"] andKbdOrActionWithTarget:uniqueId andData:@""];
-    [self sendSinter:sinter];
-}
 
 - (void) sendBtingFG:(NSString*) uniqueId {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"foreground"] andKbdOrActionWithTarget:uniqueId andData:@""];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRActionForeground] andKbdOrActionWithTarget:uniqueId andData:@""];
     [self sendSinter:sinter];
 }
 
-
-- (void) sendFocusAt:(NSString*) uniqueId andSyncUsingHash:(NSString*) hash {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"focus"] andKbdOrActionWithTarget:uniqueId andData:hash];
-    [self sendSinter:sinter];
-}
 
 - (void) setTextAt:(NSString*) uniqueId text:(NSString*) text {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"settext"] andKbdOrActionWithTarget:uniqueId andData:text];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRActionSetText] andKbdOrActionWithTarget:uniqueId andData:text];
     [self sendSinter:sinter];
 }
 
-- (void) appendTextAt:(NSString*) uniqueId text:(NSString*) text {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"appendtext"] andKbdOrActionWithTarget:uniqueId andData:text];
-    [self sendSinter:sinter];
-}
 
 - (void) sendKeystorkesAt:(NSString*) processId strokes:(NSString*) strokes {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd"] andKbdOrActionWithTarget:processId andData:strokes];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboard] andKbdOrActionWithTarget:processId andData:strokes];
     [self sendSinter:sinter];
 }
 
+/*
 - (void) sendMouseMoveAt:(NSString*) processId andX:(int) x andY:(int) y {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"mouse"] andMouseWithX:x andY:y andButton:-1];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRMouse] andMouseWithX:x andY:y andButton:-1];
     [self sendSinter:sinter];
 }
 
 - (void) sendMouseClickAt:(NSString*) processId andX:(int) x andY:(int) y andButton:(int) button {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"mouse"] andMouseWithX:x andY:y andButton:button];
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRMouse] andMouseWithX:x andY:y andButton:button];
+    [self sendSinter:sinter];
+}
+ */
+- (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length {
+    //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"caret"] andCaret:(int)location andLength:(int)length andTarget:runtimeId];
+    
+    Params * params = [[Params alloc] init];
+    params.target_id = runtimeId;
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRMouse]
+                                                  subCode:[serviceCodes objectForKey:STRMouseCaret]
+                                                processId:runtimeId
+                                                   params:params];
+    NSLog(@"!!empty data inside mouse_caret"); //cannot find the structure in messages.xls, is it still valid?
     [self sendSinter:sinter];
 }
 
-- (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length {
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"caret"] andCaret:(int)location andLength:(int)length andTarget:runtimeId];
-    [self sendSinter:sinter];
-}
 
 - (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat {
     //Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd_shortcut"] andKbdOrActionWithTarget:key andData:@(repeat).stringValue];
-    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:@"kbd_shortcut"] andKbdOrActionWithTarget:key andData:key];
+    
+    Params * params = [[Params alloc] init];
+    params.target_id = @"";
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboard] subCode:[serviceCodes objectForKey:STRKeyboardShortcut] processId:nil params:params];
+    
+    [self sendSinter:sinter];
+}
+
+- (void) sendKeystrokes:(NSString*)key processId:(NSString*)processId targetId:(NSString*)targetId {
+    Params * params = [[Params alloc] init];
+    params.target_id = targetId;
+    if([key isEqualToString:@"{BACKSPACE}"]){
+        params.keypress = [NSNumber numberWithInt:0x08]; //for windows scraper
+        params.data1 = @"DELETE"; //for osx scraper
+    }
+    else{
+        params.keypress = [NSNumber numberWithInt:0];
+        params.data1 = key;
+    }
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRKeyboard]
+                                                  subCode:[serviceCodes objectForKey:STRKeyboardShortcut]
+                                                processId:processId
+                                                   params:params];
+    
     [self sendSinter:sinter];
 }
 

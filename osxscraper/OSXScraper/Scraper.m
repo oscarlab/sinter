@@ -23,15 +23,16 @@
 
     Created by Syed Masum Billah on 10/19/16.
 */
-
 #import "Scraper.h"
 #include "Sinter.h"
 #include "KeyMapping.h"
 #include "Config.h"
 #include "AccAPI.h"
+#import "XMLTags.h"
+#import "ScraperServer.h"
 
 
-static NSDictionary* serviceCodes;
+//static NSDictionary* serviceCodes;
 
 @implementation Scraper
 @synthesize appCache;
@@ -48,6 +49,7 @@ Scraper * refToSelf;
         refToSelf = self;
         [self setIdentifier:identifier];
         [self setClientHandler:clientHandler];
+        _isPasscodeVerified = false;
         
         appCache = [[NSMutableDictionary alloc] init];
         
@@ -67,57 +69,83 @@ Scraper * refToSelf;
     NSDictionary *userInfo = notification.userInfo;
     if(userInfo) {
         Sinter *sinter = [userInfo objectForKey:@"sinter"];
-        NSLog(@"data server socket %i", [sinter.header.service_code intValue]);
-        [self execute:sinter];
+        NSNumber * service_code = sinter.header.service_code;
+        if(_isPasscodeVerified == true || [service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]){
+            [self execute:sinter];
+        }
+        else{
+            //NSLog(@"ignore msgs before passcode verified");
+        }
     }
 }
 
 
-- (void) execute: (Sinter *) command {
-    NSNumber * service_code = command.header.service_code;
-    Sinter * sinter = nil;
-    if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_req"]]) {
-        sinter = [AccAPI getListOfApplications];
-    
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"ls_l_req"]]) {
-        int pid = [command.header.process_id intValue];
-        sinter = [self handleLSRequestwithPid:pid];
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"kbd"]]) {
-        int pid = [command.header.process_id intValue];
-        if (command.header.kbd_or_action) {
-            [self handleKeyboardInput:pid andValue: command.header.kbd_or_action.generic_data];
+- (void) execute: (Sinter *) cmdSinter {
+    NSNumber * service_code = cmdSinter.header.service_code;
+    Sinter * sinterToSend = nil;
+    if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
+        int client_passcode = [cmdSinter.header.params.data1 intValue];
+        if(client_passcode == gPasscode){
+            [_clientHandler sendPasscodeVerifyRes:true];
+            _isPasscodeVerified = true;
+        }
+        else{
+            [_clientHandler sendPasscodeVerifyRes:false];
+            [_clientHandler close];
         }
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"mouse"]]) {
-        int pid = [command.header.process_id intValue];
-        MouseOrCaret * mouse = command.header.mouse_or_caret;
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsReq]]) {
+        sinterToSend = [AccAPI getListOfApplications];
+    
+    }
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongReq]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        sinterToSend = [self handleLSRequestwithPid:pid];
+    }
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRKeyboard]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        if (cmdSinter.header.params) {
+            [self handleKeyboardInput:pid andValue: cmdSinter.header.params.data1];
+        }
+    }
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRMouse]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        MouseOrCaret * mouse = cmdSinter.header.mouse_or_caret;
         if (mouse) {
             [self handleMouseClick:pid andX:mouse.x_or_starting andY:mouse.y_or_ending andButton:mouse.button_type];
         }
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"delta"]]) {
-        //int pid = [sinter.header.process_id intValue];
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRDelta]]) {
         
     }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"focus"]]) {
-        //int pid = [sinter.header.process_id intValue];
+    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRAction]]) {
+        int pid = [cmdSinter.header.process_id intValue];
+        int sub_code = [cmdSinter.header.sub_code intValue];
         
-    }
-    else if ([service_code isEqualToNumber: [serviceCodes objectForKey:@"default_action"]]) {
-        //int pid = [sinter.header.process_id intValue];
-    
+        if(sub_code == [[serviceCodes objectForKey:STRActionDefault] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            [AccAPI handleActionDefault:pid targetID:whichUI];
+        }
+        else if(sub_code == [[serviceCodes objectForKey:STRActionExpand] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            [AccAPI handleActionExpand:pid targetID:whichUI];
+        }
+        else if(sub_code == [[serviceCodes objectForKey:STRActionCollapse] intValue]){
+            NSString * whichUI = cmdSinter.header.params.target_id;
+            [AccAPI handleActionCollapse:pid targetID:whichUI];
+        }
     }
     else {
     
     }
     
     // send sinter response
-    if (sinter) {
-        [_clientHandler sendSinter:sinter];
+    if (sinterToSend) {
+        [_clientHandler sendSinter:sinterToSend];
     }
 }
+
+
 
 
 - (void) handleMouseClick:(int) pid andX:(NSNumber *) x andY:(NSNumber *) y andButton:(NSNumber *) button {
@@ -188,7 +216,7 @@ Scraper * refToSelf;
     AXUIElementRef app_ref;
     Sinter * sinter = [AccAPI getDomOf:pid andReturnRef:&app_ref withCache:cache_pid];
     if (sinter) {
-        //[self registerObserverFor:pid forElementRef:app_ref];
+        [self registerObserverFor:pid forElementRef:app_ref];
     }
     return sinter;
 }
@@ -201,6 +229,8 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
         NSLog(@"Observer registration failed");
         return ;
     }
+    
+    //NSLog(@"notification Name = %@", notificationName);
     
     NSMutableDictionary * pid_cache = [[refToSelf appCache] objectForKey:[NSNumber numberWithInt:pid]] ;
     Sinter * sinter =  [AccAPI getDeltaAt:element havingPID:pid andUpdateType:(__bridge NSString *)(notificationName) withCache:pid_cache];

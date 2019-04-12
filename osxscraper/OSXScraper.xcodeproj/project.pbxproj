@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		086E2FDD222735E200FD2CFF /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 086E2FDC222735E200FD2CFF /* osxsinter.p12 */; };
+		08791EB622331CB2009EB201 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB322331CB2009EB201 /* Word.m */; };
+		08791EB722331CB2009EB201 /* Params.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB522331CB2009EB201 /* Params.m */; };
+		08791EC022331EA3009EB201 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EBE22331EA2009EB201 /* XMLTags.m */; };
+		08866A4822398052006F3473 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08866A4722398052006F3473 /* RoleMapping.plist */; };
+		08E6D9C3222087690057A290 /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 08E6D9C2222087690057A290 /* osxsinter.p12 */; };
 		0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6C19C01DB7B742004DFB3F /* Scraper.m */; };
-		0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */; };
 		0DB4CA4C20D75AE200FFFD23 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */; };
 		0DB4CA4F20D75B0D00FFFD23 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4E20D75B0D00FFFD23 /* Serializer.m */; };
 		0DB4CA5220D75B2C00FFFD23 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5020D75B2C00FFFD23 /* GDataXMLNode.m */; };
@@ -49,10 +52,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		086E2FDC222735E200FD2CFF /* osxsinter.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = osxsinter.p12; sourceTree = "<group>"; };
+		08791EB222331CB2009EB201 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Word.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.h; sourceTree = "<group>"; };
+		08791EB322331CB2009EB201 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Word.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.m; sourceTree = "<group>"; };
+		08791EB422331CB2009EB201 /* Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Params.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.h; sourceTree = "<group>"; };
+		08791EB522331CB2009EB201 /* Params.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Params.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.m; sourceTree = "<group>"; };
+		08791EBE22331EA2009EB201 /* XMLTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLTags.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.m; sourceTree = "<group>"; };
+		08791EBF22331EA3009EB201 /* XMLTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLTags.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.h; sourceTree = "<group>"; };
+		08866A4722398052006F3473 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = RoleMapping.plist; path = ../common/RoleMapping.plist; sourceTree = "<group>"; };
+		08E6D9C2222087690057A290 /* osxsinter.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = osxsinter.p12; sourceTree = "<group>"; };
 		0D6C19BF1DB7B742004DFB3F /* Scraper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scraper.h; sourceTree = "<group>"; };
 		0D6C19C01DB7B742004DFB3F /* Scraper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scraper.m; sourceTree = "<group>"; };
-		0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = RoleMapping.plist; sourceTree = "<group>"; };
 		0DB4CA4A20D75AE200FFFD23 /* ClientHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClientHandler.h; path = ../common/AppleConnection/AppleConnection/ClientHandler.h; sourceTree = "<group>"; };
 		0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ClientHandler.m; path = ../common/AppleConnection/AppleConnection/ClientHandler.m; sourceTree = "<group>"; };
 		0DB4CA4D20D75B0D00FFFD23 /* Serializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serializer.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Serializer/Serializer.h; sourceTree = "<group>"; };
@@ -127,6 +136,12 @@
 		0D6C19CC1DB7DB60004DFB3F /* AppleXMLSerializer */ = {
 			isa = PBXGroup;
 			children = (
+				08791EBF22331EA3009EB201 /* XMLTags.h */,
+				08791EBE22331EA2009EB201 /* XMLTags.m */,
+				08791EB422331CB2009EB201 /* Params.h */,
+				08791EB522331CB2009EB201 /* Params.m */,
+				08791EB222331CB2009EB201 /* Word.h */,
+				08791EB322331CB2009EB201 /* Word.m */,
 				0DB4CA6520D75B7B00FFFD23 /* Config.h */,
 				0DB4CA6620D75B7B00FFFD23 /* Config.m */,
 				0DB4CA5A20D75B4900FFFD23 /* Entity.h */,
@@ -161,6 +176,7 @@
 		9CFA676A1AA01864007E84ED = {
 			isa = PBXGroup;
 			children = (
+				08866A4722398052006F3473 /* RoleMapping.plist */,
 				0DAF71111DB81018002BE0A1 /* Connection */,
 				0D6C19CC1DB7DB60004DFB3F /* AppleXMLSerializer */,
 				9CFA677C1AA01865007E84ED /* OSXScraper */,
@@ -202,8 +218,6 @@
 		9CFA677C1AA01865007E84ED /* OSXScraper */ = {
 			isa = PBXGroup;
 			children = (
-				086E2FDC222735E200FD2CFF /* osxsinter.p12 */,
-				0DAF71151DB81A39002BE0A1 /* RoleMapping.plist */,
 				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
 				9CFE59551BCB00D100BEAC79 /* documentation.rtf */,
 				9CFE59561BCB00D100BEAC79 /* AccAPI.h */,
@@ -213,6 +227,7 @@
 				7BC447C91AA390B0006C2146 /* Keymapping.m */,
 				9CFA67AC1AA018D1007E84ED /* ScraperServer.h */,
 				9CFA67AD1AA018D1007E84ED /* ScraperServer.m */,
+				08E6D9C2222087690057A290 /* osxsinter.p12 */,
 				9CFA67881AA01865007E84ED /* AppDelegate.h */,
 				9CFA67891AA01865007E84ED /* AppDelegate.m */,
 				9CFA678B1AA01865007E84ED /* MainMenu.xib */,
@@ -331,12 +346,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				9CFA67811AA01865007E84ED /* InfoPlist.strings in Resources */,
+				08866A4822398052006F3473 /* RoleMapping.plist in Resources */,
 				9CFA678F1AA01865007E84ED /* Images.xcassets in Resources */,
 				9CFA67871AA01865007E84ED /* Credits.rtf in Resources */,
 				9CFE595B1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist in Resources */,
 				9CFA678D1AA01865007E84ED /* MainMenu.xib in Resources */,
-				086E2FDD222735E200FD2CFF /* osxsinter.p12 in Resources */,
-				0DAF71161DB81A39002BE0A1 /* RoleMapping.plist in Resources */,
+				08E6D9C3222087690057A290 /* osxsinter.p12 in Resources */,
 				9CFE59581BCB00D100BEAC79 /* documentation.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -367,11 +382,14 @@
 				0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */,
 				0DB4CA5220D75B2C00FFFD23 /* GDataXMLNode.m in Sources */,
 				0DB4CA4F20D75B0D00FFFD23 /* Serializer.m in Sources */,
+				08791EB722331CB2009EB201 /* Params.m in Sources */,
 				7BC447CA1AA390B0006C2146 /* Keymapping.m in Sources */,
 				9CFE59591BCB00D100BEAC79 /* AccAPI.m in Sources */,
+				08791EB622331CB2009EB201 /* Word.m in Sources */,
 				0DB4CA6020D75B4A00FFFD23 /* Header.m in Sources */,
 				9CFA67831AA01865007E84ED /* main.m in Sources */,
 				0DB4CA6120D75B4A00FFFD23 /* Screen.m in Sources */,
+				08791EC022331EA3009EB201 /* XMLTags.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -538,7 +556,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lxml2";
-				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = SBU.OSXScraper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

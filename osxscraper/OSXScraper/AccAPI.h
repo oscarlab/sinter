@@ -29,8 +29,11 @@
 
 @interface AccAPI : NSObject
 
-+ (Sinter *) getListOfApplications;
++ (void) initialize;
++ (NSArray *) getAllProcessesIDs;
++ (Entity *) getEntityForApp:(pid_t) pid;
 
++ (Sinter *) getListOfApplications;
 + (Sinter *) getDomOf:(pid_t) pid
              andReturnRef:(AXUIElementRef*) elemRef
              withCache:(NSMutableDictionary*) cache;
@@ -40,18 +43,37 @@
              andUpdateType:(NSString *) updateType
              withCache:(NSMutableDictionary*) cache ;
 
++ (Entity *) getEntityFroElement:(AXUIElementRef) element
+                         atIndex:(int) index
+                        havingId:(NSString*) elemId
+                     andParentId:(NSString *) parentId
+                       withCache:(NSMutableDictionary*) cache
+                     updateCache:(bool) whenAsked;
+
++ (AXUIElementRef) findAXUIElement:(NSString *)unique_id root:(AXUIElementRef)root atIndex:(int)index andParentId:(NSString *)parentId;
++ (void) handleActionDefault:(int)pid targetID:(NSString*)whichUI;
++ (void) handleActionExpand:(int)pid targetID:(NSString*)whichUI;
++ (void) handleActionCollapse:(int)pid targetID:(NSString*)whichUI;
+
++ (NSArray *) attributeNamesOfUIElement:(AXUIElementRef)element;
++ (id) valueOfAttribute:(NSString *)attribute ofUIElement:(AXUIElementRef) element;
++ (NSString *) getRoleOfUIElement:(AXUIElementRef) element;
++ (NSString * ) getImmediateIdOfUIElement: (AXUIElementRef) element andReturnIdType:(int *) type;
++ (NSString * ) getCompleteIdOfUIElement: (AXUIElementRef)element havingIndex:(int) index andParentID:(NSString *) parentID;
 
 + (NSDictionary *) getSegmentedIdOfUIElement: (AXUIElementRef) element
                    andReturnKeys:(NSMutableArray**) key_list;
 
-+ (Entity *) getEntityForApp:(pid_t) pid;
-
-+ (Entity *) getEntityFroElement:(AXUIElementRef)
-             element atIndex:(int) index
-             havingId:(NSString*) elemId
-             andParentId:(NSString *) parentId
-             withCache:(NSMutableDictionary*) cache
-             updateCache:(bool) whenAsked;
++ (NSString *) getTitleOfUIElement:(AXUIElementRef) element;
++ (int) getNumChildOfUIElement:(AXUIElementRef) element;
++ (NSString *) getValueOfUIElement:(AXUIElementRef) element;
++ (NSString *) getAccessbilityDescriptionAttribute:(AXUIElementRef) element ;
++ (BOOL) canSetAttribute:(NSString *)attributeName ofUIElement:(AXUIElementRef)element;
++ ( unsigned int) getStatesOfUIElement:(AXUIElementRef)element;
++ (CGPoint)carbonScreenPointFromCocoaScreenPoint:(NSPoint)cocoaPoint;
++ (NSRect) flippedScreenBounds:(NSRect) bounds;
++ (NSRect) getFrameOfUIElement:(AXUIElementRef)element;
++(int) indexInParentofUIElement:(AXUIElementRef) element parent:(AXUIElementRef) parent;
 
 + (void) printObserverStatus:(AXError) code;
 

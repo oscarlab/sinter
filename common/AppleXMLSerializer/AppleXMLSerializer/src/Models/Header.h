@@ -30,22 +30,23 @@
 #import "MouseOrCaret.h"
 #import "KbdOrAction.h"
 #import "Header.h"
+#import "Params.h"
 
 @interface Header : NSObject 
 
 @property (nonatomic, assign) NSNumber* service_code;
+@property (nonatomic, assign) NSNumber* sub_code;
 @property (nonatomic, retain) NSString* timestamp;
 @property (nonatomic, retain) NSString* process_id;
-
-@property (nonatomic, retain) Screen*       screen;
+@property (nonatomic, retain) Params* params;
+//@property (nonatomic, retain) Screen*       screen;
 @property (nonatomic, retain) KbdOrAction*  kbd_or_action;
 @property (nonatomic, retain) MouseOrCaret* mouse_or_caret;
 
 
 - (id) init;
-- (id) initWithServiceCodeInt:(int) service_code;
-- (id) initWithServiceCode:(NSNumber *) service_code;
-- (id) initWithServiceCode:(NSNumber *) service_code andProcessId:(NSString *) process_id;
+- (id) initWithServiceCode:(NSNumber *)service_code;
+- (id) initWithServiceCode:(NSNumber *)service_code subCode:(NSNumber *)sub_code processId:(NSString*)process_id parameters:(Params*)params;
 
 - (NSDate *) getNSDate;
 

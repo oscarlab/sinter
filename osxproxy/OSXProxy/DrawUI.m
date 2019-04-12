@@ -25,6 +25,8 @@
 */
 
 #import "DrawUI.h"
+#import "Config.h"
+#import "XMLTags.h"
 
 
 @import Foundation;
@@ -524,10 +526,15 @@ static  ClientHandler  * sharedConnection;
 */
 
 #pragma mark NSTextView/EDIT
-- (NSTextView *) drawEditText:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent{
-    //NSTextView *textView = [idToUITable objectForKey:model.unique_id];
+- (NSTextView *) drawEditText:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent type:(NSString*)uiType{
     CustomTextView *textView = [idToUITable objectForKey:model.unique_id];
+    
+    NSString* string = nil;
+	string = model.value;
+    
     if (textView) {
+        
+        [textView setString: string];
         if (model.version) {
             model.version = 0;
         }
@@ -546,6 +553,7 @@ static  ClientHandler  * sharedConnection;
     //textView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width-2, contentSize.height)];
     textView = [[CustomTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width-2, contentSize.height)
                andConnection:sharedConnection];
+    textView.process_id = process_id;
     
     [textView setMinSize:NSMakeSize(0.0, contentSize.height)];
     [textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
@@ -563,7 +571,7 @@ static  ClientHandler  * sharedConnection;
     [idToUITable setObject:textView forKey:textView.identifier];
 
     
-    [textView setString: model.value]; //stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"]
+    [textView setString: string]; //stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"]
     [scrollview setDocumentView:textView];
     [parent addSubview:scrollview];//
     
@@ -571,6 +579,10 @@ static  ClientHandler  * sharedConnection;
     //[(NSWindow*) parent setContentView:textView];
     //[(NSWindow*) parent makeKeyAndOrderFront:nil];
     //[(NSWindow*) parent makeFirstResponder:textView];
+
+    //set cursor to beginning just like newly open a file
+    [textView setSelectedRange:(NSRange){0, 0}];
+    [sharedConnection sendKeystrokes:@"^{HOME}" processId:process_id targetId:textView.identifier];
     
     return textView;
     
@@ -688,7 +700,8 @@ static  ClientHandler  * sharedConnection;
 
     [[label window] makeFirstResponder:label];
     [label setAutoresizesSubviews:TRUE];
-    [parent addSubview:label];
+    if (![parent isKindOfClass:[NSMenu class]]) //to avoid exception thrown
+    { [parent addSubview:label]; }
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
@@ -707,15 +720,62 @@ static  ClientHandler  * sharedConnection;
     return label;
 }
 
+-(CustomLabel*) drawLabel:(Model*) model frame:(NSRect)frame parentView:(NSView*) parent{
+    if (model.states & STATE_INVISIBLE) {
+        return nil;
+    }
+    
+    CustomLabel *label = [idToUITable objectForKey:model.unique_id];
+    if (label) {
+        [label setHidden:NO];
+        [label setStrValue:model.value];
+        
+        //[label setLabel:model.name];
+        if (model.version) {
+            model.version = 0;
+        }
+        return label;
+    }
+    label = [[CustomLabel alloc] initWithFrame:frame andConnection:sharedConnection];
+    [label setLabel:model.name];
+    [label setStrValue: model.value];
+    
+    // check if it is not numeric string
+    if (![self isNumericString:model.value]){
+        [label setStrValue: model.name];
+    }
+    
+    [[label window] makeFirstResponder:label];
+    [label setAutoresizesSubviews:TRUE];
+    if (![parent isKindOfClass:[NSMenu class]]){ // to avoid exception thrown
+        [parent addSubview:label];
+    }
+    
+    [label setIdentifier:model.unique_id];
+    [idToUITable setObject:label forKey:label.identifier];
+    
+    if ([[window title] hasPrefix:@"Calc"]) {
+        if(model.states & STATE_FOCUSED){
+            [label setLabel:@"Result"];
+            [label setNeedsDisplay:YES];
+        }else{
+            [label setHidden:YES];
+        }
+        return label;
+    }
+    
+    [label setNeedsDisplay:YES];
+    return label;
+}
 
 #pragma mark NSTextViewDelegate
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRanges:(NSArray<NSValue *> *)affectedRanges replacementStrings:(nullable NSArray<NSString *> *)replacementStrings {
     
-    //NSRange range = [[affectedRanges firstObject] rangeValue];
     if (![[replacementStrings firstObject] isEqualToString:@""]) {
         
-        [sharedConnection appendTextAt:textView.identifier text:[replacementStrings firstObject]];
-        //NSLog(@"should change range %lu, %lu , string %@", range.length, range.location, [replacementStrings firstObject]);
+        
+        [sharedConnection sendActionMsg:process_id targetId:(textView.identifier) actionType:STRActionAppendText data:[replacementStrings firstObject]];
+        //[sharedConnection sendKeystrokes:[replacementStrings firstObject] processId:process_id targetId:textView.identifier]; //this is what work for mac scraper now
         //return YES;
     }
     return YES ;
@@ -753,7 +813,7 @@ static  ClientHandler  * sharedConnection;
     Model * child = nil;
     for (int i=0; i < model.child_count; i++) {
         child = model.children[i];
-        if ([child.type isEqualToString:@"edit"]){
+        if ([child.type caseInsensitiveCompare:@"edit"] == NSOrderedSame){
             break;
         }
     }
@@ -892,7 +952,7 @@ static  ClientHandler  * sharedConnection;
 - (IBAction) radioButtonAction:(id)sender { // sender is NSMatrix object
     NSButtonCell *selCell = [sender selectedCell];
     //NSLog(@"Selected cell is %@", [selCell representedObject]);
-    [sharedConnection sendActionAt:[selCell representedObject] actionName:@"selection"];
+    [sharedConnection sendActionMsg:process_id targetId:[selCell representedObject] actionType:STRActionSelect data:nil];
 }
 
 - (NSButton * ) drawCheckBox:(Model*) control frame:(NSRect)frame parentView:(NSView *) parent{
@@ -914,7 +974,7 @@ static  ClientHandler  * sharedConnection;
     NSString* unique_id  = [(NSControl *) sender identifier];
     if (unique_id ) {
         if ([idTable objectForKey:unique_id]) {
-            [sharedConnection sendActionAt:unique_id actionName:@"toggle"];
+            [sharedConnection sendActionMsg:process_id targetId:unique_id actionType:STRActionToggle data:nil];
         }
     }
 }
@@ -964,7 +1024,7 @@ static  ClientHandler  * sharedConnection;
     // find proper toolbar item
     Model* pathUI = nil;
     for (int i = 0 ; i < control.child_count ; i++){
-        if ([((Model*)control.children[i]).type isEqualToString:@"toolbar"]) {
+        if ([((Model*)control.children[i]).type caseInsensitiveCompare:@"toolbar"] == NSOrderedSame) {
             pathUI = control.children[i];
             break;
         }
@@ -1046,8 +1106,7 @@ static  ClientHandler  * sharedConnection;
     int clickedSegmentTag = (int)[[sender cell] tagForSegment:clickedSegment];
     Model* control = [idTable objectForKey:[(NSControl*) sender identifier]];
     if (control && clickedSegmentTag < control.child_count) {
-        [sharedConnection sendActionAt:[control.children[clickedSegmentTag] unique_id]];
-        
+        [sharedConnection sendActionMsg:process_id targetId:[control.children[clickedSegmentTag] unique_id] actionType:STRActionDefault data:nil];
     }
 }
 
@@ -1158,13 +1217,13 @@ static  ClientHandler  * sharedConnection;
     
     // find 'list', 'load button' in combobox
     for (Model* item in control.children) {
-        if ([item.type isEqualToString:@"edit"])
+        if ([item.type caseInsensitiveCompare:@"edit"] == NSOrderedSame)
             [control.user_data setObject:item.unique_id forKey:@"edit"];
 
-        if ([item.type isEqualToString:@"button"])
+        if ([item.type caseInsensitiveCompare:@"button"] == NSOrderedSame)
             [control.user_data setObject:item.unique_id forKey:@"load"];
         
-        if ([item.type isEqualToString:@"list"] && item.child_count) {
+        if ([item.type caseInsensitiveCompare:@"list"] == NSOrderedSame && item.child_count) {
             [self getListHeader:item];
             [control.user_data setObject:item.unique_id forKey:@"list"];
             hasList = YES;
@@ -1173,8 +1232,7 @@ static  ClientHandler  * sharedConnection;
     // if list is not populated, expand the list
     if (!hasList) {
         for (int i=0; i < 1; i++) { //press the load button
-            [sharedConnection sendActionAt:
-             [control.user_data objectForKey:@"load"]];
+            [sharedConnection sendActionMsg:process_id targetId:[control.user_data objectForKey:@"load"] actionType:STRActionDefault data:nil];
         }
     }
     return hasList;
@@ -1192,7 +1250,8 @@ static  ClientHandler  * sharedConnection;
         } else {
             [self addToScreenMapTable:control];
             // register structure change notification
-            [sharedConnection sendActionAt:control.unique_id actionName:@"structureChangeNotification"];
+            [sharedConnection sendActionMsg:process_id targetId:(control.unique_id) actionType:@"structureChangeNotification" data:nil];
+            NSLog(@"what is \"structureChangeNotification\"??");
         }
     }
     return nil;
@@ -1208,7 +1267,7 @@ static  ClientHandler  * sharedConnection;
         
         // count num columns from header, or from last row (if header not found)
         if (!isHeader &&
-            ((isHeader = [list_item.type isEqualToString:@"header"]) ||
+            ((isHeader = [list_item.type caseInsensitiveCompare:@"header"] == NSOrderedSame) ||
              (list_item == [control.children lastObject]))) {
                 if (isHeader) { // remove header from listitem
                     header = list_item;
@@ -1299,6 +1358,9 @@ static  ClientHandler  * sharedConnection;
         return;
     
     if ([idToUITable objectForKey:menu.title]) {
+        Model* selectedMenu = selectedMenuModel;
+        selectedMenu.version = 1;
+        [self menuNeedsUpdate:menu];
         return;
     }
     
@@ -1326,13 +1388,15 @@ static  ClientHandler  * sharedConnection;
 
 - (Model *) findSubMenuModelInParentModel:(Model *) parentModel {
     Model * model = parentModel;
-    while (![model.type isEqualToString:@"menu"]) {
-        if ([model.type isEqualToString:@"menuitem"] && model.child_count > 0){
+    while ([model.type caseInsensitiveCompare:@"menu"] != NSOrderedSame) {
+        if (([model.type caseInsensitiveCompare:@"menuitem"] == NSOrderedSame && model.child_count > 0)
+            || (([model.type caseInsensitiveCompare:@"menubaritem"] == NSOrderedSame && model.child_count > 0))){
             model = [model.children firstObject];
         } else { // unknow model-type
             model = nil;
-            break;
+			//break; 
         }
+		break; //this bug results no menu rendered! 
     }
     return model;
 }
@@ -1374,7 +1438,7 @@ static  ClientHandler  * sharedConnection;
     NSMenuItem *subMenuItem;
     for (int i = 0 ; i < items.count ; i++) {
         Model* child = items[i];
-        if(![child.type isEqualToString:@"separator"]){
+        if([child.type caseInsensitiveCompare:@"separator"] != NSOrderedSame){
             subMenuItem = [[NSMenuItem alloc] initWithTitle:child.name action:@selector(menuAction:)  keyEquivalent:@"" ];
             [subMenuItem setTarget:self];
             if (child.states & STATE_DISABLED) {
@@ -1467,7 +1531,7 @@ static  ClientHandler  * sharedConnection;
 //    if (model.states & STATE_CHECKED) {
 //        [sharedConnection sendMouseMoveAt:model.unique_id andX:model.left andY:model.top];
 //    } else {
-        [sharedConnection sendFocusAt:model.unique_id];
+        [sharedConnection sendActionMsg:process_id targetId:(model.unique_id) actionType:STRActionChangeFocus data:nil];
 //    }
     
 }
@@ -1476,7 +1540,7 @@ static  ClientHandler  * sharedConnection;
     Model* model = [self getModelForMenu:menu];
     //NSLog(@"in willopen current menu %@, local menu %@", [model name] , [selectedMenuModel name]);
     if (model && fabs([lasOperationTime timeIntervalSinceNow]) > 0.2 ) {
-        [sharedConnection sendActionAt:model.unique_id actionName:@"expand"];
+        [sharedConnection sendActionMsg:process_id targetId:(model.unique_id) actionType:STRActionExpand data:nil];
         selectedMenuModel = model;
         lasOperationTime = [NSDate date];
         
@@ -1497,7 +1561,7 @@ static  ClientHandler  * sharedConnection;
     NSMenuItem *item = sender;
     Model * model = [idTable objectForKey:[item representedObject]];
     if (model) {
-        [sharedConnection sendActionAt:model.unique_id];
+        [sharedConnection sendActionMsg:process_id targetId:(model.unique_id) actionType:STRActionDefault data:nil];
         selectedMenuModel = nil;
     }
 }
@@ -1506,7 +1570,7 @@ static  ClientHandler  * sharedConnection;
 #pragma mark action handler
 - (void) sendFocus:(NSView*) sender {
     if (sender.identifier) {
-        [sharedConnection sendFocusAt:sender.identifier];
+        [sharedConnection sendActionMsg:process_id targetId:sender.identifier actionType:STRActionChangeFocus data:nil];
     }
 }
 
@@ -1514,7 +1578,7 @@ static  ClientHandler  * sharedConnection;
     if (sender.identifier) {
         Model* item = [idTable objectForKey:sender.identifier];
         if (item) {
-            [sharedConnection sendFocusAt:sender.identifier andSyncUsingHash:item.name];
+            [sharedConnection sendActionMsg:process_id targetId:(sender.identifier) actionType:STRActionChangeFocus data:item.name];
         }
     }
 }
@@ -1524,7 +1588,7 @@ static  ClientHandler  * sharedConnection;
     if (unique_id ) {
         Model *uiRemote = [idTable objectForKey:unique_id];
         if (uiRemote) {
-            [sharedConnection sendActionAt:unique_id];
+            [sharedConnection sendActionMsg:process_id targetId:unique_id actionType:STRActionDefault data:nil];
         }
     }
 }

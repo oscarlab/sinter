@@ -25,6 +25,7 @@
 */
 
 #import "CustomPathControl.h"
+#import "XMLTags.h"
 
 @implementation CustomPathControl
 
@@ -132,7 +133,7 @@
         NSPathComponentCell *cell = [pathControl clickedPathComponentCell];
         if (cell) {
             NSString* unique_id = [[cell URL] absoluteString];
-            [sharedConnection sendActionAt:unique_id];
+            [sharedConnection sendActionMsg:nil targetId:unique_id actionType:STRActionDefault data:nil];
             //NSLog(@"clicked cell %@", unique_id);
         }
     }

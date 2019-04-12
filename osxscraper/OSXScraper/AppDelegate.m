@@ -31,6 +31,7 @@
 
 
 @implementation AppDelegate
+@synthesize passcodeTextField;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -38,9 +39,22 @@
     ScraperServer * server = [[ScraperServer alloc] init];
     if ( [server start] ) {
         NSLog(@"Started server on port %zu.", (size_t) [server port]);
+        
+#ifndef DEBUG
+        gPasscode = arc4random_uniform(1000000);
+#else
+        gPasscode = 123456; //for testing
+#endif
+        NSString *passcodeStr = [NSString stringWithFormat:@"%d", gPasscode];
+        [passcodeTextField setStringValue:passcodeStr];
+        
         [[NSRunLoop currentRunLoop] run];
     } else {
         NSLog(@"Error starting server");
+        NSString *passcodeStr = @"<Empty>";
+        [passcodeTextField setStringValue:passcodeStr];
+        
+        [[NSRunLoop currentRunLoop] run];
     }
 
 //   // debug

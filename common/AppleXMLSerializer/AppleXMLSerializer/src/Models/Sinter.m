@@ -57,21 +57,14 @@ static NSArray * props;
     return self;
 }
 
-- (id) initWithApplications {
+- (id) initWithEntities {
     if ( self = [super init] ) {
         _header = [[Header alloc] init];
-        _applications = [[NSMutableArray alloc] init];
+        _entities = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
-- (id) initWithUpdates {
-    if ( self = [super init] ) {
-        _header = [[Header alloc] init];
-        _applications = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
 
 - (id) initWithServiceCode:(NSNumber * ) serviceCode {
     if ( self = [super init] ) {
@@ -81,28 +74,39 @@ static NSArray * props;
 }
 
 
+/* deprecated */
 - (id) initWithServiceCode:(NSNumber * ) serviceCode andKbdOrActionWithTarget:(NSString *) targetId andData:(NSString *) data {
     if ( self = [super init] ) {
         _header = [[Header alloc] initWithServiceCode:serviceCode];
-        _header.kbd_or_action = [[KbdOrAction alloc] initWithTarget:targetId andData:data];
+    }
+    NSLog(@"Should not call this function"); //use below function instead
+    //_header.kbd_or_action = [[KbdOrAction alloc] initWithTarget:targetId andData:data];
+    return self;
+}
+/* deprecated */
+
+
+- (id) initWithServiceCode:(NSNumber * ) serviceCode subCode:(NSNumber *)subCode processId:(NSString*)processId params:(Params *) params{
+    if ( self = [super init] ) {
+        _header = [[Header alloc] initWithServiceCode:serviceCode subCode:subCode processId:processId parameters:params];
     }
     return self;
 }
 
-
+/*
 - (id) initWithServiceCode:(NSNumber * ) serviceCode andMouseWithX:(int) x andY:(int) y andButton:(int) button {
     if ( self = [super init] ) {
         _header = [[Header alloc] initWithServiceCode:serviceCode ];
-        _header.mouse_or_caret = [[MouseOrCaret alloc] initWithX:x andY:y andButton:button ];
+        //_header.mouse_or_caret = [[MouseOrCaret alloc] initWithX:x andY:y andButton:button ];
     }
     return self;
 }
-
+*/
 
 - (id) initWithServiceCode:(NSNumber * ) serviceCode andCaret:(int) location andLength:(int) ending andTarget:(NSString*) targetId {
     if ( self = [super init] ) {
         _header = [[Header alloc] initWithServiceCode:serviceCode ];
-        _header.mouse_or_caret = [[MouseOrCaret alloc] initWithCaret:location andLength:ending andTarget:targetId];
+        //_header.mouse_or_caret = [[MouseOrCaret alloc] initWithCaret:location andLength:ending andTarget:targetId];
     }
     return self;
 }

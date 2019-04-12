@@ -51,24 +51,33 @@ static NSDateFormatter * dateFormatter;
     return self;
 }
 
+/*
 - (id) initWithServiceCodeInt:(int) service_code {
     if ( self = [self init] ) {
         _service_code = [NSNumber numberWithInt: service_code];
+        _sub_code = [NSNumber numberWithInt: service_code];
     }
     return self;
 }
+ */
 
 - (id) initWithServiceCode:(NSNumber *) service_code {
+    NSLog(@"service_code is same as sub_code = %@ ?", service_code);
     if ( self = [self init] ) {
         _service_code = service_code;
+        _sub_code = service_code;
     }
     return self;
 }
 
-- (id) initWithServiceCode:(NSNumber *) service_code andProcessId:(NSString *) process_id {
+
+- (id) initWithServiceCode:(NSNumber *)service_code subCode:(NSNumber *)sub_code processId:(NSString*)process_id parameters:(Params*)params
+{
     if ( self = [self init] ) {
         _service_code = service_code;
+        _sub_code = sub_code;
         _process_id = process_id;
+        _params = params;
     }
     return self;
 }

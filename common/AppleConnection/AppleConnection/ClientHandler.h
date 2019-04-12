@@ -63,6 +63,7 @@
 // singleton reference of connection
 + (id) getConnection ;
 + (id) sharedConnectionWith:(NSString *)_ipAddress andPort:(int)_port;
+- (void) setIPAndPort:(NSString *)_ipAddress andPort:(int)_port;
 - (void) initForClientSocket;
 - (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier ;
 - (void) dispatchMessage:(NSMutableData *) part;
@@ -75,22 +76,24 @@
 
 
 // utility method for sending message
+- (void) sendPasscodeVerifyReq:(NSString *) passcode;
+- (void) sendPasscodeVerifyRes:(bool) result;
 - (void) sendListRemoteApp;
 - (void) sendDomRemoteApp:(NSString*) appId;
-- (void) sendActionAt:(NSString *) uniqueId;
-- (void) sendActionAt:(NSString *) uniqueId actionName:(NSString*) action;
+/* sendActionMsg to replace old sendActionAt, sendFocusAt, appendTextAt */
+- (void) sendActionMsg:(NSString *)processId targetId:(NSString*)targetId actionType:(NSString*)action data:(NSString*)data;
 - (void) sendBtingFG:(NSString*) uniqueId;
-- (void) sendFocusAt:(NSString*) uniqueId;
-- (void) sendFocusAt:(NSString*) uniqueId andSyncUsingHash:(NSString*) hash;
-
 - (void) setTextAt:(NSString*) uniqueId text:(NSString*) text;
-- (void) appendTextAt:(NSString*) uniqueId text:(NSString*) text;
 
 - (void) sendKeystorkesAt:(NSString*) processId strokes:(NSString*) strokes;
+/*
 - (void) sendMouseMoveAt:(NSString*) processId andX:(int) x andY:(int) y;
 - (void) sendMouseClickAt:(NSString*) processId andX:(int) x andY:(int) y andButton:(int) button;
+ */
 - (void) sendCaretMoveAt:(NSString*) runtimeId andLocation:(NSInteger) location andLength:(NSInteger) length;
+
 - (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat;
+- (void) sendKeystrokes:(NSString *)key processId:(NSString*)processId targetId:(NSString*)targetId;
 
 
 @end

@@ -27,11 +27,12 @@
 #import <Foundation/Foundation.h>
 #include "ClientHandler.h"
 
+
 @interface Scraper : NSObject
 
 @property (nonatomic , retain) ClientHandler * clientHandler;
 @property (assign) int identifier;
-
+@property (assign) bool isPasscodeVerified;
 @property (nonatomic, strong ) NSMutableDictionary* appCache;
 
 
