@@ -61,7 +61,7 @@ namespace LinqAndTrie
                 i = 0;
                 foreach (var suffix in endingSuffixes)
                 {
-                    Console.Write(suffix + " ");
+                    //Console.Write(suffix + " ");
                     i++;
                     if (i >= 10)
                         break;
@@ -84,7 +84,7 @@ namespace LinqAndTrie
                 i = 0;
                 foreach (var suffix in endingSuffixes)
                 {
-                    Console.Write(suffix + " ");
+                    //Console.Write(suffix + " ");
                     i++;
                     if (i >= 10)
                         break;

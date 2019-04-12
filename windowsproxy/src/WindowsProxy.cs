@@ -157,6 +157,7 @@ namespace WindowsProxy
             Console.WriteLine("current type {0}", entity.Type);
             Console.WriteLine("current name {0}", entity.Name);
 
+            entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
             invoking_method_name = string.Format("Render{0}", entity.Type);
             invoking_method = type.GetMethod(invoking_method_name,
               BindingFlags.NonPublic | BindingFlags.Instance);
@@ -317,6 +318,11 @@ namespace WindowsProxy
               control.Tag = entity;
               control.KeyPress += Document_KeyPress;
               control.Click += Text_Click;
+
+            // set default cursor to beginning of the document just like opening a file.
+            text.SelectionStart = 0;
+            text.SelectionLength = 0;
+
               return control;
         }
 
@@ -1125,6 +1131,7 @@ namespace WindowsProxy
                 Console.WriteLine("Type: {0}", sinter.EntityNode.Type);
                 if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem"))
                 {
+                    UpdateMenu(sinter);
                     return;
                 }
 

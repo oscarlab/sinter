@@ -263,7 +263,15 @@ namespace WindowsScraper
                         ((ValuePattern)valuePattern).SetValue(text);
                     }
                     else
-                    {//send keystrokes
+                    {   //send keystrokes
+                        // Set focus for input functionality and begin.
+                        element.SetFocus();
+
+                        // Pause before sending keyboard input.
+                        Thread.Sleep(100);
+                        SendKeys.SendWait("^{HOME}");   // Move to start of control
+                        SendKeys.SendWait("^+{END}");   // Select everything
+                        SendKeys.SendWait("{DEL}");     // Delete selection
                         SendKeys.SendWait(text);
                     }
                 }
@@ -416,21 +424,23 @@ namespace WindowsScraper
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-            //automationElementTrie.ContainsKey(runtimeId);
+
             if (automationElementTrie.ContainsKey(runtimeId))
             {
-                DeltaForClose(stringRuntimeId);
+                //DeltaForClose(stringRuntimeId);
+                DeltaForClose(null); // targetID = 'null' will make client close all windows of the processID. 
+                                     // this is different from OnWindowClosed(), which close only specific targetID.
                 Console.WriteLine("Window Closed Locally " + runtimeId);
             }
         }
 
+        //Every windows under AutomationElement.RootElement will trigger this event. 
         private void OnWindowClosed(object obj, AutomationEventArgs _e)
         {
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-            //int[] runtimeId = e.GetRuntimeId();
-
+     
             if (automationElementTrie.ContainsKey(runtimeId))
             {
                 DeltaForClose(stringRuntimeId);
@@ -515,7 +525,7 @@ namespace WindowsScraper
         {
             AutomationElement element = (AutomationElement)sender;
 
-            Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
+            //Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
 
             // Property: IsOffScreen
             if (e.Property == AutomationElement.IsOffscreenProperty)
@@ -631,7 +641,7 @@ namespace WindowsScraper
             //return;
             //}
 
-            Console.WriteLine("Structure Changed Global");
+            //Console.WriteLine("Structure Changed Global");
             AutomationElement element = (AutomationElement)sender;
             Console.WriteLine("Struct changed global {0}", element.Current.ControlType.ProgrammaticName);
 
@@ -655,7 +665,7 @@ namespace WindowsScraper
             AutomationElementCollection elementCollection = element.FindAll(TreeScope.Children, Condition.TrueCondition);
 
             // Console.WriteLine("Local Structure {0}", element.Current.ControlType);
-            Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+            //Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
 
             if (element.Current.ControlType == ControlType.SplitButton)
             {
@@ -774,8 +784,8 @@ namespace WindowsScraper
                     EntityNode = UIAElement2EntityRecursive(anchor),
                 };
 
-                Console.WriteLine("Chillins");
-                Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
+                //Console.WriteLine("Chillins");
+                //Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
                 PrintChildrenNodes(sinter.EntityNode);
 
                 // send
@@ -789,7 +799,7 @@ namespace WindowsScraper
             {
                 foreach (Entity child_entity in node.Children)
                 {
-                    Console.WriteLine("{0} {1}", child_entity.Type, child_entity.Name);
+                    Console.WriteLine("PrintChildrenNodes {0} {1}", child_entity.Type, child_entity.Name);
                     PrintChildrenNodes(child_entity);
                 }
             }
@@ -1084,7 +1094,7 @@ namespace WindowsScraper
         {
             Sinter sinter = new Sinter
             {
-                HeaderNode = MsgUtil.BuildHeader(serviceCodes["event"], serviceCodes["event_closed"]),
+                HeaderNode = MsgUtil.BuildHeader(serviceCodes["event"], serviceCodes["event_closed"], rid),
             };
 
             connection.SendMessage(sinter);
@@ -1201,7 +1211,7 @@ namespace WindowsScraper
 
             AutomationElement.AutomationElementInformation current = element.Current;
 
-            Console.WriteLine("Form Entity for {0}", element.Current.Name);
+            //Console.WriteLine("Form Entity for {0}", element.Current.Name);
 
             String uniqueId;
 
@@ -1556,8 +1566,7 @@ namespace WindowsScraper
         {
             /* handles verify_passcode_req */
             string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
-            Console.WriteLine("client passcode: {0}", clientPasscode);
-
+            //Console.WriteLine("client passcode: {0}", clientPasscode);
 
             bool result = false;
             if(clientPasscode == this.passcode)
@@ -1592,7 +1601,7 @@ namespace WindowsScraper
         public void execute_ls_req(Sinter _)
         {
             // demo: only fetch explorer app for now
-            string[] supportedProcesses = { "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad" };
+            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad"};
 
             Dictionary<string, string> processes = new Dictionary<string, string>();
             foreach (string pname in supportedProcesses)
@@ -1613,9 +1622,13 @@ namespace WindowsScraper
                     if (node == null)
                         continue;
 
-                    if (processes.ContainsKey(node.Process))
+                    if (processes.ContainsKey(node.Process) || processes.ContainsValue(node.Name))
                     {
-                        node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                        //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes. 
+                        if (!(processes.ContainsValue(node.Name))) 
+                        {
+                            node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                        }
                         entityNodes.Add(node);
                     }
                 }
@@ -1724,9 +1737,16 @@ namespace WindowsScraper
 	  //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
 	  Thread.Sleep(10);
 	  key = sinter.HeaderNode.ParamsInfo.KeyPress;
-	  string keyPress = key.ToString();
-	  Console.WriteLine(key);
-	  SendKeys.SendWait(keyPress);
+            if (key != 0)
+            {
+                string keyPress = key.ToString();
+                Console.WriteLine(key);
+                SendKeys.SendWait(keyPress);
+            }
+            else{
+                Console.WriteLine(sinter.HeaderNode.ParamsInfo.Data1);
+                SendKeys.SendWait(sinter.HeaderNode.ParamsInfo.Data1);
+            }
     }
 
         public void execute_mouse(Sinter sinter)
@@ -1798,6 +1818,8 @@ namespace WindowsScraper
             Console.WriteLine("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
             if (sinter.HeaderNode.ParamsInfo != null)
                 runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            else
+                runtimeId = sinter.HeaderNode.Process;  //for example: action_close
 
             if (!serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out _serviceCode))
                 return;
@@ -1809,20 +1831,20 @@ namespace WindowsScraper
             // extract the automation element pointed by runtimeId
             AutomationElement element = null;
 
-            Console.WriteLine("RuntimeID {0}", runtimeId);
+            //Console.WriteLine("RuntimeID {0}", runtimeId);
             try
             {
-                Console.WriteLine("execute_action: Get RuntimeId");
+                //Console.WriteLine("execute_action: Get RuntimeId");
                 if (runtimeId != null && sinter.HeaderNode.SubCode != 813)
                 {
                     element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
                     if (element == null)
                         return;
-                    Console.WriteLine("execute_action: Got element from RuntimeId");
+                    //Console.WriteLine("execute_action: Got element from RuntimeId: {0}", runtimeId);
                 }
 
                 int[] id = element.GetRuntimeId();
-                Console.WriteLine("{0}", id);
+                //Console.WriteLine("{0}", id);
                 if (automationElementTrie.TryGetValue(id, out Entity entity))
                 {
                     //vInfo.version = Util.Version.Updated;
@@ -1865,8 +1887,10 @@ namespace WindowsScraper
                     case "action_change_focus_precise":
                         break;
                     case "action_set_text":
+                        executeSetText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_append_text":
+                        executeAppendText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_foreground":
                         break;
@@ -1874,7 +1898,7 @@ namespace WindowsScraper
                         Console.WriteLine("Case action_expand_and_select");
                         if(sinter.HeaderNode.ParamsInfo.TargetIdList != null)
                         {
-                            Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
+                            //Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
                             UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId.ToString(), uint.Parse(sinter.HeaderNode.ParamsInfo.Data1), sinter.HeaderNode.ParamsInfo.TargetIdList);
                         }
                         break;

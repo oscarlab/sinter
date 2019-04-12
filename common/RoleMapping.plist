@@ -125,9 +125,11 @@
     <key>Params</key>
     <array>
       <string>target_id</string>
+      <string>target_id_list</string>
       <string>data1</string>
       <string>data2</string>
       <string>data3</string>
+      <string>keypress</string>
     </array>
 		<key>Entity</key>
 		<array>

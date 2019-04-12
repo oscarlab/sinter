@@ -15,25 +15,37 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_07BDABD49574E1682DAE87AEDAEA36AF"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_348B43D6AD7D4C97AE231806A5C4CBB4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4B34008BFFDD423C988E219E5B8186B1"
+        "MsmKey" = "8:_3DE84BE857F93F191151428CBBD1A406"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3DE84BE857F93F191151428CBBD1A406"
+        "OwnerKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E12377FDB1145F29E97B936E3FB20E7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_6D94B11A9124454987B1DBA23B7226A9"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7B919208BF921BD40E8163B2D977B261"
+        "MsmKey" = "8:_826D30B645BAEF871B09D13D423E5D38"
         "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -45,26 +57,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C08063B61B1406DC9711697040BD4694"
+        "MsmKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
         "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_C08063B61B1406DC9711697040BD4694"
-        "OwnerKey" = "8:_EDE86F12493C1DBA95DBE2F8F578052C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_CC5395717C591A9763A5246A26BD06DC"
-        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_EDE86F12493C1DBA95DBE2F8F578052C"
-        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmKey" = "8:_E0ADF852D0414519B4858052F67491E6"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -76,25 +76,25 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7B919208BF921BD40E8163B2D977B261"
+        "OwnerKey" = "8:_826D30B645BAEF871B09D13D423E5D38"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_EDE86F12493C1DBA95DBE2F8F578052C"
+        "OwnerKey" = "8:_07BDABD49574E1682DAE87AEDAEA36AF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C08063B61B1406DC9711697040BD4694"
+        "OwnerKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_CC5395717C591A9763A5246A26BD06DC"
+        "OwnerKey" = "8:_3DE84BE857F93F191151428CBBD1A406"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -184,7 +184,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:.NETFramework,Version=v4.6.1"
+                "FrameworkVersion" = "8:v4.6.1"
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=671728"
                 }
@@ -192,136 +192,14 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_348B43D6AD7D4C97AE231806A5C4CBB4"
-            {
-            "SourcePath" = "8:..\\src\\config.xml"
-            "TargetName" = "8:config.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B34008BFFDD423C988E219E5B8186B1"
-            {
-            "SourcePath" = "8:..\\Common\\RoleMapping.plist"
-            "TargetName" = "8:RoleMapping.plist"
-            "Tag" = "8:"
-            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6D94B11A9124454987B1DBA23B7226A9"
-            {
-            "SourcePath" = "8:..\\Common\\Windows.plist"
-            "TargetName" = "8:Windows.plist"
-            "Tag" = "8:"
-            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7B919208BF921BD40E8163B2D977B261"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_7B919208BF921BD40E8163B2D977B261"
-                    {
-                    "Name" = "8:Gma.System.MouseKeyHook.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Gma.System.MouseKeyHook.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C08063B61B1406DC9711697040BD4694"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PListLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_C08063B61B1406DC9711697040BD4694"
-                    {
-                    "Name" = "8:PListLib.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:PListLib.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CC5395717C591A9763A5246A26BD06DC"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_07BDABD49574E1682DAE87AEDAEA36AF"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:LinqDemo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_CC5395717C591A9763A5246A26BD06DC"
+                    "_07BDABD49574E1682DAE87AEDAEA36AF"
                     {
                     "Name" = "8:LinqDemo.exe"
                     "Attributes" = "3:512"
@@ -345,18 +223,115 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_EDE86F12493C1DBA95DBE2F8F578052C"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_348B43D6AD7D4C97AE231806A5C4CBB4"
+            {
+            "SourcePath" = "8:..\\src\\config.xml"
+            "TargetName" = "8:config.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3DE84BE857F93F191151428CBBD1A406"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:PListLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_3DE84BE857F93F191151428CBBD1A406"
+                    {
+                    "Name" = "8:PListLib.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:PListLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7E12377FDB1145F29E97B936E3FB20E7"
+            {
+            "SourcePath" = "8:..\\..\\common\\RoleMapping.plist"
+            "TargetName" = "8:RoleMapping.plist"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_826D30B645BAEF871B09D13D423E5D38"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_826D30B645BAEF871B09D13D423E5D38"
+                    {
+                    "Name" = "8:Gma.System.MouseKeyHook.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Gma.System.MouseKeyHook.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C431C87424E8724090E4AE12420CC1BB"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:WindowsConnection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_EDE86F12493C1DBA95DBE2F8F578052C"
-                    {
-                    "Name" = "8:WindowsConnection.exe"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WindowsConnection.exe"
             "TargetName" = "8:"
@@ -374,6 +349,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E0ADF852D0414519B4858052F67491E6"
+            {
+            "SourcePath" = "8:..\\..\\common\\Windows.plist"
+            "TargetName" = "8:Windows.plist"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -954,7 +949,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9114F349EFF743A7B93B93173BAD89DC"
             {
-            "SourcePath" = "8:..\\src\\obj\\x86\\Debug\\WindowsProxy.exe"
+            "SourcePath" = "8:..\\src\\obj\\x86\\Release\\WindowsProxy.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"

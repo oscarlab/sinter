@@ -119,7 +119,7 @@ namespace LinqAndTrie
             }
 
             // Code prevents menus from updating
-            Console.WriteLine("{0} {1}", currentNode.Value, currentNode.HasValue);
+            //Console.WriteLine("{0} {1}", currentNode.Value, currentNode.HasValue);
            /* if (currentNode.HasValue)
             {
                 if (!allowReplace)
