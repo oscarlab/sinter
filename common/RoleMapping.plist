@@ -80,8 +80,8 @@
     <integer>810</integer>
     <key>action_append_text</key>
     <integer>811</integer>
-    <key>action_foreground</key>
-    <integer>812</integer>
+		<key>action_foreground</key>
+		<integer>812</integer>
     <key>action_expand_and_select</key>
     <integer>813</integer>
     <key>listener</key>
@@ -178,7 +178,7 @@
 		<key>colorwell</key>
 		<string>unknown</string>
 		<key>column</key>
-		<string>unknown</string>		
+		<string>unknown</string>
 		<key>combobox</key>
 		<string>System.Windows.Forms.ComboBox</string>
 		<key>date</key>

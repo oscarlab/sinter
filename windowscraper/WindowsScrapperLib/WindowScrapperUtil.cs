@@ -137,13 +137,48 @@ namespace WindowsScraper
 
       public static void PerformExpandAction(AutomationElement element)
       {
+        Console.WriteLine("Expand {0}", element.GetRuntimeId());
         if (element.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
         {
           ((ExpandCollapsePattern)expandCollapsePattern).Expand();
         }
       }
 
-      public static void PerformCollapseAction(AutomationElement element)
+        public static void PerformExpandAndSelectAction(string runtimeId, uint button, List<string[]> element)
+        {
+            AutomationElement id = null;
+            Console.WriteLine("Executing ExpandAndSelectAction");
+
+            Console.WriteLine("Executing ExpandAndSelectAction {0}", runtimeId);
+            id = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
+            Console.WriteLine("Retrieved ID {0}", id);
+            if (id.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
+            {
+                Console.WriteLine("ExpandAndSelect: expanding {0}", id);
+                ((ExpandCollapsePattern)expandCollapsePattern).Expand();
+            }
+
+            uint x;
+            uint y;
+                Console.WriteLine("Element list {0}", element);
+            foreach (string[] pos in element)
+            {
+                    uint mask = ((button == 1) ?
+                                Win32.MOUSEEVENTF_RIGHTDOWN | Win32.MOUSEEVENTF_RIGHTUP :
+                                Win32.MOUSEEVENTF_LEFTDOWN | Win32.MOUSEEVENTF_LEFTUP);
+
+                    x = uint.Parse(pos[0]);
+                    y = uint.Parse(pos[1]);
+                    Console.WriteLine("Gets position x: {0} y: {1}", x, y);
+                    Win32.SetCursorPos((int)x, (int)y);
+                    Win32.mouse_event(mask, x, y, 0, 0);
+                }
+           
+                
+
+        }
+
+        public static void PerformCollapseAction(AutomationElement element)
       {
         if (element.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
         {
@@ -301,6 +336,11 @@ namespace WindowsScraper
               runtimeIdStr = string.Format("{0}/{1}/{2}/{3}", element.Current.ClassName, element.Current.Name, "" + rect.X, "" + rect.Y);
               return runtimeIdStr;
             }
+           /* if (element.Current.ControlType == ControlType.Button || element.Current.ControlType == ControlType.RadioButton)
+                        {
+                            runtimeIdStr = string.Format("{0}/{1}/{2}", element.Current.ClassName, element.Current.Name, element.Current.ControlType);
+                            return runtimeIdStr;
+                        }*/
           }
           // regular case
           int[] runtimeids = useCached ?
@@ -317,7 +357,7 @@ namespace WindowsScraper
         }
         catch (Exception ex)
         {
-          //Console.WriteLine("Error in getting runtime_id {0}", ex.Message);
+          Console.WriteLine("Exception in getting runtime_id {0}", ex.Message);
         }
 
         return runtimeIdStr;
@@ -383,7 +423,7 @@ namespace WindowsScraper
       public static Stopwatch stopwatch = new Stopwatch();
     }
 
-    class VersionInfo
+   /* class VersionInfo
     {
       public string runtimeID { get; set; }
       public Version version { get; set; }
@@ -399,7 +439,7 @@ namespace WindowsScraper
         this.runtimeID = runtimeID;
         this.version = version;
       }
-    }
+    }*/
 
     static class States
     {
@@ -424,7 +464,7 @@ namespace WindowsScraper
       public const int FOCUSABLE = 0x100000;
     }
 
-    class AutomationElementDictionary
+    /*class AutomationElementDictionary
     {
       private ConcurrentDictionary<string, VersionInfo> currentElements = null;
       private AutomationElement applicationRoot = null;
@@ -523,7 +563,7 @@ namespace WindowsScraper
           Thread.Sleep(sleepTimeMs);
         }
       }
-    }
+    }*/
 
     public class Logger
     {
