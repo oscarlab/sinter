@@ -180,12 +180,12 @@ static NSDictionary * roleMappings;
         parent_key = (NSString *)[keys lastObject];
         
         for(int j = (int)[keys count] - 2 ; j >= i ; j--){
-            parent_key = [NSString stringWithFormat:@"%@/%@", parent_key, keys[j]];
+            parent_key = [NSString stringWithFormat:@"/%@/%@", parent_key, keys[j]]; //should be "/application_0/menubar_1" instead of "application_0/menubar_1"
         }
         if (i == 0) {
             current_key = parent_key;
         }
-        parent_key = [NSString stringWithFormat:@"/%@", parent_key]; //should be "/application_0/menubar_1" instead of "application_0/menubar_1"
+        //parent_key = [NSString stringWithFormat:@"/%@", parent_key];
         if([cache objectForKey:parent_key]){
             parent = (__bridge AXUIElementRef)([dict_keys objectForKey: keys[i]]);
             hit    = YES;
@@ -245,6 +245,13 @@ static NSDictionary * roleMappings;
         primary_id = [self getCompleteIdOfUIElement:element havingIndex:index andParentID:parentId];
     }
     
+    NSString * name = [self getTitleOfUIElement:element];
+    
+    //do not send Apple system menu to client
+    if ([name isEqualToString:@"Apple"]){
+        return nil;
+    }
+    
     // add to primary key dictionary for future lookup
     if (whenAsked) {
         if([cache objectForKey:primary_id]){
@@ -254,7 +261,6 @@ static NSDictionary * roleMappings;
     }
     
     Entity * entity     = [[Entity alloc] init];
-    
     
     [entity setUnique_id: primary_id];
     [entity setType     : [self getRoleOfUIElement:element]];
@@ -284,12 +290,33 @@ static NSDictionary * roleMappings;
         entity.children = [[NSMutableArray alloc] init];
         for (int i = 0; i < CFArrayGetCount(children); i++){
             AXUIElementRef child_element = (AXUIElementRef) CFArrayGetValueAtIndex(children, i);
-            [entity.children addObject:
-             [self getEntityFroElement:child_element atIndex:i havingId:nil andParentId:primary_id withCache:cache updateCache:whenAsked]];
+            Entity * e = [self getEntityFroElement:child_element atIndex:i havingId:nil andParentId:primary_id withCache:cache updateCache:whenAsked];
+            if (e != nil)[entity.children addObject:e];
         }
         CFRelease(children);
     }
     return entity;
+}
+
++ (void) bringWindowToFront:(int)pid {
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+    int   child_count = [self getNumChildOfUIElement:app];
+    CFArrayRef    children;
+    NSString * app_unique_id = [self getCompleteIdOfUIElement:app havingIndex:0 andParentID:@""];
+
+    if(child_count && AXUIElementCopyAttributeValue(app, (CFStringRef) NSAccessibilityChildrenAttribute, (CFTypeRef *) &children) == kAXErrorSuccess) {
+        for (int i = 0; i < CFArrayGetCount(children); i++){
+            AXUIElementRef child_element = (AXUIElementRef) CFArrayGetValueAtIndex(children, i);
+            NSString * unique_id = [self getCompleteIdOfUIElement:child_element havingIndex:i andParentID:app_unique_id];
+            if([unique_id hasPrefix:@"window"]) {
+                AXError ret = AXUIElementPerformAction(child_element, (CFStringRef)@"AXRaise");
+                NSLog(@"Action raise window, result = %d", ret);
+                CFRelease(app);
+                return;
+            }
+        }
+    }
+    CFRelease(app);
 }
 
 + (AXUIElementRef) findAXUIElement:(NSString *)unique_id root:(AXUIElementRef)root atIndex:(int)index andParentId:(NSString *)parentId {
@@ -322,19 +349,24 @@ static NSDictionary * roleMappings;
     AXError ret = 0;
     NSString * defaultActionName = nil;
     
+    [self bringWindowToFront:pid];
+    
     /* for development logging: to know which actions are there */
     CFArrayRef actionNames;
     ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
-    if(CFArrayGetCount(actionNames) > 0) {
-        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    if(actionNames != nil){
+        for(int i=0; i<CFArrayGetCount(actionNames);i++) {
+            NSLog(@"actionNames[%d] = %@", i, (CFStringRef)CFArrayGetValueAtIndex(actionNames, i));
+        }
     }
     
     /* decide what's the default action for this UI type */
     NSString * type =[AccAPI getRoleOfUIElement:ui];
-    if([type isEqualToString:@"button"]){
+    if([type isEqualToString:@"button"] || [type isEqualToString:@"menuitem"]){
         defaultActionName = @"AXPress";
     }
-    
+ 
+    NSLog(@"handleActionDefault() for \"%@\", action: %@", whichUI, defaultActionName);
     ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
     if(ret != kAXErrorSuccess){
         NSLog(@"Action %@ result = %d",defaultActionName, ret);
@@ -350,12 +382,18 @@ static NSDictionary * roleMappings;
     AXError ret = 0;
     NSString * defaultActionName = nil;
     
+    [self bringWindowToFront:pid];
+    
     /* for development logging: to know which actions are there */
+    /*
     CFArrayRef actionNames;
     ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
-    if(CFArrayGetCount(actionNames) > 0) {
-        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    if(actionNames != nil){
+        for(int i=0; i<CFArrayGetCount(actionNames);i++) {
+            NSLog(@"actionNames[%d] = %@", i, (CFStringRef)CFArrayGetValueAtIndex(actionNames, i));
+        }
     }
+    */
     
     /* decide what's the default action for this UI type */
     NSString * type =[AccAPI getRoleOfUIElement:ui];
@@ -363,6 +401,7 @@ static NSDictionary * roleMappings;
         defaultActionName = @"AXPress";
     }
     
+    NSLog(@"handleActionExpand() for \"%@\", action: %@", whichUI, defaultActionName);
     ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
     if(ret != kAXErrorSuccess){
         NSLog(@"Action %@ result = %d",defaultActionName, ret);
@@ -379,18 +418,23 @@ static NSDictionary * roleMappings;
     NSString * defaultActionName = nil;
     
     /* for development logging: to know which actions are there */
+    /*
     CFArrayRef actionNames;
     ret = AXUIElementCopyActionNames(ui, (CFArrayRef *)&actionNames);
-    if(CFArrayGetCount(actionNames) > 0) {
-        NSLog(@"Action count = %d, action[0] = %@", (int)CFArrayGetCount(actionNames), (CFStringRef)CFArrayGetValueAtIndex(actionNames, 0));
+    if(actionNames != nil){
+        for(int i=0; i<CFArrayGetCount(actionNames);i++) {
+            NSLog(@"actionNames[%d] = %@", i, (CFStringRef)CFArrayGetValueAtIndex(actionNames, i));
+        }
     }
+    */
     
     /* decide what's the default action for this UI type */
     NSString * type =[AccAPI getRoleOfUIElement:ui];
     if([type isEqualToString:@"menubaritem"] ){
         defaultActionName = @"AXCancel";
     }
-    
+
+    NSLog(@"handleActionCollapse() for \"%@\", action: %@", whichUI, defaultActionName);
     ret = AXUIElementPerformAction(ui, (CFStringRef)defaultActionName);
     if(ret != kAXErrorSuccess){
         NSLog(@"Action %@ result = %d",defaultActionName, ret);
