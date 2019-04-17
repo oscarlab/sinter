@@ -34,6 +34,8 @@
 @property (assign) int identifier;
 @property (assign) bool isPasscodeVerified;
 @property (nonatomic, strong ) NSMutableDictionary* appCache;
+@property (nonatomic, strong ) NSMutableDictionary* appObservers;
+
 
 
 - (id) initWithId:(int) identifier andClientHandler:(ClientHandler *) clientHandler;

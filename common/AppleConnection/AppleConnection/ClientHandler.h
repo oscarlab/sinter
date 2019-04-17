@@ -94,6 +94,7 @@
 
 - (void) sendSpecialStroke:(NSString *) key numRepeat:(int) repeat;
 - (void) sendKeystrokes:(NSString *)key processId:(NSString*)processId targetId:(NSString*)targetId;
+- (void) sendEventClosed:(NSString*) process_id;
 
 
 @end
