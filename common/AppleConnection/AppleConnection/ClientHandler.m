@@ -554,4 +554,11 @@ static ClientHandler* shared       = nil;
     [self sendSinter:sinter];
 }
 
+- (void) sendEventClosed:(NSString*) process_id {
+    Sinter * sinter = [[Sinter alloc] init];
+    sinter.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STREvent]
+                                                subCode:[serviceCodes objectForKey:STREventClosed] processId:process_id parameters:nil];
+    [self sendSinter:sinter];
+}
+
 @end
