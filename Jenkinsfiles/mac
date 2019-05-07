@@ -1,0 +1,42 @@
+#!/usr/bin/env groovy
+
+def SLAVE_NODE = ''
+
+pipeline {
+  agent {
+    label 'sinter-mac'
+  }
+
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          SLAVE_NODE = sh(script: 'hostname -s', returnStdout: true).trim()
+        }
+          
+        sh '''
+        echo "Build OSXScraper..."
+        cd osxscraper
+        xcodebuild -list -project OSXScraper.xcodeproj
+        xcodebuild -scheme OSXScraper build
+        
+        echo "Build OSXProxy..."
+        cd ../osxproxy
+        xcodebuild -list -project OSXProxy.xcodeproj
+        xcodebuild -scheme OSXProxy build
+        '''
+          
+      }
+    }
+
+    stage('Unit Testing') {
+      steps {
+        timeout(time: 1, unit: 'HOURS'){
+          sh '''
+            echo "Test(s) go here"
+          '''
+        }
+      }
+    }
+  }
+}
