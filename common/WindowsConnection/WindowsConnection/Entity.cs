@@ -79,7 +79,6 @@ namespace Sintering {
 
         public Entity()
         {
-            ChildCount = 0;
         }
 
         [XmlAttribute("unique_id")]
