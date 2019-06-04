@@ -747,7 +747,19 @@ bool isHeader = FALSE;
     else if ([current.type isEqualToString:@"menubar"]) {
         [renderer drawMenuBar:current parentView:remoteMenu];
     }
-    else if ([current.type isEqualToString:@"menuitem"] || [current.type isEqualToString:@"menubaritem"]) {
+    else if ([current.type isEqualToString:@"menuitem"]) {
+        //render windows menuitems
+        [renderer drawMenu:current anchor:remoteMenu];
+        NSLog(@"%@ rendered", current.type);
+        for (Model* child in current.children) {
+            [self renderDOM:child anchor:anchor];
+        }
+    }
+    else if ([current.type isEqualToString:@"menubaritem"]) {
+        //render mac menuitems
+        if([current.unique_id isEqualToString:renderer.selectedMenuModel.unique_id]){
+            renderer.selectedMenuModel.version = 1;
+        }
         [renderer drawMenu:current anchor:remoteMenu];
         NSLog(@"%@ rendered", current.type);
         for (Model* child in current.children) {
@@ -847,7 +859,7 @@ bool isHeader = FALSE;
             [self parseXMLDocument:node havingUI:ui updateType:updateTypeNodeExpanded];
             ui.type = [ui.type lowercaseString];
             if (ui && ui.version && [ui.type hasPrefix:@"menu"]) {
-                if (0) // ([ui.type isEqualToString:@"menubar"])
+                if ([ui.type isEqualToString:@"menubar"])
                 {
                     //OSXScraper sends the whole menubar, we just render the children of it instead of re-draw the menubar
                     for (Model* child in ui.children) {

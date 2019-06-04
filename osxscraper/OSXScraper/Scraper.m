@@ -36,6 +36,7 @@
 
 @implementation Scraper
 @synthesize appCache;
+@synthesize appObservers;
 
 + (void) initialize {
     serviceCodes = [Config getServiceCodes];
@@ -52,6 +53,7 @@ Scraper * refToSelf;
         _isPasscodeVerified = false;
         
         appCache = [[NSMutableDictionary alloc] init];
+        appObservers = [[NSMutableDictionary alloc] init];
         
         [self checkAccessibilityAPI];
         // add notification
@@ -60,6 +62,12 @@ Scraper * refToSelf;
             selector:@selector(receivedMessage:)
             name:[NSString stringWithFormat:@"Client_%i_Notification", identifier]
             object:nil];
+        
+        /* Register for application termination notifications */
+        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                               selector:@selector(applicationTerminated:)
+                                                                   name:NSWorkspaceDidTerminateApplicationNotification
+                                                                 object:nil];
     }
     return self;
 }
@@ -79,6 +87,21 @@ Scraper * refToSelf;
     }
 }
 
+- (void)applicationTerminated:(NSNotification *)notification
+{
+    NSNumber *pidNumber = [[notification userInfo] valueForKey:@"NSApplicationProcessIdentifier"];
+    /* check if we have created observer for this pid */
+    AXObserverRef observer = (AXObserverRef)CFBridgingRetain([appObservers objectForKey:pidNumber]);
+    if(observer) {
+        NSLog(@"Application \"%@\" terminated", [[notification userInfo] valueForKey:@"NSApplicationName"]);
+        /* Stop listening to the accessibility notifications for the dead application */
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(),
+                              AXObserverGetRunLoopSource(observer),
+                              kCFRunLoopDefaultMode);
+        [appObservers removeObjectForKey:pidNumber];
+        [[refToSelf clientHandler] sendEventClosed:[pidNumber stringValue]]; //notify client
+    }
+}
 
 - (void) execute: (Sinter *) cmdSinter {
     NSNumber * service_code = cmdSinter.header.service_code;
@@ -247,6 +270,9 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
         return NO;
     }
     
+    /* Remember the observer so that we can unregister later when receiving application termination notification */
+    [appObservers setObject:(__bridge id)observer_ref forKey:[NSNumber numberWithInt:pid]];
+    
     AXError code;
     // register kAXValueChangedNotification
     if( (code = AXObserverAddNotification(observer_ref, appRef, kAXValueChangedNotification, (__bridge void *)(self)))!=kAXErrorSuccess) {
@@ -267,9 +293,9 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
     CFRunLoopAddSource( [[NSRunLoop currentRunLoop] getCFRunLoop],
                        AXObserverGetRunLoopSource(observer_ref),
                        kCFRunLoopDefaultMode);
+    CFRelease(observer_ref);
     return YES;
 }
-
 
 - (bool) checkAccessibilityAPI {
     NSDictionary *options = @{(__bridge id) kAXTrustedCheckOptionPrompt: @YES };
