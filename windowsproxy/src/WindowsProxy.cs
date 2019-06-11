@@ -61,6 +61,7 @@ namespace WindowsProxy
     {
         RootForm root;
         AppForm form;
+        string RemoteCloseButtonUID; //UniqueID of remote close button
 
         Point rootPoint;
         Entity root_entity;
@@ -106,7 +107,7 @@ namespace WindowsProxy
         { // Form
             root = r;
 
-          // loading the config dictionaries
+            // loading the config dictionaries
             winControls = Config.getConfig("control_types_windows");
 
             Dictionary<string, object> serviceCodesTemp = Config.getConfig("service_code");
@@ -148,14 +149,35 @@ namespace WindowsProxy
             }
         }
 
+        public string RemoteProcessName = "";
+
         #region Main Renderer
         string invoking_method_name;
         MethodInfo invoking_method;
 
         Control Render(Entity entity, Control parent_control = null)
         {
-            Console.WriteLine("current type {0}", entity.Type);
-            Console.WriteLine("current name {0}", entity.Name);
+            Console.WriteLine("Rendering: {0}/{1}", entity.Type, entity.Name);
+
+            if ((entity.States & States.DISABLED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
+            }
+
+            if ((entity.States & States.FOCUSABLE) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is FOCUSABLE", entity.Type, entity.Name);
+            }
+
+            if ((entity.States & States.FOCUSED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is FOCUSED", entity.Type, entity.Name);
+            }
+
+            if ((entity.States & States.INVISIBLE) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
+            }
 
             entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
             invoking_method_name = string.Format("Render{0}", entity.Type);
@@ -183,9 +205,11 @@ namespace WindowsProxy
                 current_control = (Control)invoking_method.Invoke(this,
                   new object[] { entity, parent_control });
 
-                Console.WriteLine("Is current control null? {0}", current_control);
                 if (current_control == null)
+                {
+                    Console.WriteLine("Current control is null?");
                     return null;
+                }
 
                 if (parent_control != null && parent_control != current_control)
                 {
@@ -202,7 +226,7 @@ namespace WindowsProxy
             }
 
             // check children
-            Console.WriteLine("{1} HasChildren? {0}", entity.Name, HasChildren(entity));
+            Console.WriteLine("{0}/{1} has {2} children", entity.Type, entity.Name, entity.Children.Count);
             if (!HasChildren(entity))
                 return current_control;
 
@@ -227,12 +251,19 @@ namespace WindowsProxy
 
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
+                if (entity.Name.Equals("AXCloseButton"))
+                {
+                    RemoteCloseButtonUID = entity.UniqueID;
+                }
                 return parent;
             }
 
             if (entity.Name.Equals("AXCloseButton") || entity.Name.Equals("AXMinimizeButton") || entity.Name.Equals("AXZoomButton"))
             {
-                /* mappint not done yet */
+                if (entity.Name.Equals("AXCloseButton"))
+                {
+                    RemoteCloseButtonUID = entity.UniqueID;
+                }
                 return parent;
             }
 
@@ -287,9 +318,9 @@ namespace WindowsProxy
             foreach (Entity child_entity in entity.Children)
             {
                 Console.WriteLine("{0} {1}", child_entity.Name, child_entity.Type);
-                if(child_entity.Type == "List")
+                if (child_entity.Type == "List")
                 {
-                    foreach(Entity listItem in child_entity.Children)
+                    foreach (Entity listItem in child_entity.Children)
                     {
                         ToolStripMenuItem tmp = new ToolStripMenuItem();
                         tmp.Name = listItem.Name;
@@ -429,7 +460,7 @@ namespace WindowsProxy
                 ((MenuStrip)control).Items.Add(mi);
 
                 /* OSX server sends whole menu in DOM at the first beginning */
-                if(child_entity.Children.Count > 0)
+                if (child_entity.Children.Count > 0)
                 {
                     menuHashMenuItem.TryAdd(mi.Name, mi);
                     foreach (Entity entity_mi in child_entity.Children[0].Children)
@@ -459,14 +490,14 @@ namespace WindowsProxy
 
         private Control RenderPane(Entity entity, Control parent)
         {
-           /* Control control = new Panel();
-            control.SendToBack();
+            /* Control control = new Panel();
+             control.SendToBack();
 
-             AdjustProperties(entity, ref control);
+              AdjustProperties(entity, ref control);
 
-             control.Tag = entity;
+              control.Tag = entity;
 
-             return control;*/
+              return control;*/
             return parent;
         }
 
@@ -522,14 +553,31 @@ namespace WindowsProxy
 
         private Control RenderText(Entity entity, Control parent)
         {
-            Control control = new TextBox();
+            Control control = null;
             Console.WriteLine("Executing RenderText");
+
+            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("calc --Calculator") == true))
+            {
+                control = new Label(); //windows 7 calculator will fall to here
+            }
+            else
+            {
+                control = new TextBox();
+            }
             AdjustProperties(entity, ref control);
+
+            if (this.RemoteProcessName.Contains("calc --Calculator") && control.Text.Equals("Memory"))
+            {
+                control.Text = "";
+            }
+
+
 
             control.Tag = entity;
             control.KeyPress += Control_KeyPress;
             return control;
         }
+
 
         private Control RenderThumb(Entity entity, Control parent)
         {
@@ -602,7 +650,7 @@ namespace WindowsProxy
             }
 
             //register event listener and delegate
-            form.FormClosing += Form_Closed;
+            form.FormClosing += Form_Closing;
             form.delegateKeyPresses = ProcessKeyPress;
 
             return control;
@@ -862,7 +910,7 @@ namespace WindowsProxy
 
             while (menuItemParent.TryGetValue(name, out Entity parent))
             {
-                if(!menuItemParent.TryGetValue(parent.Name, out Entity stop))
+                if (!menuItemParent.TryGetValue(parent.Name, out Entity stop))
                 {
                     id = parent.UniqueID;
                     Console.WriteLine("FInal Name: {0}", parent.Name);
@@ -908,14 +956,14 @@ namespace WindowsProxy
             Control textControl = text;
             MouseEventArgs args = e as MouseEventArgs;
             if (entity == null)
-              return;
+                return;
             Point point = new Point(args.X, args.Y);
             //Point click = textControl.PointToClient(point);
             Point center = GetCenter(entity);
 
             Sinter sinter = new Sinter
             {
-              HeaderNode = MsgUtil.BuildHeader(
+                HeaderNode = MsgUtil.BuildHeader(
                   serviceCodes["mouse"],
                   serviceCodes["mouse_click_left"],
                   "",
@@ -941,7 +989,7 @@ namespace WindowsProxy
             Entity entity = (Entity)textBox.Tag;
             if (entity != null)
             {
-              ProcessKeyPress(e, entity.UniqueID, caretPos);
+                ProcessKeyPress(e, entity.UniqueID, caretPos);
             }
         }
 
@@ -962,9 +1010,9 @@ namespace WindowsProxy
             isSent = false;
             return;
         }
-#endregion
+        #endregion
 
-#region AppForm handler/helper
+        #region AppForm handler/helper
         public void close_forms()
         {
             if (this.form != null)
@@ -974,11 +1022,29 @@ namespace WindowsProxy
             this.form = null;
         }
 
-        private void Form_Closed(object sender, EventArgs e)
+        private void Form_Closing(object sender, FormClosingEventArgs e)
         {
-            Console.WriteLine("Form closed\n");
-            this.form = null;
-            root.Remove_Dict_Item(requestedProcessId);
+            Console.WriteLine("CloseButton is pressed, this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
+
+            if (this.RemoteCloseButtonUID != null)
+            {
+                e.Cancel = true;
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                                  serviceCodes["action"],
+                                  serviceCodes["action_default"],
+                                  this.RemoteCloseButtonUID
+                                ),
+                };
+                execute_action(sinter);
+            }
+            else
+            {
+                Console.WriteLine("Form closed\n");
+                this.form = null;
+                root.Remove_Dict_Item(requestedProcessId);
+            }
         }
 
         public void ProcessKeyPress(string keypresses, string targetId)
@@ -1001,13 +1067,13 @@ namespace WindowsProxy
         {
             Sinter sinter = new Sinter
             {
-              HeaderNode = MsgUtil.BuildHeader(serviceCodes["kbd"]),
+                HeaderNode = MsgUtil.BuildHeader(serviceCodes["kbd"]),
             };
 
             sinter.HeaderNode.ParamsInfo = new Params()
             {
-              TargetId = targetId,
-              KeyPress = keypresses,
+                TargetId = targetId,
+                KeyPress = keypresses,
             };
 
             execute_kbd(sinter);
@@ -1047,9 +1113,9 @@ namespace WindowsProxy
 
             execute_kbd(sinter);
         }
-#endregion
+        #endregion
 
-#region IWinCommands Implementation
+        #region IWinCommands Implementation
         public ConnectionHandler connection { get; set; }
 
         public void execute_verify_passcode_req(Sinter _)
@@ -1179,6 +1245,10 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
+                            if (this.RemoteProcessName.Contains("calc --Calculator") && newValue.Equals("Memory"))
+                            {
+                                newValue = "";
+                            }
                             control.Text = newValue;
                         }));
                     }
@@ -1236,25 +1306,25 @@ namespace WindowsProxy
                 // form = null;
                 //root.Remove_Dict_Item(requestedProcessId);
 
-                ((Control) form).BeginInvoke((Action)(() =>
-                {
-                    Console.WriteLine("All ctrl elements");
-                    Control[] arr = new Control[form.Controls.Count];
+                ((Control)form).BeginInvoke((Action)(() =>
+               {
+                   Console.WriteLine("All ctrl elements");
+                   Control[] arr = new Control[form.Controls.Count];
 
-                    form.Controls.CopyTo(arr, 0);
+                   form.Controls.CopyTo(arr, 0);
 
-                    foreach(Control element in arr)
-                    {
-                        Console.WriteLine("{0}", ((Entity)element.Tag).Type);
-                        if (!((Entity)element.Tag).Type.Equals("MenuBar"))
-                        {
-                            form.Controls.Remove(element);
-                        }
-                    }
+                   foreach (Control element in arr)
+                   {
+                       Console.WriteLine("{0}", ((Entity)element.Tag).Type);
+                       if (!((Entity)element.Tag).Type.Equals("MenuBar"))
+                       {
+                           form.Controls.Remove(element);
+                       }
+                   }
 
                     // form.Controls.Clear();
                     Render(sinter.EntityNode, form);
-                }));
+               }));
 
                 //now show it
                 Console.WriteLine("Check that form is not null: {0}", form);
@@ -1267,7 +1337,7 @@ namespace WindowsProxy
         delegate void CloseMethod(Form form);
         static private void CloseForm(Form form)
         {
-            if(form != null)
+            if (form != null)
             {
                 if (!form.IsDisposed)
                 {
@@ -1293,6 +1363,7 @@ namespace WindowsProxy
             //server send this msg to indicate app is closed in server side
             if ((sinter.HeaderNode.ParamsInfo == null) && (this.form != null))
             {
+                this.RemoteCloseButtonUID = null;
                 this.form.Invoke(new Action(() => this.form.Close()));
             }
             this.form = null;
@@ -1361,9 +1432,9 @@ namespace WindowsProxy
 
         }
 
-#endregion
+        #endregion
 
-#region Utility Methods
+        #region Utility Methods
 
         private Point GetCenter(Entity entity)
         {
@@ -1371,12 +1442,12 @@ namespace WindowsProxy
             int y = entity.Top + (entity.Height) / 2;
             return new Point(x, y);
         }
-		
-		private void UpdateMenu(Sinter sinter)
+
+        private void UpdateMenu(Sinter sinter)
         {
-            if (sinter.EntityNode.Type.Equals("menubar")){
+            if (sinter.EntityNode.Type.Equals("menubar")) {
                 /* from Mac OSX */
-                foreach (Entity child in sinter.EntityNode.Children){
+                foreach (Entity child in sinter.EntityNode.Children) {
                     UpdateMenuItem(child, true, null);
                 }
                 return;
@@ -1397,11 +1468,11 @@ namespace WindowsProxy
                 UpdateMenuItem(entity, false, null);
             }
         }
-		
-		private void UpdateMenuItem(Entity entity, Boolean isOSX, Control ctrl)
+
+        private void UpdateMenuItem(Entity entity, Boolean isOSX, Control ctrl)
         {
             /* mac : the entity is "menubaritem"/menu/menuitem (we cant use menu since the <name> of menu from osx is empty unlike windows)
-            /* windows: the entity is type "menu"/menuitem */ 
+            /* windows: the entity is type "menu"/menuitem */
 
             Console.WriteLine("entity.Name: {0}", entity.Name);
 
@@ -1467,14 +1538,20 @@ namespace WindowsProxy
             }));
         }
 
-		
-		private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
+
+        private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
         {
             ToolStripMenuItem newMenu = new ToolStripMenuItem(entity_mi.Name);
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
             newMenu.Name = entity_mi.Name;
+            if ((entity_mi.States & States.DISABLED) != 0 || (entity_mi.States & States.INVISIBLE) != 0)
+            {
+                newMenu.Enabled = false;
+            }
             newMenu.Click += Control_Click_MenuItem;
+            newMenu.ShortcutKeys = ParseShortcutKeys(entity_mi.Value);
+
             if (!newMenu.Name.Equals("separator", StringComparison.Ordinal) && parent_mi.DropDownItems.IndexOfKey(newMenu.Name) == -1)
             {
                 Console.WriteLine("Adding menuitem: {0}", entity_mi.Name);
@@ -1490,6 +1567,71 @@ namespace WindowsProxy
             }
         }
 
+        private Keys ParseShortcutKeys(string ShortcutString){
+            Keys ShortcutKeys = Keys.None;
+            if (ShortcutString != null)
+            {
+                string[] keys = ShortcutString.Split(new Char[] { '+' });
+                foreach (string s in keys)
+                {
+                    s.Trim();
+                    Console.WriteLine("key = {0}", s);
+                    switch (s)
+                    {
+                        case ("Ctrl"):
+                            ShortcutKeys |= Keys.Control;
+                            break;
+                        case ("Alt"):
+                            ShortcutKeys |= Keys.Alt;
+                            break;
+                        case ("Shift"):
+                            ShortcutKeys |= Keys.Shift;
+                            break;
+                        case ("Space"):
+                            ShortcutKeys |= Keys.Space;
+                            break;
+                        case ("Tab"):
+                            ShortcutKeys |= Keys.Tab;
+                            break;
+                        case ("F12"):
+                            ShortcutKeys |= Keys.F12;
+                            break;
+                        case ("F11"):
+                            ShortcutKeys |= Keys.F11;
+                            break;
+                        case ("F10"):
+                            ShortcutKeys |= Keys.F10;
+                            break;
+                        default:
+                            char[] chars = s.ToCharArray();
+                            if (s.Length == 2)
+                            {
+                                if (chars[0] == 'F' && (chars[1] >= '1' && chars[1] <= '9'))
+                                {
+                                    ShortcutKeys |= (Keys.F1 + (chars[1] - '1'));
+                                    break;
+                                }
+                            }
+                            else if (s.Length == 1)
+                            {
+                                if (chars[0] >= '0' && chars[0] <= '9')
+                                {
+                                    ShortcutKeys |= (Keys.D0 + (chars[0] - '0'));
+                                    break;
+                                }
+                                else if (chars[0] >= 'A' && chars[0] <= 'Z')
+                                {
+                                    ShortcutKeys |= (Keys.A + (chars[0] - 'A'));
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+            return ShortcutKeys;    
+        }
+
         void AdjustProperties(Entity entity, ref Control control)
         {
             control.Height = (int)(entity.Height * height_ratio);
@@ -1500,6 +1642,11 @@ namespace WindowsProxy
 
             control.Top = (int)((entity.Top - rootPoint.Y) * height_ratio);
             control.Left = (int)((entity.Left - rootPoint.X) * width_ratio);
+
+            if ((entity.States & States.DISABLED) != 0)
+            {
+                control.Enabled = false;
+            }
 
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }

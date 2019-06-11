@@ -23,7 +23,30 @@ using System.Linq;
 
 namespace Sintering
 {
-  public static class MsgUtil
+    public static class States
+    {
+        public const uint DISABLED = 0x1;
+        public const uint SELECTED = 0x2;
+        public const uint FOCUSED = 0x4;
+        public const uint PRESSED = 0x8;
+        public const uint CHECKED = 0x10;
+        public const uint MIXED = 0x20;
+        public const uint READONLY = 0x40;
+        public const uint DEFAULT = 0x100;
+        public const uint EXPANDED = 0x200;
+        public const uint COLLAPSED = 0x400;
+        public const uint BUSY = 0x800;
+        public const uint INVISIBLE = 0x8000;
+        public const uint VISITED = 0x800000;
+        public const uint LINKED = 0x400000;
+        public const uint HASPOPUP = 0x40000000;
+        public const uint PROTECTED = 0x20000000;
+        public const uint OFFSCREEN = 0x10000;
+        public const uint SELECTABLE = 0x200000;
+        public const uint FOCUSABLE = 0x100000;
+    }
+
+    public static class MsgUtil
   {
 
     static Dictionary<string, int> serviceCodes;

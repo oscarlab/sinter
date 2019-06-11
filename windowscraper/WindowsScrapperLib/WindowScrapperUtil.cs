@@ -441,28 +441,7 @@ namespace WindowsScraper
       }
     }*/
 
-    static class States
-    {
-      public const int DISABLED = 0x1;
-      public const int SELECTED = 0x2;
-      public const int FOCUSED = 0x4;
-      public const int PRESSED = 0x8;
-      public const int CHECKED = 0x10;
-      public const int MIXED = 0x20;
-      public const int READONLY = 0x40;
-      public const int DEFAULT = 0x100;
-      public const int EXPANDED = 0x200;
-      public const int COLLAPSED = 0x400;
-      public const int BUSY = 0x800;
-      public const int INVISIBLE = 0x8000;
-      public const int VISITED = 0x800000;
-      public const int LINKED = 0x400000;
-      public const int HASPOPUP = 0x40000000;
-      public const int PROTECTED = 0x20000000;
-      public const int OFFSCREEN = 0x10000;
-      public const int SELECTABLE = 0x200000;
-      public const int FOCUSABLE = 0x100000;
-    }
+
 
     /*class AutomationElementDictionary
     {
