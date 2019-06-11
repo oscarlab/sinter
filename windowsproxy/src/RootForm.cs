@@ -208,6 +208,7 @@ namespace WindowsProxy {
       Entity entity = (Entity)grid.SelectedRows[0].Tag;
 
       proxy.RequestedProcessId = int.Parse(entity.Process);
+      proxy.RemoteProcessName = (string)grid.SelectedRows[0].Cells[0].Value;
       proxy.execute_ls_l_req(null);
     }
 
