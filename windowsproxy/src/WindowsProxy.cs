@@ -1024,26 +1024,48 @@ namespace WindowsProxy
 
         private void Form_Closing(object sender, FormClosingEventArgs e)
         {
-            Console.WriteLine("CloseButton is pressed, this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
-
-            if (this.RemoteCloseButtonUID != null)
+            Console.WriteLine("Form_Closing(), this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
+            if (this.RemoteCloseButtonUID == null)
             {
-                e.Cancel = true;
-                Sinter sinter = new Sinter
-                {
-                    HeaderNode = MsgUtil.BuildHeader(
-                                  serviceCodes["action"],
-                                  serviceCodes["action_default"],
-                                  this.RemoteCloseButtonUID
-                                ),
-                };
-                execute_action(sinter);
-            }
-            else
-            {
-                Console.WriteLine("Form closed\n");
+                //just the local window
                 this.form = null;
                 root.Remove_Dict_Item(requestedProcessId);
+                return;
+            }
+            else {
+                const string message =
+                    "Do you want to close the remote window as well?";
+                string caption = this.RemoteProcessName;
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.YesNoCancel,
+                                             MessageBoxIcon.Question,
+                                             MessageBoxDefaultButton.Button2);
+
+                // If the yes button was pressed, sends to remote
+                if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+                if (result == DialogResult.Yes)
+                {
+                    // cancel the closure of the form.
+                    e.Cancel = true;
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_default"],
+                                      this.RemoteCloseButtonUID
+                                    ),
+                    };
+                    execute_action(sinter);
+                }
+                else
+                {
+                    //just the local window
+                    this.form = null;
+                    root.Remove_Dict_Item(requestedProcessId);
+                }
             }
         }
 
