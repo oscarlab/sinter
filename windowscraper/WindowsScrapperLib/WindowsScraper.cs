@@ -1275,7 +1275,7 @@ namespace WindowsScraper
 
             // states
             //int states = (int)element.GetCurrentPropertyValue(LegacyIAccessiblePattern.StateProperty);
-            int states = 0;
+            uint states = 0;
             #region code for getting States manually
             if (current.IsOffscreen)
                 states |= States.OFFSCREEN;
@@ -1429,7 +1429,7 @@ namespace WindowsScraper
 
             // states
             //int states = (int)element.GetCurrentPropertyValue(LegacyIAccessiblePattern.StateProperty);
-            int states = 0;
+            uint states = 0;
             #region code for getting States manually
             object pattern;
             if (current.ControlType == ControlType.TreeItem)
