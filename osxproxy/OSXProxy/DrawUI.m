@@ -683,6 +683,10 @@ static  ClientHandler  * sharedConnection;
         [label setHidden:NO];
         [label setStrValue:model.value];
         
+        if ([model.value isEqualToString:@"Memory"] && [rmUiRoot.name isEqualToString:@"Calculator"]){
+            [label setStrValue:@""]; /* tweak for windows calculator @"Calc" */
+        }
+        
         //[label setLabel:model.name];
         if (model.version) {
             model.version = 0;
@@ -706,12 +710,17 @@ static  ClientHandler  * sharedConnection;
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
     
-    if ([[window title] hasPrefix:@"Calc"]) {
+    if ([[window title] hasPrefix:@"Calc"]) { //[rmUiRoot.name isEqualToString:@"Calculator"]
         if(model.states & STATE_FOCUSED){
             [label setLabel:@"Result"];
             [label setNeedsDisplay:YES];
         }else{
-            [label setHidden:YES];
+            if (![model.name isEqualToString:@"Running History"] && ![model.name isEqualToString:@"Memory"]){
+                [label setHidden:YES];//ignore the other result text field from windows calculator
+            }
+            if ([model.name isEqualToString:@"Memory"]){
+                [label setStrValue:@""]; /* tweak for windows calculator @"Calc" */
+            }
         }
         return label;
     }
@@ -753,16 +762,6 @@ static  ClientHandler  * sharedConnection;
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
-    
-    if ([[window title] hasPrefix:@"Calc"]) {
-        if(model.states & STATE_FOCUSED){
-            [label setLabel:@"Result"];
-            [label setNeedsDisplay:YES];
-        }else{
-            [label setHidden:YES];
-        }
-        return label;
-    }
     
     [label setNeedsDisplay:YES];
     return label;

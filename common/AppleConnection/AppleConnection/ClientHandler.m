@@ -220,7 +220,7 @@ static ClientHandler* shared       = nil;
     // deserialize XML
     Sinter * sinter = [Serializer xmlToObject:incoming_data];
     if(!sinter) return;
-    NSLog(@"Sinter received: service_code = %@, service_code = %@", sinter.header.service_code, sinter.header.sub_code);
+    NSLog(@"Sinter recv: service_code = %@, sub_code = %@", sinter.header.service_code, sinter.header.sub_code);
 
     
     NSString *notificationName = @"";
