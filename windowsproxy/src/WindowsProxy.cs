@@ -62,6 +62,9 @@ namespace WindowsProxy
         RootForm root;
         AppForm form;
         string RemoteCloseButtonUID; //UniqueID of remote close button
+        string RemoteMinimizeButtonUID; //UniqueID of remote close button
+        string RemoteZoomButtonUID; //UniqueID of remote close button
+        FormWindowState prevWindowState; 
 
         Point rootPoint;
         Entity root_entity;
@@ -133,6 +136,7 @@ namespace WindowsProxy
             timer.Tick += Timer_Tick;
 
             this.bPasscodeVerified = false;
+            this.prevWindowState = FormWindowState.Normal;
         }
 
         private int requestedProcessId = 0;
@@ -166,7 +170,7 @@ namespace WindowsProxy
 
             if ((entity.States & States.FOCUSABLE) != 0)
             {
-                Console.WriteLine("{0}/{1} states is FOCUSABLE", entity.Type, entity.Name);
+                //Console.WriteLine("{0}/{1} states is FOCUSABLE", entity.Type, entity.Name);
             }
 
             if ((entity.States & States.FOCUSED) != 0)
@@ -251,9 +255,25 @@ namespace WindowsProxy
 
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
-                if (entity.Name.Equals("AXCloseButton"))
+                if (entity.Name.Equals("Close"))
                 {
                     RemoteCloseButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("Minimize"))
+                {
+                    RemoteMinimizeButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) != 0)
+                    {
+                        this.form.MinimizeBox = false;
+                    }
+                }
+                else if (entity.Name.Equals("Maximize"))
+                {
+                    RemoteZoomButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) != 0)
+                    {
+                        this.form.MaximizeBox = false;
+                    }
                 }
                 return parent;
             }
@@ -263,6 +283,14 @@ namespace WindowsProxy
                 if (entity.Name.Equals("AXCloseButton"))
                 {
                     RemoteCloseButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("AXMinimizeButton"))
+                {
+                    RemoteMinimizeButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("AXZoomButton"))
+                {
+                    RemoteZoomButtonUID = entity.UniqueID;
                 }
                 return parent;
             }
@@ -670,6 +698,7 @@ namespace WindowsProxy
 
             //register event listener and delegate
             form.FormClosing += Form_Closing;
+            form.SizeChanged += Form_SizeChanged;
             form.delegateKeyPresses = ProcessKeyPress;
 
             return control;
@@ -1034,6 +1063,7 @@ namespace WindowsProxy
         #region AppForm handler/helper
         public void close_forms()
         {
+            this.RemoteCloseButtonUID = null;
             if (this.form != null)
             {
                 this.form.Invoke(new Action(() => this.form.Close()));
@@ -1065,7 +1095,7 @@ namespace WindowsProxy
                 {
                     e.Cancel = true;
                 }
-                if (result == DialogResult.Yes)
+                else if (result == DialogResult.Yes)
                 {
                     // cancel the closure of the form.
                     e.Cancel = true;
@@ -1086,6 +1116,51 @@ namespace WindowsProxy
                     root.Remove_Dict_Item(requestedProcessId);
                 }
             }
+        }
+
+        private void Form_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.form.WindowState == FormWindowState.Minimized)
+            {
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_default"],
+                                      this.RemoteMinimizeButtonUID
+                                    ),
+                };
+                execute_action(sinter);
+            }
+            else if (this.form.WindowState == FormWindowState.Normal)
+            {
+                if (this.prevWindowState == FormWindowState.Minimized)
+                {
+                    //bring it back 
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                          serviceCodes["action"],
+                                          serviceCodes["action_foreground"]
+                                        ),
+                    };
+                    execute_action(sinter);
+                }
+            }
+            else if (this.form.WindowState == FormWindowState.Maximized)
+            {
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_foreground"],
+                                      this.RemoteZoomButtonUID
+                                    ),
+                };
+                execute_action(sinter);
+            }
+            this.prevWindowState = this.form.WindowState;
+
         }
 
         public void ProcessKeyPress(string keypresses, string targetId)
@@ -1249,6 +1324,10 @@ namespace WindowsProxy
             }
             else if (subCode == serviceCodes["delta_prop_change_value"])
             {
+                if (this.form!= null && this.form.WindowState == FormWindowState.Minimized)
+                {
+                    return; //ignore, the msg is due to proxy asked scraper to minimize
+                }
                 root_entity = sinter.EntityNode;
                 // Console.WriteLine("{0}", root_entity.Type);
                 if (sinter.EntityNode != null)
@@ -1400,18 +1479,20 @@ namespace WindowsProxy
 
         public void execute_event(Sinter sinter)
         {
-            // Entity e = sinter.EntityNode;
-
             //server send this msg to indicate app is closed in server side
-            if ((sinter.HeaderNode.ParamsInfo == null) && (this.form != null))
+            if ((sinter.HeaderNode.ParamsInfo == null)
+                ||(sinter.HeaderNode.ParamsInfo.TargetId == null))
             {
                 this.RemoteCloseButtonUID = null;
-                this.form.Invoke(new Action(() => this.form.Close()));
-            }
-            this.form = null;
+                if (this.form != null)
+                {
+                    this.form.Invoke(new Action(() => this.form.Close()));
+                }
+                this.form = null;
 
-            //re-load the list from server
-            this.execute_ls_req(null);
+                //re-load the list from server
+                this.execute_ls_req(null);
+            }
         }
 
         // client related calls
@@ -1439,14 +1520,15 @@ namespace WindowsProxy
             height_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height / height;
             width_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / width;
             Control ctrl = null;
-            if (form == null)
+            if (this.form == null)
             {
-                form = (AppForm)Render(sinter.EntityNode, null);
+                this.form = (AppForm)Render(sinter.EntityNode, null);
                 foreach (Entity other_entity in sinter.EntityNodes)
                 {
                     //this comes from mac scraper
                     ctrl = Render(other_entity, form);
                 }
+                this.prevWindowState = FormWindowState.Normal;
             }
             //now show it
             root.DisplayProxy(form, requestedProcessId);

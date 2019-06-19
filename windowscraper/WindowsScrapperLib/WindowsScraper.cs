@@ -764,6 +764,9 @@ namespace WindowsScraper
             if (anchor.Current.ControlType == ControlType.Window)
                 return;
 
+            //if (anchor.Current.ControlType != ControlType.Pane)
+              //  return;
+
             if (!IsCached(element))
                 anchor = GetAnchorElementFromCache(element);
 
@@ -772,6 +775,7 @@ namespace WindowsScraper
             {
                 Console.WriteLine("DeltaGeneric");
                 SinterUtil.ScreenSize(out int width, out int height);
+
                 Header header = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_subtree_replace"]);
                 header.ParamsInfo = new Params
                 {
@@ -912,6 +916,10 @@ namespace WindowsScraper
 
                         // send
                         Console.WriteLine("Sending new Window");
+                        if ((sinter.EntityNode.States & States.DISABLED) != 0)
+                        {
+                            return; //'DISABLE' states confuses proxy. if it is disabled, scraper no need to send size change anyway 
+                        }
                         connection.SendMessage(sinter);
                     //}
                 }
@@ -1822,9 +1830,13 @@ namespace WindowsScraper
             string runtimeId = "";
             string _serviceCode = "";
             string _subCode = "";
-            Console.WriteLine("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
+            AutomationElement element = null;
+
             if (sinter.HeaderNode.ParamsInfo != null)
+            {
+                Console.WriteLine("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
                 runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            }
             else
                 runtimeId = sinter.HeaderNode.Process;  //for example: action_close
 
@@ -1835,33 +1847,31 @@ namespace WindowsScraper
             if (!_serviceCode.Equals("action"))
                 return;
 
-            // extract the automation element pointed by runtimeId
-            AutomationElement element = null;
-
-            //Console.WriteLine("RuntimeID {0}", runtimeId);
-            try
+            serviceCodesRev.TryGetValue(sinter.HeaderNode.SubCode, out _subCode);
+            if ((_subCode != "action_expand_and_select") && (_subCode != "action_foreground"))
             {
-                //Console.WriteLine("execute_action: Get RuntimeId");
-                if (runtimeId != null && sinter.HeaderNode.SubCode != 813)
+                // extract the automation element pointed by runtimeId
+                try
                 {
-                    element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
-                    if (element == null)
-                        return;
-                    //Console.WriteLine("execute_action: Got element from RuntimeId: {0}", runtimeId);
-                }
+                    //Console.WriteLine("execute_action: Get RuntimeId = {0}", runtimeId);
+                    if (runtimeId != null)
+                    {
+                        element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
+                        if (element == null)
+                            return;
+                    }
 
-                int[] id = element.GetRuntimeId();
-                //Console.WriteLine("{0}", id);
-                if (automationElementTrie.TryGetValue(id, out Entity entity))
-                {
-                    //vInfo.version = Util.Version.Updated;
-                    entity.versionInfo.version = Sintering.Version.Updated;
-                   // Console.WriteLine("Version from AutoElement Dict {0}", vInfo.runtimeID);
+                    int[] id = element.GetRuntimeId();
+                    if (automationElementTrie.TryGetValue(id, out Entity entity))
+                    {
+                        entity.versionInfo.version = Sintering.Version.Updated;
+                        // Console.WriteLine("Version from AutoElement Dict {0}", vInfo.runtimeID);
+                    }
                 }
-            }
-            catch
-            {
-                Console.WriteLine("problem with extracting {0}", runtimeId);
+                catch
+                {
+                    Console.WriteLine("problem with extracting {0}", runtimeId);
+                }
             }
 
             if (serviceCodesRev.TryGetValue(sinter.HeaderNode.SubCode, out _subCode))
@@ -1900,6 +1910,8 @@ namespace WindowsScraper
                         executeAppendText(runtimeId, sinter.HeaderNode.ParamsInfo.Data1);
                         break;
                     case "action_foreground":
+                        // bring the current app window to foreground
+                        executeSetProcessToForeground(sinter.HeaderNode.Process);
                         break;
                     case "action_expand_and_select":
                         Console.WriteLine("Case action_expand_and_select");
