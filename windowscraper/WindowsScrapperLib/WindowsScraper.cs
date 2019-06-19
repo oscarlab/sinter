@@ -1481,7 +1481,14 @@ namespace WindowsScraper
                 }
                 xmlDoc.Children.Add(childEntity);
             }
-            xmlDoc.ChildCount = xmlDoc.Children.Count;
+            if (xmlDoc.Children != null)
+            {
+                xmlDoc.ChildCount = xmlDoc.Children.Count;
+            }
+            else
+            {
+                xmlDoc.ChildCount = 0;
+            }
             #endregion
 
             //log.Info(String.Format("\t\t {0}  --> {1}", xmlDoc.Name.Length > 15 ? xmlDoc.Name.Substring(0, 15) : xmlDoc.Name.PadLeft(15), uiStopwatch.ElapsedMilliseconds));
@@ -1859,7 +1866,7 @@ namespace WindowsScraper
 
             if (serviceCodesRev.TryGetValue(sinter.HeaderNode.SubCode, out _subCode))
             {
-                Console.WriteLine("execute_action: Got subCode");
+                Console.WriteLine("execute_action: Got subCode = {0}", _subCode);
                 switch (_subCode)
                 {
                     case "action_default":

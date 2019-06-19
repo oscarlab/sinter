@@ -304,7 +304,14 @@ namespace WindowsProxy
 
         private Control RenderCheckBox(Entity entity, Control parent)
         {
-            return parent;
+            Control control = new CheckBox();
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderCheckBox");
+
+            control.Tag = entity;
+            ((CheckBox)control).Click += Control_Click_Button;
+
+            return control;
         }
 
         private Control RenderComboBox(Entity entity, Control parent)
@@ -312,6 +319,7 @@ namespace WindowsProxy
             Console.WriteLine("Rendering ComboBox");
             Control control = new ComboBox();
             AdjustProperties(entity, ref control);
+            control.Text = entity.Value;
 
             control.Tag = entity;
 
@@ -325,6 +333,9 @@ namespace WindowsProxy
                         ToolStripMenuItem tmp = new ToolStripMenuItem();
                         tmp.Name = listItem.Name;
                         tmp.Text = listItem.Name;
+                        if ((listItem.States & States.SELECTED) != 0){
+                            control.Text = listItem.Name;
+                        }
                         tmp.Click += Control_Click_ComboBox;
                         ((ComboBox)control).Items.Add(tmp);
                         comboBoxParent.TryAdd(listItem.Name, child_entity);
@@ -386,7 +397,16 @@ namespace WindowsProxy
 
         private Control RenderEdit(Entity entity, Control parent)
         {
-            return parent;
+            Control control = null;
+            Console.WriteLine("Executing RenderEdit");
+
+            control = new TextBox();
+            AdjustProperties(entity, ref control);
+
+            control.Text = entity.Value;
+            control.Tag = entity;
+            control.KeyPress += Control_KeyPress;
+            return control;
         }
 
         private Control RenderGroup(Entity entity, Control parent)
@@ -553,17 +573,16 @@ namespace WindowsProxy
 
         private Control RenderText(Entity entity, Control parent)
         {
-            Control control = null;
+            Control control = new TextBox();
             Console.WriteLine("Executing RenderText");
 
             if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("calc --Calculator") == true))
             {
-                control = new Label(); //windows 7 calculator will fall to here
+                //windows 7 calculator will fall to here
+                ((TextBox)control).ReadOnly = true;
+                ((TextBox)control).BorderStyle = 0;
             }
-            else
-            {
-                control = new TextBox();
-            }
+            
             AdjustProperties(entity, ref control);
 
             if (this.RemoteProcessName.Contains("calc --Calculator") && control.Text.Equals("Memory"))
@@ -698,7 +717,7 @@ namespace WindowsProxy
             if (isSent)
                 return;
 
-            Button button = (Button)sender;
+            Control button = (Control)sender;
             Entity entity = (Entity)button.Tag;
             if (entity == null)
                 return;
@@ -1224,6 +1243,7 @@ namespace WindowsProxy
                     control.BeginInvoke((Action)(() =>
                     {
                         control.Name = newName;
+                        control.Text = newName;
                     }));
                 }
             }
@@ -1669,7 +1689,22 @@ namespace WindowsProxy
             {
                 control.Enabled = false;
             }
-
+            if ((entity.States & States.CHECKED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is CHECKED", entity.Type, entity.Name);
+                if (entity.Type == "CheckBox")
+                {
+                    ((CheckBox)control).Checked = true;
+                }
+            }
+            if ((entity.States & States.SELECTED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is SELECTED", entity.Type, entity.Name);
+                if (entity.Type == "RadioButton")
+                {
+                    ((RadioButton)control).Checked = true;
+                }
+            }
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }
 
