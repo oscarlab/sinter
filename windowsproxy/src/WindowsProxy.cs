@@ -200,6 +200,16 @@ namespace WindowsProxy
                 invoking_method_name = "RenderMenuItem";
             }
             /* tweak for Mac Scraper: End */
+
+            if (invoking_method_name.Equals("RenderWindow") && parent_control != null)
+            {
+                /* trick for window7 calc statistic mode (window/pane/window)
+                   treat sub window as pane so it will not be rendered.
+                   otherwise exception in below session when window added under pane:
+                   parent_control.Controls.Add(current_control); */
+                invoking_method_name = "RenderPane";
+            }
+
             invoking_method = type.GetMethod(invoking_method_name,
               BindingFlags.NonPublic | BindingFlags.Instance);
             Console.WriteLine("Method {0}", invoking_method);
