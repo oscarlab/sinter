@@ -589,6 +589,10 @@ namespace WindowsScraper
                 //Console.WriteLine("NameChanged {0} {1}", element.Current.Name, e.NewValue);
                 DeltaGenericHash(element);
             }
+            if (e.Property == SelectionItemPattern.IsSelectedProperty)
+            {
+                DeltaGeneric(element);
+            }
             else
             {
                 // not required now
@@ -678,7 +682,10 @@ namespace WindowsScraper
 
             if (element.Current.Name != "View")
             {
-                DeltaGeneric(element);
+                if (element.Current.LocalizedControlType != "text") //already sent the msg 511 (delta_prop_change_value)
+                {
+                    DeltaGeneric(element);
+                }
             }
 
         }
@@ -1691,6 +1698,7 @@ namespace WindowsScraper
             AutomationElement.BoundingRectangleProperty,
             AutomationElement.NameProperty,
                     ValuePattern.ValueProperty,
+                    SelectionItemPattern.IsSelectedProperty,
                     /*AutomationElement.IsOffscreenProperty*/
                     /*AutomationElement.ControlTypeProperty*/
             });

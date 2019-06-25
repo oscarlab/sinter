@@ -474,7 +474,29 @@ namespace WindowsProxy
 
         private Control RenderList(Entity entity, Control parent)
         {
-            return parent;
+            ListView listView = new ListView();
+            listView.View = View.List;
+
+            listView.BeginUpdate();
+
+            int i = 0; 
+            foreach (Entity child in entity.Children)
+            {
+                ListViewItem li = new ListViewItem(child.Name);
+                listView.Items.Add(li);
+                if ((child.States & States.SELECTED) != 0)
+                {
+                    listView.Items[i].Selected = true;
+                }
+                i++;
+            }
+            Control control = (Control)listView;
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderList");
+            control.Tag = entity;
+            control.Click += Control_Click_Button;
+            listView.EndUpdate();
+            return control;
         }
 
         private Control RenderListItem(Entity entity, Control parent)
@@ -1418,10 +1440,34 @@ namespace WindowsProxy
                     return;
 
                 Console.WriteLine("Type: {0}", sinter.EntityNode.Type);
-                if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem"))
+                if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem") || sinter.EntityNode.Type.Equals("Text"))
                 {
-                    Console.WriteLine("delta_subtree_replace Not handled");
+                    Console.WriteLine("delta_subtree_replace Not handled for type {0}", sinter.EntityNode.Type);
                     //UpdateMenu(sinter);
+                    return;
+                }
+                else if (sinter.EntityNode.Type.Equals("List"))
+                {
+                    if (hash.TryGetValue(sinter.EntityNode.UniqueID, out Control ctrl))
+                    {
+                            ctrl.BeginInvoke((Action)(() =>
+                            {
+                                ctrl.Focus();
+                                int i = 0;
+                                foreach (Entity child in sinter.EntityNode.Children)
+                                {
+                                    if ((child.States & States.SELECTED) != 0)
+                                    {
+                                        ((ListView)ctrl).Items[i].Selected = true;
+                                    }
+                                    else
+                                    {
+                                        ((ListView)ctrl).Items[i].Selected = false;
+                                    }
+                                    i++;
+                                }
+                            }));
+                    }
                     return;
                 }
 
