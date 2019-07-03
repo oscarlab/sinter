@@ -163,26 +163,6 @@ namespace WindowsProxy
         {
             Console.WriteLine("Rendering: {0}/{1}", entity.Type, entity.Name);
 
-            if ((entity.States & States.DISABLED) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.FOCUSABLE) != 0)
-            {
-                //Console.WriteLine("{0}/{1} states is FOCUSABLE", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.FOCUSED) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is FOCUSED", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.INVISIBLE) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
-            }
-
             entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
             invoking_method_name = string.Format("Render{0}", entity.Type);
             /* tweak for Mac Scraper*/
@@ -216,6 +196,14 @@ namespace WindowsProxy
             Control current_control = null;
             if (invoking_method != null)
             {
+
+                if (hash.TryGetValue(entity.UniqueID, out Control prev))
+                {
+                    Console.WriteLine("Remove previous control from parent");
+                    parent_control.Controls.Remove(prev);
+                    hash.TryRemove(entity.UniqueID, out Control rem);
+                }
+
                 current_control = (Control)invoking_method.Invoke(this,
                   new object[] { entity, parent_control });
 
@@ -256,12 +244,14 @@ namespace WindowsProxy
         {
 
             Console.WriteLine("RenderButton entity.UniqueId: {0} {1}", entity.UniqueID, entity.Name);
+            /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
                 Console.WriteLine("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
+            */
 
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
@@ -317,13 +307,14 @@ namespace WindowsProxy
 
         private Control RenderRadioButton(Entity entity, Control parent)
         {
-
+            /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
                 Console.WriteLine("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
+            */
 
             Control control = new RadioButton();
             AdjustProperties(entity, ref control);
@@ -371,7 +362,8 @@ namespace WindowsProxy
                         ToolStripMenuItem tmp = new ToolStripMenuItem();
                         tmp.Name = listItem.Name;
                         tmp.Text = listItem.Name;
-                        if ((listItem.States & States.SELECTED) != 0){
+                        if ((listItem.States & States.SELECTED) != 0)
+                        {
                             control.Text = listItem.Name;
                         }
                         tmp.Click += Control_Click_ComboBox;
@@ -482,6 +474,7 @@ namespace WindowsProxy
             int i = 0; 
             foreach (Entity child in entity.Children)
             {
+                Console.WriteLine("Rendered ListItem: {0}", child.Name);
                 ListViewItem li = new ListViewItem(child.Name);
                 listView.Items.Add(li);
                 if ((child.States & States.SELECTED) != 0)
@@ -501,7 +494,7 @@ namespace WindowsProxy
 
         private Control RenderListItem(Entity entity, Control parent)
         {
-            Console.WriteLine("Rendered ListItem");
+            //Console.WriteLine("Rendered ListItem");
             return parent;
         }
 
@@ -644,13 +637,6 @@ namespace WindowsProxy
             }
             
             AdjustProperties(entity, ref control);
-
-            if (this.RemoteProcessName.Contains("calc --Calculator") && control.Text.Equals("Memory"))
-            {
-                control.Text = "";
-            }
-
-
 
             control.Tag = entity;
             control.KeyPress += Control_KeyPress;
@@ -1364,8 +1350,6 @@ namespace WindowsProxy
                 // Console.WriteLine("{0}", root_entity.Type);
                 if (sinter.EntityNode != null)
                 {
-
-
                     Console.WriteLine("Prop Change {0}", sinter.EntityNode.Type);
                     if (sinter.EntityNode.Type.Equals("Window", StringComparison.Ordinal))
                     {
@@ -1386,10 +1370,17 @@ namespace WindowsProxy
                             form.Height += (30 + 8);
                             form.Height += 25;
 
-                            Console.WriteLine("Form adjusted");
+                            Console.WriteLine("Window form adjusted");
+                            foreach (Entity child in sinter.EntityNode.Children)
+                            {
+                                AdjustSubTreeProperties(child);
+                            }
                         }));
                     }
-
+                    else 
+                    {
+                        AdjustSubTreeProperties(sinter.EntityNode);
+                    }
                 }
                 else
                 {
@@ -1398,7 +1389,8 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
-                            if (this.RemoteProcessName.Contains("calc --Calculator") && newValue.Equals("Memory"))
+                            if (this.RemoteProcessName.Contains("calc --Calculator") && 
+                                (newValue.Equals("Memory") || newValue.Equals("Running History")))
                             {
                                 newValue = "";
                             }
@@ -1548,6 +1540,17 @@ namespace WindowsProxy
 
                 //re-load the list from server
                 this.execute_ls_req(null);
+            }
+            else
+            {
+                if ((hash.TryGetValue(sinter.HeaderNode.ParamsInfo.TargetId, out Control control))
+                    && (control != null))
+                {
+                    Control parent_control = control.Parent;
+                    parent_control.Invoke(new Action(() => parent_control.Controls.Remove(control)));
+                    hash.TryRemove(sinter.HeaderNode.ParamsInfo.TargetId, out Control old_control);
+                    root.DisplayProxy(form, requestedProcessId);
+                }
             }
         }
 
@@ -1725,9 +1728,21 @@ namespace WindowsProxy
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
             newMenu.Name = entity_mi.Name;
-            if ((entity_mi.States & States.DISABLED) != 0 || (entity_mi.States & States.INVISIBLE) != 0)
+            if ((entity_mi.States & States.DISABLED) != 0 )
             {
                 newMenu.Enabled = false;
+            }
+            if ((entity_mi.States & States.CHECKED) != 0 )
+            {
+                newMenu.Checked = true;
+            }
+            if ((entity_mi.States & States.INVISIBLE) != 0)
+            {
+                newMenu.Visible = false;
+            }
+            if ((entity_mi.States & States.FOCUSED) != 0)
+            {
+                newMenu.Select();
             }
             newMenu.Click += Control_Click_MenuItem;
             newMenu.ShortcutKeys = ParseShortcutKeys(entity_mi.Value);
@@ -1812,6 +1827,19 @@ namespace WindowsProxy
             return ShortcutKeys;    
         }
 
+
+        void AdjustSubTreeProperties(Entity entity)
+        {
+            if (hash.TryGetValue(entity.UniqueID, out Control control))
+            {
+                AdjustProperties(entity, ref control);
+            }
+            foreach (Entity child in entity.Children)
+            {
+                AdjustSubTreeProperties(child);
+            }
+        }
+
         void AdjustProperties(Entity entity, ref Control control)
         {
             control.Height = (int)(entity.Height * height_ratio);
@@ -1820,11 +1848,19 @@ namespace WindowsProxy
             control.Name = entity.Name;
             control.Text = entity.Name;
 
+            if (this.RemoteProcessName.Contains("calc --Calculator") &&
+                (control.Text.Equals("Memory") || control.Text.Equals("Running History")))
+            {
+                control.Text = "";
+            }
+
             control.Top = (int)((entity.Top - rootPoint.Y) * height_ratio);
             control.Left = (int)((entity.Left - rootPoint.X) * width_ratio);
+            Console.WriteLine("AdjustProperties {0}/{1}/{2}, Top: {3}", entity.Type, entity.Name, entity.UniqueID, control.Top);
 
             if ((entity.States & States.DISABLED) != 0)
             {
+                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
                 control.Enabled = false;
             }
             if ((entity.States & States.CHECKED) != 0)
@@ -1842,6 +1878,11 @@ namespace WindowsProxy
                 {
                     ((RadioButton)control).Checked = true;
                 }
+            }
+            if ((entity.States & States.INVISIBLE) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
+                control.Visible = false;
             }
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }

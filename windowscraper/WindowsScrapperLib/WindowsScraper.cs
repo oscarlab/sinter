@@ -330,7 +330,8 @@ namespace WindowsScraper
         }
 
 
-
+        /* remove unused code */
+        /*
         private void RegisterStructureChangedNotification(AutomationElement element)
         {
             if (element != null)
@@ -343,6 +344,7 @@ namespace WindowsScraper
                 Console.WriteLine("registration of structureChangeNotification failed");
             }
         }
+        */
 
         public void executeCaretMoveOrSelection(string runtimeId, uint location, uint length)
         {
@@ -440,11 +442,28 @@ namespace WindowsScraper
             WindowClosedEventArgs e = _e as WindowClosedEventArgs;
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
-     
+
+
+
             if (automationElementTrie.ContainsKey(runtimeId))
             {
-                DeltaForClose(stringRuntimeId);
-                Console.WriteLine("Window Closed Globally" + runtimeId);
+                if (automationElementTrie.TryGetValue(runtimeId, out Entity entity))
+                {
+                    if (entity.Type == "Pane")
+                    {
+                        Console.WriteLine(entity);
+                        foreach (Entity child in entity.Children)
+                        {
+                            Console.WriteLine("Window Closed Globally: " + child.Type);
+                            DeltaForClose(child.UniqueID);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Window Closed Globally: " + entity.Type);
+                        DeltaForClose(stringRuntimeId);
+                    }
+                }
             }
         }
 
@@ -659,10 +678,13 @@ namespace WindowsScraper
             }
         }
 
+        
         private void OnStructureChangedLocal(object sender, StructureChangedEventArgs e)
         {
             if (e.StructureChangeType != StructureChangeType.ChildAdded)
+            {
                 return;
+            }
 
             Console.WriteLine("OnStructureChangedLocal");
             AutomationElement element = (AutomationElement)sender;
@@ -1329,6 +1351,7 @@ namespace WindowsScraper
                 }
             }
 
+            
             /* //Debug
            AutomationPattern[] patterns = element.GetSupportedPatterns();
            Console.WriteLine("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
