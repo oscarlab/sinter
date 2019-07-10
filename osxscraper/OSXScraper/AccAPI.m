@@ -261,15 +261,15 @@ static NSDictionary * roleMappings;
     }
     
     Entity * entity     = [[Entity alloc] init];
-    
     [entity setUnique_id: primary_id];
     [entity setType     : [self getRoleOfUIElement:element]];
     [entity setName     : [self getTitleOfUIElement:element]];
     [entity setValue    : [self getValueOfUIElement:element]];
+
     if ([entity.type isEqualToString:@"button"]
-        && ([entity.name isEqualToString:@""] || [entity.value isEqualToString:@""])){
-        //NSLog(@"Button without name and value, get label");
-        [entity setValue    : [self getAccessbilityDescriptionAttribute:element]];
+        && ([entity.name isEqualToString:@""] && [entity.value isEqualToString:@""])){
+        //NSLog(@"Some Buttons are without name and value, get label"); //for example in calculator app
+        [entity setName    : [self getAccessbilityDescriptionAttribute:element]];
     }
     [entity setStates   : [NSNumber numberWithUnsignedInteger:[self getStatesOfUIElement:element]]];
     
