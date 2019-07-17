@@ -599,8 +599,14 @@ namespace WindowsScraper
             else if (e.Property == ValuePattern.ValueProperty)
             {
                 Console.WriteLine("valueChanged {0} {1}", element.Current.Name, e.NewValue);
+                DeltaGenericHash(element);
                 //MarkUpdateRequired(element);
             }//update required
+            else if (e.Property == RangeValuePattern.ValueProperty)
+            {
+                Console.WriteLine("RangeValuePattern value {0} {1}", element.Current.Name, e.NewValue);
+                DeltaGenericHash(element, e.NewValue.ToString());
+            }
             else if (e.Property == AutomationElement.NameProperty &&
                 (element.Current.ControlType == ControlType.Text ||
                 element.Current.ControlType == ControlType.Button))
@@ -1248,7 +1254,7 @@ namespace WindowsScraper
 
             AutomationElement.AutomationElementInformation current = element.Current;
 
-            //Console.WriteLine("Form Entity for {0}", element.Current.Name);
+            Console.WriteLine("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
 
             String uniqueId;
 
@@ -1297,6 +1303,11 @@ namespace WindowsScraper
             // entity.Type = current.ClassName;//.ToLower();
             //else //sizeof("ControlType.") = 11
             entity.Type = current.ControlType.ProgrammaticName.Substring(12);//.ToLower();
+
+            if (current.ControlType == ControlType.Pane && current.ClassName.Equals("SysDateTimePick32"))
+            {
+                entity.Type = "DateTimePicker";
+            }
 
             // name, value
             //entity.Value = "" + element.GetCurrentPropertyValue(LegacyIAccessiblePattern.ValueProperty);
@@ -1374,6 +1385,14 @@ namespace WindowsScraper
                     {
                         states |= States.SELECTED;
                     }
+                }
+            }
+            else if (current.ControlType == ControlType.Spinner)
+            {
+                object rangeValue = element.GetCurrentPropertyValue(RangeValuePattern.ValueProperty, true);
+                if (rangeValue != AutomationElement.NotSupported)
+                {
+                    entity.Value = rangeValue.ToString();
                 }
             }
 
@@ -1534,36 +1553,35 @@ namespace WindowsScraper
             return xmlDoc;
         }
 
-        public void AppendChildren(Entity rootNode, AutomationElement parent)
+        public void AppendChildren(Entity parentNode, AutomationElement parent)
         {
             try
             {
-                Entity curParentNode = rootNode;
-                AutomationElement child = treeWalker.GetFirstChild(parent);
-                while (child != null)
+                AutomationElement childElement = treeWalker.GetFirstChild(parent);
+                while (childElement != null)
                 {
                     try
                     {
-                        curParentNode = UIAElement2EntitySingle(child);
-                        if (curParentNode != null)
+                        Entity childEntity = UIAElement2EntitySingle(childElement);
+                        if (childEntity != null)
                         {
-                            if (rootNode.Children == null)
+                            if (parentNode.Children == null)
                             {
-                                rootNode.Children = new List<Entity>();
+                                parentNode.Children = new List<Entity>();
                             }
-                            rootNode.Children.Add(curParentNode);
-                            if (child.Current.ControlType == ControlType.Image)
+                            parentNode.Children.Add(childEntity);
+                            if (childElement.Current.ControlType == ControlType.Image)
                             { // if image then replace it to group
-                                curParentNode.Type = ControlType.Group.ProgrammaticName.Substring(12).ToLower();
+                                childEntity.Type = ControlType.Group.ProgrammaticName.Substring(12).ToLower();
                             }
-                            AppendChildren(curParentNode, child);
+                            AppendChildren(childEntity, childElement);
                         }
                     }
                     catch (Exception exception)
                     {
                         Console.WriteLine("In AppendChildren: " + exception.Message);
                     }
-                    child = treeWalker.GetNextSibling(child);
+                    childElement = treeWalker.GetNextSibling(childElement);
                 }
             }
             catch (Exception ex)
@@ -1722,6 +1740,7 @@ namespace WindowsScraper
             AutomationElement.NameProperty,
                     ValuePattern.ValueProperty,
                     SelectionItemPattern.IsSelectedProperty,
+                    RangeValuePattern.ValueProperty,
                     /*AutomationElement.IsOffscreenProperty*/
                     /*AutomationElement.ControlTypeProperty*/
             });

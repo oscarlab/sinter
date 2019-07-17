@@ -130,6 +130,7 @@ namespace Sintering {
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
+          return;
         }
 #endif
         try
@@ -139,6 +140,7 @@ namespace Sintering {
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
+          return;
         }
         networkStream.Flush();
 

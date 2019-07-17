@@ -121,6 +121,10 @@ namespace WindowsScraper
         {
            ((TogglePattern)togglePattern).Toggle();
         }
+        else if (element.TryGetCurrentPattern(SelectionItemPattern.Pattern, out object selectionPattern))
+        {
+            ((SelectionItemPattern)selectionPattern).Select();
+        }
       }
 
       public static void PerformToggleAction(AutomationElement element)

@@ -102,7 +102,7 @@ namespace WindowsProxy
         ConcurrentDictionary<string, ToolStripMenuItem> menuHashMenuItem = new ConcurrentDictionary<string, ToolStripMenuItem>();
         ConcurrentDictionary<string, Entity> menuItemParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxParent = new ConcurrentDictionary<string, Entity>();
-        ConcurrentDictionary<string, Entity> comboBoxEntity = new ConcurrentDictionary<string, Entity>();
+        ConcurrentDictionary<string, Entity> comboBoxEntities = new ConcurrentDictionary<string, Entity>();
 
         Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
 
@@ -232,8 +232,16 @@ namespace WindowsProxy
             if (!HasChildren(entity))
                 return current_control;
 
-            foreach (Entity child_entity in entity.Children)
-                Render(child_entity, current_control);
+            if (entity.Type == "Spinner")
+            {
+                foreach (Entity child_entity in entity.Children)
+                    Render(child_entity, parent_control); //otherwise "Botton"s won't show as children of "Edit"
+            }
+            else
+            {
+                foreach (Entity child_entity in entity.Children)
+                    Render(child_entity, current_control);
+            }
 
             return current_control;
         }
@@ -331,6 +339,21 @@ namespace WindowsProxy
             return parent;
         }
 
+        private Control RenderDateTimePicker(Entity entity, Control parent)
+        {
+            Control control = new DateTimePicker();
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderDateTimePicker");
+            control.Tag = entity;
+
+            DateTimePicker dateTimePicker = (DateTimePicker)control;
+            dateTimePicker.CustomFormat = "MM/dd/yyyy";
+            dateTimePicker.Format = DateTimePickerFormat.Custom;
+            dateTimePicker.Value = DateTime.Parse(entity.Name);
+
+            return control;
+        }
+
         private Control RenderCheckBox(Entity entity, Control parent)
         {
             Control control = new CheckBox();
@@ -366,13 +389,13 @@ namespace WindowsProxy
                         {
                             control.Text = listItem.Name;
                         }
-                        tmp.Click += Control_Click_ComboBox;
                         ((ComboBox)control).Items.Add(tmp);
                         comboBoxParent.TryAdd(listItem.Name, child_entity);
-                        comboBoxEntity.TryAdd(listItem.Name, listItem);
+                        comboBoxEntities.TryAdd(listItem.Name, listItem);
                     }
                 }
             }
+            ((ComboBox)control).SelectedIndexChanged += Control_ComboBox_SelectedIndexChanged;
             Console.WriteLine("Rendered ComboBox");
             return control;
         }
@@ -596,7 +619,9 @@ namespace WindowsProxy
 
         private Control RenderSpinner(Entity entity, Control parent)
         {
-            return parent;
+            //return parent;
+			entity.Width -= 18; //not to cover the bottons of spinner
+            return RenderEdit(entity, parent);
         }
 
         private Control RenderSplitButton(Entity entity, Control parent)
@@ -876,6 +901,42 @@ namespace WindowsProxy
             timer.Enabled = true;
         }
 
+        private void Control_ComboBox_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            int selectedIndex = comboBox.SelectedIndex;
+            Object selectedItem = comboBox.SelectedItem;
+
+            if (comboBoxEntities.TryGetValue(selectedItem.ToString(), out Entity listItem))
+            {
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                  serviceCodes["action"],
+                  serviceCodes["action_default"],
+                  listItem.UniqueID
+                ),
+                };
+                execute_mouse(sinter);
+            }
+            else
+            {
+                Entity comboBox_entity = (Entity)((Control)comboBox).Tag;
+                if (comboBox_entity == null)
+                    return;
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                  serviceCodes["action"],
+                  serviceCodes["action_select"],
+                  comboBox_entity.UniqueID,
+                  selectedIndex.ToString()
+                ),
+                };
+                execute_mouse(sinter);
+            }
+        }
+
         private void Control_Click_ComboBox(object sender, EventArgs e)
         {
             Console.WriteLine("Begin Control_Click_Combo_Box");
@@ -885,7 +946,7 @@ namespace WindowsProxy
             ComboBox item = (ComboBox)sender;
             // Entity entity;
             Console.WriteLine("MenuItem Click {0}", item.Text);
-            comboBoxEntity.TryGetValue(item.Text, out Entity entity);
+            comboBoxEntities.TryGetValue(item.Text, out Entity entity);
             if (entity == null)
                 return;
             Console.WriteLine("MenuItem ID {0}", entity.UniqueID);
@@ -1446,15 +1507,22 @@ namespace WindowsProxy
                             {
                                 ctrl.Focus();
                                 int i = 0;
+                                ListView listView = (ListView)ctrl;
+
+                                foreach (ListViewItem oldLi in listView.Items)
+                                {
+                                    Console.WriteLine("Remove oldlistItem {0}", oldLi.Name);
+                                    listView.Items.Remove(oldLi);
+                                }
+
                                 foreach (Entity child in sinter.EntityNode.Children)
                                 {
+                                    Console.WriteLine("Rendered ListItem: {0}", child.Name);
+                                    ListViewItem li = new ListViewItem(child.Name);
+                                    listView.Items.Add(li);
                                     if ((child.States & States.SELECTED) != 0)
                                     {
-                                        ((ListView)ctrl).Items[i].Selected = true;
-                                    }
-                                    else
-                                    {
-                                        ((ListView)ctrl).Items[i].Selected = false;
+                                        listView.Items[i].Selected = true;
                                     }
                                     i++;
                                 }
@@ -1846,7 +1914,14 @@ namespace WindowsProxy
             control.Width = (int)(entity.Width * width_ratio);
 
             control.Name = entity.Name;
-            control.Text = entity.Name;
+            if (entity.Type == "Edit")
+            {
+                control.Text = entity.Value;
+            }
+            else
+            {
+                control.Text = entity.Name;
+            }
 
             if (this.RemoteProcessName.Contains("calc --Calculator") &&
                 (control.Text.Equals("Memory") || control.Text.Equals("Running History")))
