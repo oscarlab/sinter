@@ -117,6 +117,14 @@ namespace WindowsScraper
         {
           ((InvokePattern)invokePattern).Invoke();
         }
+        else if (element.TryGetCurrentPattern(TogglePattern.Pattern, out object togglePattern))
+        {
+           ((TogglePattern)togglePattern).Toggle();
+        }
+        else if (element.TryGetCurrentPattern(SelectionItemPattern.Pattern, out object selectionPattern))
+        {
+            ((SelectionItemPattern)selectionPattern).Select();
+        }
       }
 
       public static void PerformToggleAction(AutomationElement element)

@@ -117,21 +117,30 @@ namespace Sintering {
           // serialize
           serializer.Serialize(writer , sinter , ns);
         }
-        try
-        {
 #if DEBUG
+       try
+       {
                     byte[] bytesToFile = ms.ToArray();
                     string filestring = Encoding.ASCII.GetString(bytesToFile);
                     using (StreamWriter sw = File.AppendText(xmlFilePath))
                     {
                         sw.WriteLine(filestring);
                     }
-#endif
-                    networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
         }
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
+          return;
+        }
+#endif
+        try
+        {
+          networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine("Exception: {0}", e);
+          return;
         }
         networkStream.Flush();
 
