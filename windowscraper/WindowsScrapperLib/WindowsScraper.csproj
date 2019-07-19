@@ -47,8 +47,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UIAutomationClient" />
-    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +69,10 @@
     <ProjectReference Include="..\..\common\WindowsConnection\WindowsConnection\WindowsConnection.csproj">
       <Project>{ee45634f-3241-4b54-aca8-de5ca7f50beb}</Project>
       <Name>WindowsConnection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UIAComWrapper\UIAComWrapper\UIAComWrapper.csproj">
+      <Project>{1dd63894-dbb9-40ef-bff2-55624cb285af}</Project>
+      <Name>UIAComWrapper</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

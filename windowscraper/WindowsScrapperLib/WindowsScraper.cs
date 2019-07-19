@@ -1251,7 +1251,7 @@ namespace WindowsScraper
         {
             if (element == null)
                 return null;
-
+            
             AutomationElement.AutomationElementInformation current = element.Current;
 
             Console.WriteLine("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
@@ -1308,10 +1308,7 @@ namespace WindowsScraper
             {
                 entity.Type = "DateTimePicker";
             }
-
-            // name, value
-            //entity.Value = "" + element.GetCurrentPropertyValue(LegacyIAccessiblePattern.ValueProperty);
-
+            
             #region child count -- not setting it for the sake of performance
             /*
              entity.ChildCount = 0;
@@ -1322,9 +1319,11 @@ namespace WindowsScraper
             #endregion
 
             // states
-            //int states = (int)element.GetCurrentPropertyValue(LegacyIAccessiblePattern.StateProperty);
-            uint states = 0;
+            int states = (int)element.GetCurrentPropertyValue(LegacyIAccessiblePattern.StateProperty);
+
             #region code for getting States manually
+            /*
+            uint states = 0;
             if (current.IsOffscreen)
                 states |= States.OFFSCREEN;
             if (!current.IsEnabled)
@@ -1362,23 +1361,25 @@ namespace WindowsScraper
                 }
             }
 
-            
-            /* //Debug
-           AutomationPattern[] patterns = element.GetSupportedPatterns();
-           Console.WriteLine("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
-           foreach (AutomationPattern p in patterns) {
-             Console.WriteLine("\t{0}", p.ProgrammaticName);
-           }
-           */
+
+           ////Debug
+           //AutomationPattern[] patterns = element.GetSupportedPatterns();
+           //Console.WriteLine("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
+           //foreach (AutomationPattern p in patterns) {
+           //  Console.WriteLine("\t{0}", p.ProgrammaticName);
+           //}
+           
+
             // checked
             if (element.TryGetCurrentPattern(TogglePattern.Pattern, out pattern))
             {
                 if (((TogglePattern)pattern).Current.ToggleState == ToggleState.On)
                     states |= States.CHECKED;
             }
+
             if (current.ControlType == ControlType.RadioButton &&
                 (bool)element.GetCurrentPropertyValue(AutomationElement.IsSelectionItemPatternAvailableProperty))
-            { // for others
+            { // for others 
                 if (element.TryGetCurrentPattern(SelectionItemPattern.Pattern, out pattern))
                 {
                     if (((SelectionItemPattern)pattern).Current.IsSelected)
@@ -1387,58 +1388,70 @@ namespace WindowsScraper
                     }
                 }
             }
-            else if (current.ControlType == ControlType.Spinner)
-            {
-                object rangeValue = element.GetCurrentPropertyValue(RangeValuePattern.ValueProperty, true);
-                if (rangeValue != AutomationElement.NotSupported)
-                {
-                    entity.Value = rangeValue.ToString();
-                }
-            }
+            */
+            entity.States = (uint)states;
+            
+            #endregion
 
-            //xmlDoc.Value = "";
-            pattern = element.GetCurrentPropertyValue(ValuePattern.ValueProperty, true);
-            if (AutomationElement.NotSupported != pattern)
+            // Value Property
+            object pattern;
+            entity.Value = "" + element.GetCurrentPropertyValue(LegacyIAccessiblePattern.ValueProperty);
+            
+            if (string.IsNullOrEmpty(entity.Value))
             {
-                entity.Value = pattern as string;
-            }
-            else
-            {
-                if (current.ControlType == ControlType.Text)
+                // special treatment for UI spinner
+                if (current.ControlType == ControlType.Spinner)
                 {
-                    entity.Value = entity.Name;
-                    if (current.AccessKey != "")
+                    object rangeValue = element.GetCurrentPropertyValue(RangeValuePattern.ValueProperty, true);
+                    if (rangeValue != AutomationElement.NotSupported)
                     {
-                        entity.Value = current.AccessKey;
-                        states |= States.LINKED;
+                        entity.Value = rangeValue.ToString();
+                    }
+                }
+                else if ((pattern = element.GetCurrentPropertyValue(ValuePattern.ValueProperty, true)) != AutomationElement.NotSupported)                
+                {
+                    entity.Value = pattern as string;
+                }
+                else
+                {
+                    if (current.ControlType == ControlType.Text)
+                    {
+                        entity.Value = entity.Name;
+                        if (current.AccessKey != "")
+                        {
+                            entity.Value = current.AccessKey;
+                            //states |= States.LINKED;
+                        }
                     }
                 }
             }
+            
 
-            //override default value, state
+            //override default value
             if (current.ControlType == ControlType.MenuItem ||
                 current.ControlType == ControlType.Menu)
             {
                 entity.Value = current.AcceleratorKey;
             }
+
             /*
-          //special treatment for menu, alter the 'value' field
-          if ((bool) element.GetCurrentPropertyValue(AutomationElement.IsValuePatternAvailableProperty)) { // for others
-            if (element.TryGetCurrentPattern(ValuePattern.Pattern, out pattern)) {
-              xmlDoc.Value = ((ValuePattern)pattern).Current.Value;
-              if (((ValuePattern)pattern).Current.IsReadOnly) {
-                  states |= States.READONLY;
-              }
-            }
-          } */
-
-            entity.States = (uint)states;
-
-            #endregion
-
+            //special treatment for menu, alter the 'value' field
+            if ((bool) element.GetCurrentPropertyValue(AutomationElement.IsValuePatternAvailableProperty)) { // for others
+                if (element.TryGetCurrentPattern(ValuePattern.Pattern, out pattern)) {
+                    xmlDoc.Value = ((ValuePattern)pattern).Current.Value;
+                    if (((ValuePattern)pattern).Current.IsReadOnly) {
+                        states |= States.READONLY;
+                    }
+                }
+            } 
+            */
+        
             // check for rich text-edit element
             if (current.ControlType == ControlType.Document)
+            {
                 SerializeDocumentElement(element, entity);
+            }
+                
 
             return entity;
         }

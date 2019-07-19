@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsScraperTest", "WindowsScraper\WindowsScraperTest.csproj", "{6C683743-17CE-4D6B-AB63-DAF99A916CAF}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -28,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqAndTrie", "..\linqandtrie\LinqAndTrie\LinqAndTrie.csproj", "{AE68649E-A131-484B-88CC-7C4F603A63BC}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WindowsServerSetup", "WindowsScraper\SetupWizard\Setup\Setup.vdproj", "{4C9C2CC6-E245-49DA-99E1-9F4DAEDBBEED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIAComWrapper", "UIAComWrapper\UIAComWrapper\UIAComWrapper.csproj", "{1DD63894-DBB9-40EF-BFF2-55624CB285AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{4C9C2CC6-E245-49DA-99E1-9F4DAEDBBEED}.Debug|Any CPU.Build.0 = Debug
 		{4C9C2CC6-E245-49DA-99E1-9F4DAEDBBEED}.Release|Any CPU.ActiveCfg = Release
 		{4C9C2CC6-E245-49DA-99E1-9F4DAEDBBEED}.Release|Any CPU.Build.0 = Release
+		{1DD63894-DBB9-40EF-BFF2-55624CB285AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD63894-DBB9-40EF-BFF2-55624CB285AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD63894-DBB9-40EF-BFF2-55624CB285AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD63894-DBB9-40EF-BFF2-55624CB285AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
