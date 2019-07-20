@@ -79,7 +79,7 @@ namespace WindowsServer {
           else
           {
             Console.WriteLine("Client No:" + counter + " started!");
-            ClientHandler client = new ClientHandler(new WindowsScraper.WindowsScraper(passcode), clientSocket, "" + counter, sslStream);
+            ClientHandler client = new ClientHandler(new WindowsScraper.WindowsScraper(passcode), clientSocket, "WinScraper Client " + counter, sslStream);
             clients.Add(client);
           }
         }

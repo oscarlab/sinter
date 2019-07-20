@@ -34,7 +34,7 @@ namespace Sintering {
     public Stream networkStream; //SSL Implementation
     string clientId;
 #if DEBUG
-        string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinter.xml";
+        string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar;
 #endif
 
     XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
@@ -42,13 +42,15 @@ namespace Sintering {
     XmlWriterSettings settings = new XmlWriterSettings() {
       Encoding = new UTF8Encoding(false) ,
       OmitXmlDeclaration = true ,
-      Indent = false ,
+      Indent = true,//false
     };
 
     BlockingCollection<Sinter> messageQueue;
+
     public ConnectionHandler(TcpClient clientSocket , string clientId, BlockingCollection<Sinter> messageQueue) {
       this.clientSocket = clientSocket;
       this.clientId = clientId;
+      xmlFilePath = string.Format("{0}sinter-{1}.xml", xmlFilePath, clientId);
 
       // get network stream for reading, writing
       networkStream = clientSocket.GetStream();
@@ -63,32 +65,21 @@ namespace Sintering {
       serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
       serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
 
-#if DEBUG
-      using (StreamWriter sw = File.CreateText(xmlFilePath))
+    #if DEBUG
+      using (StreamWriter sw = new StreamWriter(xmlFilePath, false))
       {
          sw.WriteLine(DateTime.Now.ToLongTimeString());
       }
-#endif
+    #endif
 
     }
 
-    public ConnectionHandler(TcpClient clientSocket, string clientId, BlockingCollection<Sinter> messageQueue, SslStream sslStream)
+    public ConnectionHandler(TcpClient clientSocket, string clientId, BlockingCollection<Sinter> messageQueue, SslStream sslStream) 
+            : this(clientSocket,clientId, messageQueue)
     {
-      this.clientSocket = clientSocket;
-      this.clientId = clientId;
-
-      // get network stream for reading, writing
+      
+      // get network secured stream for reading, writing
       networkStream = sslStream;
-
-      // initiate shared message queue
-      this.messageQueue = messageQueue;
-
-      RequestedProcessId = 0;
-
-      // initialize xml writer
-      ns.Add("", "");
-      serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
-      serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
     }
 
     Thread ctThread;
@@ -109,7 +100,7 @@ namespace Sintering {
         using (XmlWriter writer = XmlWriter.Create(ms , settings)) {
           
           // add timestamp
-          sinter.HeaderNode.Timestamp = DateTime.Now.ToShortTimeString();
+          sinter.HeaderNode.Timestamp = DateTime.Now.ToLongTimeString();
 
           // add process id
           sinter.HeaderNode.Process = RequestedProcessId.ToString();
@@ -117,22 +108,23 @@ namespace Sintering {
           // serialize
           serializer.Serialize(writer , sinter , ns);
         }
-#if DEBUG
-       try
-       {
-                    byte[] bytesToFile = ms.ToArray();
-                    string filestring = Encoding.ASCII.GetString(bytesToFile);
-                    using (StreamWriter sw = File.AppendText(xmlFilePath))
-                    {
-                        sw.WriteLine(filestring);
-                    }
+
+    #if DEBUG
+        try
+        {
+            byte[] bytesToFile = ms.ToArray();
+            string filestring = Encoding.ASCII.GetString(bytesToFile);
+            using (StreamWriter sw = File.AppendText(xmlFilePath))
+            {
+                sw.Write(string.Format("[sent] {0}\n", filestring));                
+            }
         }
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
           return;
         }
-#endif
+    #endif
         try
         {
           networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
@@ -147,6 +139,10 @@ namespace Sintering {
         // Debug statement
         Console.WriteLine("sent: " + (int)ms.Length + " bytes");
         Console.WriteLine("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+
+        // freeing up sinter manually
+        sinter = null;
+
       }
 
       // Debug statement
@@ -235,13 +231,14 @@ namespace Sintering {
     }
 
     private void AddToMessageQueue(string xml) {
-
-#if DEBUG
-      using (StreamWriter sw = File.AppendText(xmlFilePath))
-      {
-            sw.WriteLine(xml);
-      }
-#endif
+    
+    #if DEBUG
+        using (StreamWriter sw = File.AppendText(xmlFilePath))
+        {
+            sw.Write(string.Format("[received] {0}\n", xml));
+        }
+    #endif
+    
       using (XmlReader reader = XmlReader.Create(new StringReader(xml))) {
         Sinter sinter = (Sinter)serializer.Deserialize(reader);
         messageQueue.Add(sinter);

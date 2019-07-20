@@ -139,7 +139,8 @@ namespace Sintering {
                     && Width == other.Width && words == other.words;
         }
     }
-    [XmlRoot("header")]
+
+  [XmlRoot("header")]
   public class Header {
     [XmlAttribute("service_code")]
     public int ServiceCode { get; set; }
@@ -157,7 +158,7 @@ namespace Sintering {
     public Params ParamsInfo { get; set; }
   }
 
-    [XmlRoot("screen")]
+  [XmlRoot("screen")]
   public class Screen {
     [XmlAttribute("screen_width")]
     public int ScreenWidth { get; set; }
@@ -193,6 +194,7 @@ namespace Sintering {
       return string.Format("<tid:{0}, tidList: {1}, data1:{2}, data2:{3}, data3:{4}>", TargetId, TargetIdList, Data1, Data2, Data3);
     }
   }
+
     [Flags]
     public enum Version
     {
