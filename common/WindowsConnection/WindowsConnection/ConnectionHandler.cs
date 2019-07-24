@@ -34,7 +34,7 @@ namespace Sintering {
     public Stream networkStream; //SSL Implementation
     string clientId;
 #if DEBUG
-        string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinter.xml";
+    string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
 #endif
 
     XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
@@ -188,6 +188,10 @@ namespace Sintering {
           ExtractSinterMessage(dataFromClient, out excess);
           dataFromClient = excess;
         }
+      }
+      catch (IOException ex)
+      {
+         Console.WriteLine(ex.Message);
       }
       catch (Exception ex)
       {

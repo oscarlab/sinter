@@ -18,6 +18,7 @@
 */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -55,6 +56,16 @@ namespace WindowsServer {
       string passcode = rnd.Next(1, 999999).ToString();
 #else
       string passcode = ServerConfiguration.DEFAULT_PASSCODE;
+
+            string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
+            try
+            {
+                File.Delete(xmlFilePath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
 #endif
 
       serverSocket.Start();
