@@ -672,7 +672,7 @@ namespace WindowsProxy
             Control control = new TextBox();
             Console.WriteLine("Executing RenderText");
 
-            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("calc --Calculator") == true))
+            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("Calculator") == true))
             {
                 //windows 7 calculator will fall to here
                 ((TextBox)control).ReadOnly = true;
@@ -1487,7 +1487,7 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
-                            if (this.RemoteProcessName.Contains("calc --Calculator") && 
+                            if (this.RemoteProcessName.Contains("Calculator") && 
                                 (newValue.Equals("Memory") || newValue.Equals("Running History")))
                             {
                                 newValue = "";
@@ -1839,7 +1839,7 @@ namespace WindowsProxy
         private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
         {
 #if !DEBUG  //this is for 1st release version for Calculator. MessageBox 
-            if (this.RemoteProcessName.Contains("calc --Calculator") && entity_mi.Name.Equals("About Calculator"))
+            if (this.RemoteProcessName.Contains("Calculator") && entity_mi.Name.Equals("About Calculator"))
             {
                 Console.WriteLine("skip menu: {0}", entity_mi.Name); 
                 return;
@@ -1977,12 +1977,12 @@ namespace WindowsProxy
             }
 
             /* following are treak for windows 7 calculator */
-            if (this.RemoteProcessName.Contains("calc --Calculator") &&
+            if (this.RemoteProcessName.Contains("Calculator") &&
                 (control.Text.Equals("Memory") || control.Text.Equals("Running History")))
             {
                 control.Text = "";
             }
-            if (this.RemoteProcessName.Contains("calc --Calculator") && entity.Type == "Text"
+            if (this.RemoteProcessName.Contains("Calculator") && entity.Type == "Text"
                 && entity.Name == "" && entity.Value == "")
             {
                 control.Visible = false;
