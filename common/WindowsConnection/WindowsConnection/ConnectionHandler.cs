@@ -107,6 +107,8 @@ namespace Sintering {
     public void SendMessage(Sinter sinter) {
       using (MemoryStream ms = new MemoryStream()) {
         using (XmlWriter writer = XmlWriter.Create(ms , settings)) {
+
+          if (_shouldStop) return;
           
           // add timestamp
           sinter.HeaderNode.Timestamp = DateTime.Now.ToShortTimeString();
@@ -133,6 +135,7 @@ namespace Sintering {
           return;
         }
 #endif
+        
         try
         {
           networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
@@ -140,6 +143,7 @@ namespace Sintering {
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
+          this.StopConnectionHandling();
           return;
         }
         networkStream.Flush();
