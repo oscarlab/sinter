@@ -34,7 +34,7 @@ namespace Sintering {
     public Stream networkStream; //SSL Implementation
     string clientId;
 #if DEBUG
-        string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinter.xml";
+    string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
 #endif
 
     XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
@@ -107,6 +107,8 @@ namespace Sintering {
     public void SendMessage(Sinter sinter) {
       using (MemoryStream ms = new MemoryStream()) {
         using (XmlWriter writer = XmlWriter.Create(ms , settings)) {
+
+          if (_shouldStop) return;
           
           // add timestamp
           sinter.HeaderNode.Timestamp = DateTime.Now.ToShortTimeString();
@@ -133,6 +135,7 @@ namespace Sintering {
           return;
         }
 #endif
+        
         try
         {
           networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
@@ -140,6 +143,7 @@ namespace Sintering {
         catch (Exception e)
         {
           Console.WriteLine("Exception: {0}", e);
+          this.StopConnectionHandling();
           return;
         }
         networkStream.Flush();
@@ -188,6 +192,10 @@ namespace Sintering {
           ExtractSinterMessage(dataFromClient, out excess);
           dataFromClient = excess;
         }
+      }
+      catch (IOException ex)
+      {
+         Console.WriteLine(ex.Message);
       }
       catch (Exception ex)
       {

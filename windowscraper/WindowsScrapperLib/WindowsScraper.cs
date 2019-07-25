@@ -796,7 +796,7 @@ namespace WindowsScraper
         {
             // find anchor node
             AutomationElement anchor = element;
-            if (anchor.Current.ControlType == ControlType.Window)
+            if (anchor.Current.ControlType == ControlType.Window && !anchor.Current.LocalizedControlType.Equals("Dialog"))
                 return;
 
             //if (anchor.Current.ControlType != ControlType.Pane)
@@ -1303,6 +1303,12 @@ namespace WindowsScraper
             // entity.Type = current.ClassName;//.ToLower();
             //else //sizeof("ControlType.") = 11
             entity.Type = current.ControlType.ProgrammaticName.Substring(12);//.ToLower();
+            
+            if (current.ControlType == ControlType.Window && current.LocalizedControlType.Equals("Dialog"))
+            {
+                entity.Type = current.LocalizedControlType.ToString();
+            }
+            
 
             if (current.ControlType == ControlType.Pane && current.ClassName.Equals("SysDateTimePick32"))
             {

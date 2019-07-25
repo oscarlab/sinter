@@ -24,7 +24,7 @@ namespace WindowsProxyTest
         public Program()
         {
             windowsProxy = new WindowsProxy.WindowsProxy(new RootForm());
-            windowsProxy.execute_ls_l_req(null);
+            //windowsProxy.execute_ls_l_req(null);
             baseXML = windowsProxy.baseXML;
             window_count = windowsProxy.Window_Count;
         }

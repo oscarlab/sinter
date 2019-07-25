@@ -18,6 +18,7 @@
 */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Sintering;
@@ -90,7 +91,7 @@ namespace WindowsProxy
 
         Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
-        Dictionary<int, string> sendKeysCodes;
+        //Dictionary<int, string> sendKeysCodes;
 
         public bool bPasscodeVerified { get; private set; }
         public Sinter baseXML { get; set; }
@@ -103,8 +104,9 @@ namespace WindowsProxy
         ConcurrentDictionary<string, Entity> menuItemParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxEntities = new ConcurrentDictionary<string, Entity>();
+        Dictionary<string, Form> dictSubForms = new Dictionary<string, Form>();
 
-        Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
+        //Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
 
         public WindowsProxy(RootForm r)
         { // Form
@@ -137,6 +139,11 @@ namespace WindowsProxy
 
             this.bPasscodeVerified = false;
             this.prevWindowState = FormWindowState.Normal;
+
+#if DEBUG
+            string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
+            File.Delete(xmlFilePath);
+#endif
         }
 
         private int requestedProcessId = 0;
@@ -181,13 +188,17 @@ namespace WindowsProxy
             }
             /* tweak for Mac Scraper: End */
 
-            if (invoking_method_name.Equals("RenderWindow") && parent_control != null)
+            if (invoking_method_name.Equals("RenderDialog") && parent_control != null)
             {
                 /* trick for window7 calc statistic mode (window/pane/window)
                    treat sub window as pane so it will not be rendered.
                    otherwise exception in below session when window added under pane:
                    parent_control.Controls.Add(current_control); */
                 invoking_method_name = "RenderPane";
+                if (entity.Name.Equals("About Calculator"))
+                {
+                    return null; //to finish the implement MessageBox later
+                }
             }
 
             invoking_method = type.GetMethod(invoking_method_name,
@@ -622,6 +633,13 @@ namespace WindowsProxy
             //return parent;
 			entity.Width -= 18; //not to cover the bottons of spinner
             return RenderEdit(entity, parent);
+            /* 
+            //possible tweak: in case we want to have better user experience in release version
+            Control control = RenderText(entity, parent);
+            ((TextBox)control).ReadOnly = true;
+            ((TextBox)control).Text = entity.Value;
+            return control;
+            */
         }
 
         private Control RenderSplitButton(Entity entity, Control parent)
@@ -654,7 +672,7 @@ namespace WindowsProxy
             Control control = new TextBox();
             Console.WriteLine("Executing RenderText");
 
-            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("calc --Calculator") == true))
+            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("Calculator") == true))
             {
                 //windows 7 calculator will fall to here
                 ((TextBox)control).ReadOnly = true;
@@ -743,7 +761,26 @@ namespace WindowsProxy
             form.FormClosing += Form_Closing;
             form.SizeChanged += Form_SizeChanged;
             form.delegateKeyPresses = ProcessKeyPress;
+            return control;
+        }
 
+        private Control RenderDialog(Entity entity, Control parent)
+        {
+                Form localForm = new Form();
+                Control control = localForm as Control;
+                AdjustProperties(entity, ref control);
+                localForm.Font = new Font("Segoe UI", 8);
+                localForm.TopLevel = false;
+
+                localForm.Width += 100;
+                localForm.Height += 200;
+
+                control.Tag = entity;
+                dictSubForms.Add(entity.UniqueID, localForm);
+
+                //register event listener and delegate
+                localForm.FormClosing += Form_Closing;
+                localForm.SizeChanged += Form_SizeChanged;
             return control;
         }
 
@@ -1450,7 +1487,7 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
-                            if (this.RemoteProcessName.Contains("calc --Calculator") && 
+                            if (this.RemoteProcessName.Contains("Calculator") && 
                                 (newValue.Equals("Memory") || newValue.Equals("Running History")))
                             {
                                 newValue = "";
@@ -1528,6 +1565,10 @@ namespace WindowsProxy
                                 }
                             }));
                     }
+                    return;
+                }
+                else if (!sinter.EntityNode.Type.Equals("Pane")){
+                    Console.WriteLine("delta_subtree_replace Not handled for type {0}", sinter.EntityNode.Type);
                     return;
                 }
 
@@ -1659,6 +1700,11 @@ namespace WindowsProxy
             }
             //now show it
             root.DisplayProxy(form, requestedProcessId);
+
+            foreach (KeyValuePair<string, Form> entry in dictSubForms)
+            {
+                root.DisplayProxy(entry.Value, requestedProcessId);
+            }
         }
 
         public void execute_action(Sinter sinter)
@@ -1792,6 +1838,13 @@ namespace WindowsProxy
 
         private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
         {
+#if !DEBUG  //this is for 1st release version for Calculator. MessageBox 
+            if (this.RemoteProcessName.Contains("Calculator") && entity_mi.Name.Equals("About Calculator"))
+            {
+                Console.WriteLine("skip menu: {0}", entity_mi.Name); 
+                return;
+            }
+#endif
             ToolStripMenuItem newMenu = new ToolStripMenuItem(entity_mi.Name);
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
@@ -1923,10 +1976,16 @@ namespace WindowsProxy
                 control.Text = entity.Name;
             }
 
-            if (this.RemoteProcessName.Contains("calc --Calculator") &&
+            /* following are treak for windows 7 calculator */
+            if (this.RemoteProcessName.Contains("Calculator") &&
                 (control.Text.Equals("Memory") || control.Text.Equals("Running History")))
             {
                 control.Text = "";
+            }
+            if (this.RemoteProcessName.Contains("Calculator") && entity.Type == "Text"
+                && entity.Name == "" && entity.Value == "")
+            {
+                control.Visible = false;
             }
 
             control.Top = (int)((entity.Top - rootPoint.Y) * height_ratio);
@@ -1959,6 +2018,7 @@ namespace WindowsProxy
                 Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
                 control.Visible = false;
             }
+            
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }
 
