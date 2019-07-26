@@ -125,6 +125,17 @@ namespace WindowsScraper
         {
             ((SelectionItemPattern)selectionPattern).Select();
         }
+        else if (element.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
+        {
+            try
+            {
+                ((ExpandCollapsePattern)expandCollapsePattern).Expand();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
       }
 
       public static void PerformToggleAction(AutomationElement element)
@@ -148,43 +159,50 @@ namespace WindowsScraper
         Console.WriteLine("Expand {0}", element.GetRuntimeId());
         if (element.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
         {
-          ((ExpandCollapsePattern)expandCollapsePattern).Expand();
+                    try
+                    {
+                        ((ExpandCollapsePattern)expandCollapsePattern).Expand();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
         }
       }
 
-        public static void PerformExpandAndSelectAction(string runtimeId, uint button, List<string[]> element)
-        {
-            AutomationElement id = null;
-            Console.WriteLine("Executing ExpandAndSelectAction");
-
-            Console.WriteLine("Executing ExpandAndSelectAction {0}", runtimeId);
-            id = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
-            Console.WriteLine("Retrieved ID {0}", id);
-            if (id.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
+            public static void PerformExpandAndSelectAction(string runtimeId, List<string[]> menuList)
             {
-                Console.WriteLine("ExpandAndSelect: expanding {0}", id);
-                ((ExpandCollapsePattern)expandCollapsePattern).Expand();
-            }
+                Console.WriteLine("Executing ExpandAndSelectAction {0}", runtimeId);
+                AutomationElement parentElement = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
 
-            uint x;
-            uint y;
-                Console.WriteLine("Element list {0}", element);
-            foreach (string[] pos in element)
-            {
-                    uint mask = ((button == 1) ?
-                                Win32.MOUSEEVENTF_RIGHTDOWN | Win32.MOUSEEVENTF_RIGHTUP :
-                                Win32.MOUSEEVENTF_LEFTDOWN | Win32.MOUSEEVENTF_LEFTUP);
-
-                    x = uint.Parse(pos[0]);
-                    y = uint.Parse(pos[1]);
-                    Console.WriteLine("Gets position x: {0} y: {1}", x, y);
-                    Win32.SetCursorPos((int)x, (int)y);
-                    Win32.mouse_event(mask, x, y, 0, 0);
+                if (parentElement.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
+                {
+                    Console.WriteLine("ExpandAndSelect: expanding {0}", parentElement.Current.Name);
+                    try
+                    {
+                        ((ExpandCollapsePattern)expandCollapsePattern).Expand();
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                    }
                 }
-           
-                
 
-        }
+                foreach (string[] menu in menuList)
+                {
+                    Condition propCondition = new PropertyCondition(AutomationElement.NameProperty, menu[0], PropertyConditionFlags.IgnoreCase);
+                    AutomationElement targetElement = parentElement.FindFirst(TreeScope.Subtree, propCondition);
+                    if (targetElement != null)
+                    {
+                        PerformDefaultAction(targetElement);
+                    }
+                    else
+                    {
+                        Console.WriteLine("targetElement {0} not found", menu[0]);
+                        break;
+                    }
+                }
+            }
 
         public static void PerformCollapseAction(AutomationElement element)
       {

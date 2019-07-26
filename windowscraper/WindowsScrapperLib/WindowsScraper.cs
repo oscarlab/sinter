@@ -554,7 +554,7 @@ namespace WindowsScraper
             // Property: BoundingRectangle
             else if (e.Property == AutomationElement.BoundingRectangleProperty)
             {
-                Console.WriteLine("Properties {0} {1} {2}", element.Current.ControlType.ProgrammaticName, element.Current.Name, e.Property.ProgrammaticName);
+                //Console.WriteLine("PropertyChange event {0} {1} {2}", element.Current.ControlType.ProgrammaticName, element.Current.Name, e.Property.ProgrammaticName);
                 //Console.WriteLine("New Value Width {0} Height {1} X {2} Y {3} {4}", element.Current.BoundingRectangle.Width, element.Current.BoundingRectangle.Height, element.Current.BoundingRectangle.X, element.Current.BoundingRectangle.Y, e.NewValue);
                 // Subproperty: List
                 if (element.Current.ControlType == ControlType.List)
@@ -570,7 +570,6 @@ namespace WindowsScraper
                   //}
                 else if (element.Current.ControlType == ControlType.ToolBar)
                 {
-                    Console.WriteLine("EXECUTING");
                     DeltaGeneric(element);
                 }
                 else if (element.Current.ControlType == ControlType.Window)
@@ -692,12 +691,10 @@ namespace WindowsScraper
                 return;
             }
 
-            Console.WriteLine("OnStructureChangedLocal");
             AutomationElement element = (AutomationElement)sender;
             AutomationElementCollection elementCollection = element.FindAll(TreeScope.Children, Condition.TrueCondition);
 
-            // Console.WriteLine("Local Structure {0}", element.Current.ControlType);
-            //Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+            Console.WriteLine("OnStructureChangedLocal {0}, {1}", element.Current.Name, element.Current.ControlType.ProgrammaticName);
 
             if (element.Current.ControlType == ControlType.SplitButton)
             {
@@ -825,7 +822,7 @@ namespace WindowsScraper
 
                 //Console.WriteLine("Chillins");
                 //Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
-                PrintChildrenNodes(sinter.EntityNode);
+                //PrintChildrenNodes(sinter.EntityNode);
 
                 // send
                 connection.SendMessage(sinter);
@@ -1254,7 +1251,7 @@ namespace WindowsScraper
 
             AutomationElement.AutomationElementInformation current = element.Current;
 
-            Console.WriteLine("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
+            //Console.WriteLine("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
 
             String uniqueId;
 
@@ -1644,11 +1641,13 @@ namespace WindowsScraper
               Console.WriteLine("client passcode match.");
               this.bPasscodeVerified = true;
             }
+            Console.WriteLine("OSVersion: {0}", Environment.OSVersion.ToString());
 
             Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode"], serviceCodes["verify_passcode_res"]);
             header.ParamsInfo = new Params
             {
               Data1 = result.ToString(),
+              Data2 = Environment.OSVersion.ToString(),
             };
 
             Sinter sintermsg = new Sinter()
@@ -1914,7 +1913,10 @@ namespace WindowsScraper
                     {
                         element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
                         if (element == null)
+                        {
+                            Console.WriteLine("[ERROR] AutomationElement not found");
                             return;
+                        }
                     }
 
                     int[] id = element.GetRuntimeId();
@@ -1970,12 +1972,7 @@ namespace WindowsScraper
                         executeSetProcessToForeground(sinter.HeaderNode.Process);
                         break;
                     case "action_expand_and_select":
-                        Console.WriteLine("Case action_expand_and_select");
-                        if(sinter.HeaderNode.ParamsInfo.TargetIdList != null)
-                        {
-                            //Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
-                            UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId.ToString(), uint.Parse(sinter.HeaderNode.ParamsInfo.Data1), sinter.HeaderNode.ParamsInfo.TargetIdList);
-                        }
+                        UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId, sinter.HeaderNode.ParamsInfo.TargetIdList);
                         break;
                     //case "structureChangeNotification":
                     //    RegisterStructureChangedNotification(element);
