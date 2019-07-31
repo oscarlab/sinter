@@ -1453,7 +1453,7 @@ namespace WindowsScraper
             }
 
             // call for getting platform-specific info
-            //FetchPropertiesFromAutomationElement(element, ref entity);
+            FetchPropertiesFromAutomationElement(element, ref entity);
 
             return entity;
         }

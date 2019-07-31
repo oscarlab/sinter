@@ -1,9 +1,6 @@
 ﻿using Sintering;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Automation;
 
 namespace WindowsScraper
@@ -14,6 +11,8 @@ namespace WindowsScraper
         
         public void FetchPropertiesFromAutomationElement(AutomationElement element, ref Entity entity)
         {
+            entity.DetailedEntity = new Sintering.PlatformSpecificInfo.DetailedEntity();
+
             #region Properties
             try
             {
@@ -123,6 +122,8 @@ namespace WindowsScraper
             entity.DetailedEntity.IsValuePatternAvailableProperty = (bool)element.GetCurrentPropertyValue(AutomationElementIdentifiers.IsValuePatternAvailableProperty) ? Boolean.TrueString : Boolean.FalseString;
             entity.DetailedEntity.IsVirtualizedItemPatternAvailableProperty = (bool)element.GetCurrentPropertyValue(AutomationElementIdentifiers.IsVirtualizedItemPatternAvailableProperty) ? Boolean.TrueString : Boolean.FalseString;
             entity.DetailedEntity.IsWindowPatternAvailableProperty = (bool)element.GetCurrentPropertyValue(AutomationElementIdentifiers.IsWindowPatternAvailableProperty) ? Boolean.TrueString : Boolean.FalseString;
+            entity.DetailedEntity.IsLegacyIAccessiblePatternAvailableProperty = (bool)element.GetCurrentPropertyValue(AutomationElementIdentifiers.IsLegacyIAccessiblePatternAvailableProperty) ? Boolean.TrueString : Boolean.FalseString;
+            
             #endregion
 
             #region Patterns
@@ -372,6 +373,24 @@ namespace WindowsScraper
                 entity.DetailedEntity.DockPatternNode = entity_pattern;
                 entity_pattern.DockPositionProperty = uia_pattern.Current.DockPosition.ToString();
                 //entity_pattern.Pattern = uia_pattern.Current.Pattern.ToString();
+            }
+
+            if (Boolean.Parse(entity.DetailedEntity.IsLegacyIAccessiblePatternAvailableProperty))
+            {
+                Sintering.PlatformSpecificInfo.LegacyIAccessiblePattern entity_pattern = new Sintering.PlatformSpecificInfo.LegacyIAccessiblePattern();
+                System.Windows.Automation.LegacyIAccessiblePattern uia_pattern = (System.Windows.Automation.LegacyIAccessiblePattern)element.GetCurrentPattern(LegacyIAccessiblePatternIdentifiers.Pattern);
+                
+                entity_pattern.Name = uia_pattern.Current.Name;
+                entity_pattern.Value = uia_pattern.Current.Value;
+                entity_pattern.ChildId = uia_pattern.Current.ChildId.ToString();
+                entity_pattern.DefaultAction = uia_pattern.Current.DefaultAction;
+                entity_pattern.Description = uia_pattern.Current.Description;
+                entity_pattern.Help = uia_pattern.Current.Help;
+                entity_pattern.KeyboardShortcut = uia_pattern.Current.KeyboardShortcut;
+                entity_pattern.Role = uia_pattern.Current.Role.ToString();
+                entity_pattern.State = uia_pattern.Current.State.ToString();
+                entity_pattern.Pattern = LegacyIAccessiblePatternIdentifiers.Pattern.ProgrammaticName;
+                entity.DetailedEntity.LegacyIAccessiblePatternNode = entity_pattern;
             }
             #endregion
         }

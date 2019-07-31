@@ -100,10 +100,7 @@ namespace Sintering
 
         [XmlAttribute("raw_type")]
         public string RawType { get; set; }
-
-        [XmlElement("detailed_entity", IsNullable = false)] //contain platform-specific data
-        public DetailedEntity DetailedEntity { get; set; }
-
+        
         [XmlAttribute("process_id")]
         public string Process { get; set; }
 
@@ -133,26 +130,31 @@ namespace Sintering
         [XmlArrayItem("entity", typeof(Entity), IsNullable = false)]
         public List<Entity> Children { get; set; }
 
+        [XmlElement("detailed_entity", IsNullable = false)] //contain platform-specific data
+        public DetailedEntity DetailedEntity { get; set; }
+
         [XmlIgnore]
         public VersionInfo VersionInfo { get; set; }
 
-        /*
+        
         public bool Equals(Entity other)
         {
+            if (other == null)
+                return false;
+
             return ChildCount == other.ChildCount
                     && Height == other.Height && Left == other.Left
                     && Name == other.Name && Process == other.Process
                     && RawType == other.RawType && States == other.States
                     && Top == other.Top && Type == other.Type
                     && UniqueID == other.UniqueID && Value == other.Value
-                    && Width == other.Width && words == other.words;
+                    && Width == other.Width && Words == other.Words;
         }
-        */
-
+        
+        /*
         public bool Equals(Entity other)
         {
-            if (other == null)
-                return false;
+            
 
             if (!string.IsNullOrEmpty(UniqueID) &&
                 !string.IsNullOrEmpty(other.UniqueID) &&
@@ -160,13 +162,13 @@ namespace Sintering
                 return true;
 
             return false;
-        }
+        }*/
 
         public override int GetHashCode()
         {
-            if (!string.IsNullOrEmpty(UniqueID))
-                return UniqueID.GetHashCode();
-            return GetHashCode();
+            //if (!string.IsNullOrEmpty(UniqueID))
+            //    return UniqueID.GetHashCode();
+            return base.GetHashCode();
         }
 
 
@@ -1221,6 +1223,9 @@ namespace Sintering
             [XmlAttribute("Name")]
             public string Name { get; set; }
 
+            [XmlAttribute("Value")]
+            public string Value { get; set; }
+
             [XmlAttribute("DefaultAction")]
             public string DefaultAction { get; set; }
 
@@ -1237,10 +1242,7 @@ namespace Sintering
             public string Role { get; set; }
 
             [XmlAttribute("State")]
-            public string CultureAttribute { get; set; }
-
-            [XmlAttribute("Value")]
-            public string FontNameAttribute { get; set; }
+            public string State { get; set; }
             
             [XmlAttribute("Pattern")]
             public string Pattern { get; set; }
