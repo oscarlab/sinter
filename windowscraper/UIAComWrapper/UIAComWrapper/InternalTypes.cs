@@ -280,7 +280,7 @@ namespace UIAComWrapperInternal
         [SuppressUnmanagedCodeSecurity, SecurityCritical, DllImport("UIAutomationCore.dll", EntryPoint = "UiaLookupId", CharSet = CharSet.Unicode)]
         private static extern int RawUiaLookupId(AutomationIdType type, ref Guid guid);
 
-        [SecurityCritical, SecurityTreatAsSafe]
+        [SecurityCritical, SecuritySafeCriticalAttribute]
         internal static int UiaLookupId(AutomationIdType type, ref Guid guid)
         {
             return RawUiaLookupId(type, ref guid);

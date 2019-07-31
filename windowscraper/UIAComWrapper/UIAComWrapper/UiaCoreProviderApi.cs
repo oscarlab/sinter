@@ -46,13 +46,13 @@ namespace UIAComWrapperInternal
         [SecurityCritical, SuppressUnmanagedCodeSecurity, DllImport("UIAutomationCore.dll", EntryPoint = "UiaReturnRawElementProvider", CharSet = CharSet.Unicode)]
         private static extern IntPtr RawUiaReturnRawElementProvider(IntPtr hwnd, IntPtr wParam, IntPtr lParam, IRawElementProviderSimple el);
 
-        [SecurityCritical, SecurityTreatAsSafe]
+        [SecurityCritical, SecuritySafeCriticalAttribute]
         internal static bool UiaClientsAreListening()
         {
             return RawUiaClientsAreListening();
         }
 
-        [SecurityTreatAsSafe, SecurityCritical]
+        [SecuritySafeCriticalAttribute, SecurityCritical]
         internal static IRawElementProviderSimple UiaHostProviderFromHwnd(IntPtr hwnd)
         {
             IRawElementProviderSimple simple;
@@ -60,31 +60,31 @@ namespace UIAComWrapperInternal
             return simple;
         }
 
-        [SecurityTreatAsSafe, SecurityCritical]
+        [SecuritySafeCriticalAttribute, SecurityCritical]
         internal static void UiaRaiseAsyncContentLoadedEvent(IRawElementProviderSimple provider, System.Windows.Automation.AsyncContentLoadedState asyncContentLoadedState, double PercentComplete)
         {
             CheckError(RawUiaRaiseAsyncContentLoadedEvent(provider, asyncContentLoadedState, PercentComplete));
         }
 
-        [SecurityCritical, SecurityTreatAsSafe]
+        [SecurityCritical, SecuritySafeCriticalAttribute]
         internal static void UiaRaiseAutomationEvent(IRawElementProviderSimple provider, int eventId)
         {
             CheckError(RawUiaRaiseAutomationEvent(provider, eventId));
         }
 
-        [SecurityCritical, SecurityTreatAsSafe]
+        [SecurityCritical, SecuritySafeCriticalAttribute]
         internal static void UiaRaiseAutomationPropertyChangedEvent(IRawElementProviderSimple provider, int propertyId, object oldValue, object newValue)
         {
             CheckError(RawUiaRaiseAutomationPropertyChangedEvent(provider, propertyId, oldValue, newValue));
         }
 
-        [SecurityTreatAsSafe, SecurityCritical]
+        [SecuritySafeCriticalAttribute, SecurityCritical]
         internal static void UiaRaiseStructureChangedEvent(IRawElementProviderSimple provider, StructureChangeType structureChangeType, int[] runtimeId)
         {
             CheckError(RawUiaRaiseStructureChangedEvent(provider, structureChangeType, runtimeId, (runtimeId == null) ? 0 : runtimeId.Length));
         }
 
-        [SecurityCritical, SecurityTreatAsSafe]
+        [SecurityCritical, SecuritySafeCriticalAttribute]
         internal static IntPtr UiaReturnRawElementProvider(IntPtr hwnd, IntPtr wParam, IntPtr lParam, IRawElementProviderSimple el)
         {
             return RawUiaReturnRawElementProvider(hwnd, wParam, lParam, el);

@@ -24,7 +24,6 @@ using System.Diagnostics;
 using System.Windows.Automation.Text;
 using System.Threading;
 using System.Windows;
-//using UIAComWrapperInternal;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Sintering;
@@ -36,7 +35,7 @@ using WindowsScraper.Util;
 namespace WindowsScraper
 {
 
-    public class WindowsScraper : IWinCommands
+    public partial class WindowsScraper : IWinCommands
     {
         private Thread ThreadFocusThrottler = null;
         private ConcurrentStack<RepeatedRequest> _repeatedRequestStack = new ConcurrentStack<RepeatedRequest>();
@@ -65,6 +64,7 @@ namespace WindowsScraper
 
         private string passcode;
         public bool bPasscodeVerified { get; private set; }
+
 
         public WindowsScraper(string passcode)
         {
@@ -784,7 +784,7 @@ namespace WindowsScraper
                 int[] id = element.GetRuntimeId();
                 if (automationElementTrie.TryGetValue(id, out entity))
                 {
-                    vInfo = entity.versionInfo;
+                    vInfo = entity.VersionInfo;
                     if (vInfo != null)
                         vInfo.version = Sintering.Version.Updated;
                 }
@@ -865,7 +865,7 @@ namespace WindowsScraper
             Entity entity;
             if (automationElementTrie.TryGetValue(id, out entity))
             {
-                vInfo = entity.versionInfo;
+                vInfo = entity.VersionInfo;
                 if (vInfo != null && (vInfo.version == Sintering.Version.Init || vInfo.Hash != hash))
                 {
                     int subCode = 0;
@@ -906,7 +906,7 @@ namespace WindowsScraper
 
                 if ((id == requestedProcessRuntimeId) && automationElementTrie.TryGetValue(runtimeId, out entity))
                 {
-                    vInfo = entity.versionInfo;
+                    vInfo = entity.VersionInfo;
                     if (vInfo.version == Sintering.Version.Updated)
                     {
                         Sinter sinter = new Sinter
@@ -938,7 +938,7 @@ namespace WindowsScraper
                 if ((id == requestedProcessRuntimeId) && automationElementTrie.TryGetValue(runtimeId, out entity))
                 {
                     Console.WriteLine("Got Id");
-                    vInfo = entity.versionInfo;
+                    vInfo = entity.VersionInfo;
                     //if (vInfo.version == Sintering.Version.Updated)
                     //{
                         Sinter sinter = new Sinter
@@ -977,7 +977,7 @@ namespace WindowsScraper
             VersionInfo vInfo;
             if (automationElementTrie.TryGetValue(id, out entity))
             {
-                vInfo = entity.versionInfo;
+                vInfo = entity.VersionInfo;
                 if (vInfo != null && vInfo.Hash != anchor.Current.Name)
                 {
                     vInfo.version = Sintering.Version.Updated;
@@ -1104,7 +1104,7 @@ namespace WindowsScraper
 
             if (automationElementTrie.TryGetValue(runtimeId, out Entity entity))
             {
-                VersionInfo vInfo = entity.versionInfo;
+                VersionInfo vInfo = entity.VersionInfo;
                 if (vInfo == null) return;
                 if (newValue == ExpandCollapseState.Collapsed)
                 {
@@ -1178,9 +1178,9 @@ namespace WindowsScraper
                 if (targetTextPattern != null)
                 {
 
-                    if (parentXMLNode.words == null)
+                    if (parentXMLNode.Words == null)
                     {
-                        parentXMLNode.words = new List<Word>();
+                        parentXMLNode.Words = new List<Word>();
                     }
 
                     TextPatternRange textRange = targetTextPattern.DocumentRange;
@@ -1228,7 +1228,7 @@ namespace WindowsScraper
                             wd.underline = uline == "None" ? "0" : "1";
                         }
 
-                        parentXMLNode.words.Add(wd);
+                        parentXMLNode.Words.Add(wd);
 
                     } while (textRange.MoveEndpointByUnit(TextPatternRangeEndpoint.End, TextUnit.Word, 1) == 1 &&
                              textRange.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Word, 1) == 1);
@@ -1288,12 +1288,12 @@ namespace WindowsScraper
             {
                 if (current.ControlType == ControlType.List)
                 {
-                    entity.versionInfo = new VersionInfo(SinterUtil.GetRuntimeId(element, true, false));
+                    entity.VersionInfo = new VersionInfo(SinterUtil.GetRuntimeId(element, true, false));
                     automationElementTrie.Add(runtimeId, entity);
                 }
                 else
                 {
-                    entity.versionInfo = new VersionInfo();
+                    entity.VersionInfo = new VersionInfo();
                     automationElementTrie.Add(runtimeId, entity);
                 }
             }
@@ -1451,7 +1451,9 @@ namespace WindowsScraper
             {
                 SerializeDocumentElement(element, entity);
             }
-                
+
+            // call for getting platform-specific info
+            //FetchPropertiesFromAutomationElement(element, ref entity);
 
             return entity;
         }
@@ -1927,7 +1929,7 @@ namespace WindowsScraper
                     int[] id = element.GetRuntimeId();
                     if (automationElementTrie.TryGetValue(id, out Entity entity))
                     {
-                        entity.versionInfo.version = Sintering.Version.Updated;
+                        entity.VersionInfo.version = Sintering.Version.Updated;
                         // Console.WriteLine("Version from AutoElement Dict {0}", vInfo.runtimeID);
                     }
                 }

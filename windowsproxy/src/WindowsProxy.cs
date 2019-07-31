@@ -424,7 +424,7 @@ namespace WindowsProxy
             control.Width = (int)(entity.Width * width_ratio);
 
             control.Name = entity.Name;
-            List<Word> words = entity.words;
+            List<Word> words = entity.Words;
             foreach (Word w in words) {
                 if (w.newline == "1")
                 {
