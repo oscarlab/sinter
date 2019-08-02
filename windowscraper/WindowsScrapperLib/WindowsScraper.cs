@@ -406,18 +406,25 @@ namespace WindowsScraper
         private void OnWindowOpenedLocal(object obj, AutomationEventArgs e)
         {
             AutomationElement element = (AutomationElement)obj;
-            if (element.Current.ProcessId == requestedProcessId)
+            try
             {
-                Console.WriteLine("Window Opened " + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
-
-                // send an LS_WINDOW msg as if it were a new window
-                Sinter sinter = new Sinter
+                if (element.Current.ProcessId == requestedProcessId)
                 {
-                    HeaderNode = MsgUtil.BuildHeader(serviceCodes["ls_l_res"], serviceCodes["ls_l_res_dialog"]),
-                    EntityNode = UIAElement2EntityRecursive(element),
-                };
+                    Console.WriteLine("Window Opened " + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
 
-                connection.SendMessage(sinter);
+                    // send an LS_WINDOW msg as if it were a new window
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(serviceCodes["ls_l_res"], serviceCodes["ls_l_res_dialog"]),
+                        EntityNode = UIAElement2EntityRecursive(element),
+                    };
+
+                    connection.SendMessage(sinter);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
@@ -557,28 +564,34 @@ namespace WindowsScraper
                 //Console.WriteLine("PropertyChange event {0} {1} {2}", element.Current.ControlType.ProgrammaticName, element.Current.Name, e.Property.ProgrammaticName);
                 //Console.WriteLine("New Value Width {0} Height {1} X {2} Y {3} {4}", element.Current.BoundingRectangle.Width, element.Current.BoundingRectangle.Height, element.Current.BoundingRectangle.X, element.Current.BoundingRectangle.Y, e.NewValue);
                 // Subproperty: List
-                if (element.Current.ControlType == ControlType.List)
+                try
                 {
-                    DeltaSpecialList(element);
-                } //  Subproperty: ComboBox
-                  //else if (element.Current.ControlType == ControlType.ComboBox) {
-                  //Console.WriteLine("box: {0} {1} ", element.Current.ControlType.ProgrammaticName, element.Current.Name);
-                  //DeltaComboBox(element);
-                  //} //  Subproperty: Breadcrumb , Toolbar
-                  //else if (element.Current.ControlType == ControlType.Window) {
-                  //  DeltaGenericWindow(element);
-                  //}
-                else if (element.Current.ControlType == ControlType.ToolBar)
-                {
-                    DeltaGeneric(element);
+                    if (element.Current.ControlType == ControlType.List)
+                    {
+                        DeltaSpecialList(element);
+                    } //  Subproperty: ComboBox
+                      //else if (element.Current.ControlType == ControlType.ComboBox) {
+                      //Console.WriteLine("box: {0} {1} ", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+                      //DeltaComboBox(element);
+                      //} //  Subproperty: Breadcrumb , Toolbar
+                      //else if (element.Current.ControlType == ControlType.Window) {
+                      //  DeltaGenericWindow(element);
+                      //}
+                    else if (element.Current.ControlType == ControlType.ToolBar)
+                    {
+                        DeltaGeneric(element);
+                    }
+                    else if (element.Current.ControlType == ControlType.Window)
+                    {
+                        DeltaGenericWindowSize(element);
+                    }
+                    else
+                    {
+                        // not required
+                    }
                 }
-                else if (element.Current.ControlType == ControlType.Window)
-                {
-                    DeltaGenericWindowSize(element);
-                }
-                else
-                {
-                    // not required
+                catch (Exception ex) {
+                    Console.WriteLine(ex);
                 }
             }
             // Property: ExpandCollapseState
@@ -694,23 +707,30 @@ namespace WindowsScraper
             AutomationElement element = (AutomationElement)sender;
             AutomationElementCollection elementCollection = element.FindAll(TreeScope.Children, Condition.TrueCondition);
 
-            Console.WriteLine("OnStructureChangedLocal {0}, {1}", element.Current.Name, element.Current.ControlType.ProgrammaticName);
+            try
+            {
+                Console.WriteLine("OnStructureChangedLocal {0}, {1}", element.Current.Name, element.Current.ControlType.ProgrammaticName);
 
-            if (element.Current.ControlType == ControlType.SplitButton)
-            {
-                DeltaGenericAnchor(element);
-            }
-            if (element.Current.ControlType == ControlType.ProgressBar)
-            {
-                DeltaGenericImmediate(element);
-            }
-
-            if (element.Current.Name != "View")
-            {
-                if (element.Current.LocalizedControlType != "text") //already sent the msg 511 (delta_prop_change_value)
+                if (element.Current.ControlType == ControlType.SplitButton)
                 {
-                    DeltaGeneric(element);
+                    DeltaGenericAnchor(element);
                 }
+                if (element.Current.ControlType == ControlType.ProgressBar)
+                {
+                    DeltaGenericImmediate(element);
+                }
+
+                if (element.Current.Name != "View")
+                {
+                    if (element.Current.LocalizedControlType != "text") //already sent the msg 511 (delta_prop_change_value)
+                    {
+                        DeltaGeneric(element);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
 
         }
@@ -1310,6 +1330,7 @@ namespace WindowsScraper
             if (current.ControlType == ControlType.Pane && current.ClassName.Equals("SysDateTimePick32"))
             {
                 entity.Type = "DateTimePicker";
+                entity.Name = DateTime.Now.ToShortDateString(); //dummy until we can read from LegacyIAccessible pattern
             }
 
             // name, value

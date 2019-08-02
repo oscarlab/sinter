@@ -42,7 +42,7 @@ namespace Sintering {
     XmlWriterSettings settings = new XmlWriterSettings() {
       Encoding = new UTF8Encoding(false) ,
       OmitXmlDeclaration = true ,
-      Indent = false ,
+      Indent = true ,
     };
 
     BlockingCollection<Sinter> messageQueue;
