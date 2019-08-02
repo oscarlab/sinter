@@ -410,6 +410,7 @@ namespace WindowsProxy
                         comboBoxParent.TryAdd(listItem.Name, child_entity);
                         comboBoxEntities.TryAdd(listItem.Name, listItem);
                     }
+                    comboBoxParent.TryAdd(child_entity.Name, entity);
                 }
             }
             ((ComboBox)control).SelectedIndexChanged += Control_ComboBox_SelectedIndexChanged;
@@ -1570,34 +1571,92 @@ namespace WindowsProxy
             }
             else if (subCode == serviceCodes["delta_subtree_replace"])
             {
-                if (sinter.EntityNode == null)
-                    return;
+                execute_delta_subtree_replace(sinter.EntityNode);
+            }
+        }
 
-                if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem") || sinter.EntityNode.Type.Equals("Text"))
-                {
-                    Console.WriteLine("502 - delta_subtree_replace Not handled for {0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
-                    //UpdateMenu(sinter); //another 504 will be handled
-                    return;
-                }
+        public void execute_delta_subtree_replace(Entity entity)
+        {
+            if (entity == null)
+                return;
 
-                if (sinter.EntityNode.Type.Equals("List"))
+            switch (entity.Type)
+            {
+                case "Pane":
                 {
-                    Console.WriteLine("502 - delta_subtree_replace {0}/{1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
-                    if (hash.TryGetValue(sinter.EntityNode.UniqueID, out Control ctrl))
+                    Console.WriteLine("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                    ((Control)form).BeginInvoke((Action)(() =>
                     {
-                            ctrl.BeginInvoke((Action)(() =>
+                        Console.WriteLine("Remove All ctrl elements");
+                        Control[] arr = new Control[form.Controls.Count];
+                        form.Controls.CopyTo(arr, 0);
+                        foreach (Control element in arr)
+                        {
+                            //Console.WriteLine("{0}", ((Entity)element.Tag).Type);
+                            if (!((Entity)element.Tag).Type.Equals("MenuBar"))
                             {
+                                form.Controls.Remove(element);
+                            }
+                        }
+                        // form.Controls.Clear();
+
+                        Console.WriteLine("Render New Elements");
+                        Render(entity, form);
+                    }));
+                    break;
+                }
+                case "List":
+                {
+                    Console.WriteLine("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                    if (hash.TryGetValue(entity.UniqueID, out Control ctrl))
+                    {
+                        ctrl.BeginInvoke((Action)(() =>
+                        {
+                            /* Calculator - Unit Converter "From Unit" and "To Unit" */
+                            Control comboBoxControl;
+                            if (comboBoxParent.TryGetValue(entity.Name, out Entity parent_entity)
+                                && parent_entity.Type.Equals("ComboBox")
+                                && hash.TryGetValue(parent_entity.UniqueID, out comboBoxControl))
+                            {
+                                Console.WriteLine("Found Combobox Parent {0}", parent_entity.Name);
+
+                                foreach (ToolStripMenuItem oldLi in ((ComboBox)comboBoxControl).Items)
+                                {
+                                    Console.WriteLine("oldlistItem {0}", oldLi.Text);
+                                    comboBoxParent.TryRemove(oldLi.Text, out Entity _);
+                                    comboBoxEntities.TryRemove(oldLi.Text, out Entity _);
+                                }
+                                ((ComboBox)comboBoxControl).Items.Clear();
+
+                                foreach (Entity child in entity.Children)
+                                {
+                                    Console.WriteLine("Rendered ToolStripMenuItem: {0}", child.Name);
+                                    ToolStripMenuItem mi = new ToolStripMenuItem();
+                                    mi.Name = child.Name;
+                                    mi.Text = child.Name;
+                                    if ((child.States & States.SELECTED) != 0)
+                                    {
+                                        ((ComboBox)comboBoxControl).Text = child.Name;
+                                    }
+                                    ((ComboBox)comboBoxControl).Items.Add(mi);
+                                    comboBoxParent.TryAdd(child.Name, entity);
+                                    comboBoxEntities.TryAdd(child.Name, child);
+                                }
+                            }
+                            else
+                            {
+                                /* Calculator - History window */
                                 ctrl.Focus();
                                 int i = 0;
                                 ListView listView = (ListView)ctrl;
 
                                 foreach (ListViewItem oldLi in listView.Items)
                                 {
-                                    Console.WriteLine("Remove oldlistItem {0}", oldLi.Name);
-                                    listView.Items.Remove(oldLi);
+                                    Console.WriteLine("oldlistItem {0}", oldLi.Text);
                                 }
+                                listView.Items.Clear();
 
-                                foreach (Entity child in sinter.EntityNode.Children)
+                                foreach (Entity child in entity.Children)
                                 {
                                     Console.WriteLine("Rendered ListItem: {0}", child.Name);
                                     ListViewItem li = new ListViewItem(child.Name);
@@ -1608,52 +1667,22 @@ namespace WindowsProxy
                                     }
                                     i++;
                                 }
-                            }));
+                            }
+                        }));
                     }
-                    return;
+                    break;
                 }
-                else if (!sinter.EntityNode.Type.Equals("Pane")){
-                    Console.WriteLine("delta_subtree_replace Not handled for type {0}", sinter.EntityNode.Type);
+                case "Menu": //another 504 msg will be handled for Menu
+                case "MenuItem": //another 504 msg will be handled for Menu
+                case "Text":
+                default:
+                    Console.WriteLine("502 - delta_subtree_replace Not handled for {0} {1}", entity.Type, entity.Name);
                     return;
-                }
-
-                //width = int.Parse(sinter.HeaderNode.ParamsInfo.Data1);
-                //height = int.Parse(sinter.HeaderNode.ParamsInfo.Data2);
-
-                // remote/local ratio
-                //height_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height / height;
-                //width_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / width;
-
-                //CloseForm(form);
-                // form = null;
-                //root.Remove_Dict_Item(requestedProcessId);
-
-                Console.WriteLine("502 - delta_subtree_replace {0}/{1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
-                ((Control)form).BeginInvoke((Action)(() =>
-               {
-                   Console.WriteLine("Remove All ctrl elements");
-                   Control[] arr = new Control[form.Controls.Count];
-
-                   form.Controls.CopyTo(arr, 0);
-
-                   foreach (Control element in arr)
-                   {
-                       //Console.WriteLine("{0}", ((Entity)element.Tag).Type);
-                       if (!((Entity)element.Tag).Type.Equals("MenuBar"))
-                       {
-                           form.Controls.Remove(element);
-                       }
-                   }
-
-                    // form.Controls.Clear();
-                    Render(sinter.EntityNode, form);
-               }));
-
-                //now show it
-                Console.WriteLine("Check that form is not null: {0}", form);
-                root.DisplayProxy(form, requestedProcessId);
             }
 
+            //now show it
+            root.DisplayProxy(form, requestedProcessId);
+            return;
         }
 
         // Credit: http://www.csharp411.com/close-all-forms-in-a-thread-safe-manner/
