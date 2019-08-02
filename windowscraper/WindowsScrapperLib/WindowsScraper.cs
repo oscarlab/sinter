@@ -1422,7 +1422,11 @@ namespace WindowsScraper
             if (current.ControlType == ControlType.MenuItem ||
                 current.ControlType == ControlType.Menu)
             {
+                //Assign shortcut keys (ex Alt+V) to value of Menuitem/Menubar 
                 entity.Value = current.AcceleratorKey;
+                if (entity.Value == "" && current.AccessKey.Contains("+")){
+                    entity.Value = current.AccessKey;
+                }
             }
             /*
           //special treatment for menu, alter the 'value' field
