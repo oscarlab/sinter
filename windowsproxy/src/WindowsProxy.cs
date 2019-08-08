@@ -62,10 +62,6 @@ namespace WindowsProxy
     {
         RootForm root;
         AppForm form;
-        string RemoteCloseButtonUID; //UniqueID of remote close button
-        string RemoteMinimizeButtonUID; //UniqueID of remote close button
-        string RemoteZoomButtonUID; //UniqueID of remote close button
-        FormWindowState prevWindowState; 
 
         Point rootPoint;
         Entity root_entity;
@@ -106,7 +102,10 @@ namespace WindowsProxy
         ConcurrentDictionary<string, Entity> menuItemParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxEntities = new ConcurrentDictionary<string, Entity>();
-        Dictionary<string, Form> dictSubForms = new Dictionary<string, Form>();
+
+        private readonly ConcurrentDictionary<string, Form> dictSubForms = new ConcurrentDictionary<string, Form>();
+        private readonly ConcurrentDictionary<Form, string[]> dictFormCtrlButtons = new ConcurrentDictionary<Form, string[]>();
+        private readonly ConcurrentDictionary<Form, FormWindowState> dictFormWindowStatePrev = new ConcurrentDictionary<Form, FormWindowState>();
 
         //Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
 
@@ -140,7 +139,6 @@ namespace WindowsProxy
             timer.Tick += Timer_Tick;
 
             this.bPasscodeVerified = false;
-            this.prevWindowState = FormWindowState.Normal;
 
 #if DEBUG
             string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
@@ -194,13 +192,12 @@ namespace WindowsProxy
             if (invoking_method_name.Equals("RenderDialog") && parent_control != null)
             {
                 /* trick for window7 calc statistic mode (window/pane/window)
-                   treat sub window as pane so it will not be rendered.
-                   otherwise exception in below session when window added under pane:
-                   parent_control.Controls.Add(current_control); */
-                invoking_method_name = "RenderPane";
-                if (entity.Name.Equals("About Calculator"))
-                {
-                    return null; //to finish the implement MessageBox later
+                   treat sub window as pane instead of dialog so it will show correctly */
+                if (this.RemoteProcessName.Contains("Calculator") && 
+                    this.RemotePlatform.StartsWith("Microsoft") && 
+                    !entity.Name.Equals("About Calculator"))
+                { 
+                    invoking_method_name = "RenderPane";
                 }
             }
 
@@ -212,9 +209,10 @@ namespace WindowsProxy
             {
                 if (hash.TryGetValue(entity.UniqueID, out Control prev))
                 {
-                    //Console.WriteLine("Remove previous control from parent");
-                    parent_control.Controls.Remove(prev);
                     hash.TryRemove(entity.UniqueID, out Control rem);
+                    //Console.WriteLine("Remove previous control from parent");
+                    if (parent_control != null)
+                        parent_control.Controls.Remove(prev);
                 }
 
                 current_control = (Control)invoking_method.Invoke(this,
@@ -233,11 +231,16 @@ namespace WindowsProxy
                         Form form = (Form)parent_control;
                         form.MainMenuStrip = (MenuStrip)current_control;
                     }
-                    parent_control.Controls.Add(current_control);
-
+                    if (invoking_method_name != "RenderDialog")
+                        parent_control.Controls.Add(current_control);
+                }
+                if (parent_control != current_control)
+                {
                     // add to hash
                     hash.TryAdd(entity.UniqueID, current_control);
                 }
+
+
             }
             else
             {
@@ -265,6 +268,26 @@ namespace WindowsProxy
         #endregion
 
         #region Invividual Render Methods
+
+        private int getButtonIndex(string buttonName)
+        {
+            //controlbuttons[0] : UniqueID of Minimize
+            //controlbuttons[1] : UniqueID of Maximize
+            //controlbuttons[2] : UniqueID of Close
+            if (buttonName.Equals("Minimize"))
+            {
+                return 0;
+            }
+            else if (buttonName.Equals("Maximize"))
+            {
+                return 1;
+            }
+            else //(buttonName.Equals("Close"))
+            {
+                return 2;
+            }
+        }
+
         private Control RenderButton(Entity entity, Control parent)
         {
 
@@ -278,44 +301,53 @@ namespace WindowsProxy
             }
             */
 
+            /* mapping mac control buttons to windows */
+            if (entity.Name.Equals("AXCloseButton"))
+            {
+                entity.Name = "Close";
+            }
+            else if (entity.Name.Equals("AXMinimizeButton"))
+            {
+                entity.Name = "Minimize";
+            }
+            else if (entity.Name.Equals("AXZoomButton"))
+            {
+                entity.Name = "Maximize";
+            }
+            /* mapping mac control buttons to windows */
+
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
+                string[] controlbuttonIDs; 
+                if (!dictFormCtrlButtons.TryGetValue((Form)parent, out controlbuttonIDs))
+                {   //no entry yet, create new one
+                    controlbuttonIDs = new string[3];
+                    dictFormCtrlButtons.TryAdd((Form)parent, controlbuttonIDs);
+                }
+                controlbuttonIDs[getButtonIndex(entity.Name)] = entity.UniqueID;
+
+                /*
                 if (entity.Name.Equals("Close"))
                 {
                     RemoteCloseButtonUID = entity.UniqueID;
                 }
-                else if (entity.Name.Equals("Minimize"))
+                
+                else */
+                if (entity.Name.Equals("Minimize"))
                 {
-                    RemoteMinimizeButtonUID = entity.UniqueID;
-                    if ((entity.States & States.DISABLED) != 0)
+                    //RemoteMinimizeButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) == 0) //not disabled
                     {
-                        this.form.MinimizeBox = false;
+                        this.form.MinimizeBox = true;
                     }
                 }
                 else if (entity.Name.Equals("Maximize"))
                 {
-                    RemoteZoomButtonUID = entity.UniqueID;
-                    if ((entity.States & States.DISABLED) != 0)
+                    //RemoteZoomButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) == 0) //not disabled
                     {
-                        this.form.MaximizeBox = false;
+                        this.form.MaximizeBox = true;
                     }
-                }
-                return parent;
-            }
-
-            if (entity.Name.Equals("AXCloseButton") || entity.Name.Equals("AXMinimizeButton") || entity.Name.Equals("AXZoomButton"))
-            {
-                if (entity.Name.Equals("AXCloseButton"))
-                {
-                    RemoteCloseButtonUID = entity.UniqueID;
-                }
-                else if (entity.Name.Equals("AXMinimizeButton"))
-                {
-                    RemoteMinimizeButtonUID = entity.UniqueID;
-                }
-                else if (entity.Name.Equals("AXZoomButton"))
-                {
-                    RemoteZoomButtonUID = entity.UniqueID;
                 }
                 return parent;
             }
@@ -773,26 +805,29 @@ namespace WindowsProxy
             form.FormClosing += Form_Closing;
             form.SizeChanged += Form_SizeChanged;
             form.delegateKeyPresses = ProcessKeyPress;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
             return control;
         }
 
         private Control RenderDialog(Entity entity, Control parent)
         {
-                Form localForm = new Form();
-                Control control = localForm as Control;
-                AdjustProperties(entity, ref control);
-                localForm.Font = new Font("Segoe UI", 8);
-                localForm.TopLevel = false;
+            Form localForm = new Form();
+            Control control = localForm as Control;
+            AdjustProperties(entity, ref control);
+            localForm.Font = new Font("Segoe UI", 8);
+            localForm.TopLevel = true;
 
-                localForm.Width += 100;
-                localForm.Height += 200;
+            localForm.Width += 100;
+            localForm.Height += 200;
+            localForm.SizeChanged += Form_SizeChanged;
+            localForm.FormClosing += Dialog_Closing;
+            localForm.MinimizeBox = false;
+            localForm.MaximizeBox = false;
 
-                control.Tag = entity;
-                dictSubForms.Add(entity.UniqueID, localForm);
+            control.Tag = entity;
+            dictSubForms.TryAdd(entity.UniqueID, localForm);
 
-                //register event listener and delegate
-                localForm.FormClosing += Form_Closing;
-                localForm.SizeChanged += Form_SizeChanged;
             return control;
         }
 
@@ -1199,29 +1234,45 @@ namespace WindowsProxy
         #endregion
 
         #region AppForm handler/helper
-        public void close_forms()
+        private void CloseSingleForm(Form form1)
         {
-            this.RemoteCloseButtonUID = null;
-            if (this.form != null)
+            if (form1 != null)
             {
-                this.form.Invoke(new Action(() => this.form.Close()));
+                dictFormCtrlButtons.TryRemove(form1, out _);
+                dictFormWindowStatePrev.TryRemove(form1, out _);
+                
+                if (form1.IsHandleCreated)
+                {
+                    form1.BeginInvoke((Action)(() =>
+                    { 
+                        form1.Close();
+                    }));
+                }
             }
+        }
+
+        public void CloseAllForms()
+        {
+            dictFormWindowStatePrev.Clear();
+            dictFormCtrlButtons.Clear();
+            CloseSingleForm(this.form);
             this.form = null;
+
+            foreach (KeyValuePair<string, Form> entry in dictSubForms)
+            {
+                CloseSingleForm(entry.Value);
+            }
+            dictSubForms.Clear();
         }
 
         private void Form_Closing(object sender, FormClosingEventArgs e)
         {
-            Console.WriteLine("Form_Closing(), this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
-            if (this.RemoteCloseButtonUID == null)
+            Form closingForm = (Form)sender;
+            if (dictFormCtrlButtons.TryGetValue(closingForm, out string[] controlbuttonIDs)
+                && e.CloseReason == CloseReason.UserClosing)
             {
-                //just the local window
-                this.form = null;
-                root.Remove_Dict_Item(requestedProcessId);
-                return;
-            }
-            else {
                 const string message =
-                    "Do you want to close the remote window as well?";
+                  "Do you want to close the remote window as well?";
                 string caption = this.RemoteProcessName;
                 var result = MessageBox.Show(message, caption,
                                              MessageBoxButtons.YesNoCancel,
@@ -1231,73 +1282,126 @@ namespace WindowsProxy
                 // If the yes button was pressed, sends to remote
                 if (result == DialogResult.Cancel)
                 {
+                    // cancel the closure of the form.
                     e.Cancel = true;
                 }
                 else if (result == DialogResult.Yes)
                 {
-                    // cancel the closure of the form.
+                    // cancel local closure of the form, pass to scraper
                     e.Cancel = true;
                     Sinter sinter = new Sinter
                     {
                         HeaderNode = MsgUtil.BuildHeader(
                                       serviceCodes["action"],
                                       serviceCodes["action_default"],
-                                      this.RemoteCloseButtonUID
+                                      controlbuttonIDs[getButtonIndex("Close")]
                                     ),
                     };
                     execute_action(sinter);
                 }
                 else
                 {
-                    //just the local window
+                    //User answer No, just the local window
                     this.form = null;
                     root.Remove_Dict_Item(requestedProcessId);
+                }
+            }
+            else
+            {
+                //just the local window
+                this.form = null;
+                root.Remove_Dict_Item(requestedProcessId);
+                return;
+            }
+        }
+
+
+        private void Dialog_Closing(object sender, FormClosingEventArgs e)
+        {
+            Form closingForm = (Form)sender;
+            if (dictFormCtrlButtons.TryGetValue(closingForm, out string[] controlbuttonIDs)
+                && e.CloseReason == CloseReason.UserClosing)
+            {
+                    e.Cancel = true;
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_default"],
+                                      controlbuttonIDs[getButtonIndex("Close")]
+                                    ),
+                    };
+                    execute_action(sinter);
+            }
+            else
+            {
+                Form form = (Form)sender;
+                foreach (KeyValuePair<string, Form> entry in dictSubForms)
+                {
+                    if (entry.Value == form)
+                    {
+                        CloseSingleForm(entry.Value);
+                        dictSubForms.TryRemove(entry.Key, out _);
+                        return;
+                    }
                 }
             }
         }
 
         private void Form_SizeChanged(object sender, EventArgs e)
         {
-            if (this.form.WindowState == FormWindowState.Minimized)
+            Form form1 = (Form)sender;
+            FormWindowState prevState;
+            if (!dictFormWindowStatePrev.TryGetValue(form1, out prevState))
             {
-                Sinter sinter = new Sinter
-                {
-                    HeaderNode = MsgUtil.BuildHeader(
-                                      serviceCodes["action"],
-                                      serviceCodes["action_default"],
-                                      this.RemoteMinimizeButtonUID
-                                    ),
-                };
-                execute_action(sinter);
+                Console.WriteLine("ERROR - no entry for dictFormWindowStatePrev");
             }
-            else if (this.form.WindowState == FormWindowState.Normal)
+
+
+            if (dictFormCtrlButtons.TryGetValue(form1, out string[] controlbuttonIDs))
             {
-                if (this.prevWindowState == FormWindowState.Minimized)
+                if (form1.WindowState == FormWindowState.Minimized)
                 {
-                    //bring it back 
+                    /* user triggered Minimized, notify Scraper */
                     Sinter sinter = new Sinter
                     {
                         HeaderNode = MsgUtil.BuildHeader(
                                           serviceCodes["action"],
-                                          serviceCodes["action_foreground"]
+                                          serviceCodes["action_default"],
+                                          controlbuttonIDs[getButtonIndex("Minimize")]
+                                        ),
+                    };
+                    execute_action(sinter);
+                }
+                else if (form1.WindowState == FormWindowState.Normal)
+                {
+                    if (prevState == FormWindowState.Minimized)
+                    {
+                        //bring it back 
+                        Sinter sinter = new Sinter
+                        {
+                            HeaderNode = MsgUtil.BuildHeader(
+                                              serviceCodes["action"],
+                                              serviceCodes["action_foreground"]
+                                            ),
+                        };
+                        execute_action(sinter);
+                    }
+                }
+                else if (form1.WindowState == FormWindowState.Maximized)
+                {
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                          serviceCodes["action"],
+                                          serviceCodes["action_default"],
+                                          controlbuttonIDs[getButtonIndex("Maximize")]
                                         ),
                     };
                     execute_action(sinter);
                 }
             }
-            else if (this.form.WindowState == FormWindowState.Maximized)
-            {
-                Sinter sinter = new Sinter
-                {
-                    HeaderNode = MsgUtil.BuildHeader(
-                                      serviceCodes["action"],
-                                      serviceCodes["action_foreground"],
-                                      this.RemoteZoomButtonUID
-                                    ),
-                };
-                execute_action(sinter);
-            }
-            this.prevWindowState = this.form.WindowState;
+            dictFormWindowStatePrev.TryUpdate(form1, form1.WindowState, prevState);
 
         }
 
@@ -1682,6 +1786,7 @@ namespace WindowsProxy
 
             //now show it
             root.DisplayProxy(form, requestedProcessId);
+            dictFormWindowStatePrev.TryUpdate(form, form.WindowState, FormWindowState.Normal);
             return;
         }
 
@@ -1714,13 +1819,7 @@ namespace WindowsProxy
             if ((sinter.HeaderNode.ParamsInfo == null)
                 ||(sinter.HeaderNode.ParamsInfo.TargetId == null))
             {
-                this.RemoteCloseButtonUID = null;
-                if (this.form != null)
-                {
-                    this.form.Invoke(new Action(() => this.form.Close()));
-                }
-                this.form = null;
-
+                CloseAllForms();
                 //re-load the list from server
                 this.execute_ls_req(null);
             }
@@ -1729,10 +1828,23 @@ namespace WindowsProxy
                 if ((hash.TryGetValue(sinter.HeaderNode.ParamsInfo.TargetId, out Control control))
                     && (control != null))
                 {
-                    Control parent_control = control.Parent;
-                    parent_control.Invoke(new Action(() => parent_control.Controls.Remove(control)));
                     hash.TryRemove(sinter.HeaderNode.ParamsInfo.TargetId, out Control old_control);
-                    root.DisplayProxy(form, requestedProcessId);
+
+                    Control parent_control = control.Parent;
+                    if (parent_control != null)
+                    {
+                        parent_control.Invoke(new Action(() => parent_control.Controls.Remove(control)));
+                    }
+                    if (control is Form)
+                    {
+                        CloseSingleForm((Form)control);
+                        dictSubForms.TryRemove(sinter.HeaderNode.ParamsInfo.TargetId, out _);
+                    }
+                    if (this.form != null)
+                    {
+                        root.DisplayProxy(form, requestedProcessId);
+                        dictFormWindowStatePrev.TryUpdate(form, form.WindowState, FormWindowState.Normal);
+                    }
                 }
             }
         }
@@ -1752,6 +1864,15 @@ namespace WindowsProxy
 
             if (sinter.HeaderNode.SubCode == serviceCodes["ls_l_res_dialog"])
             {
+                if (!dictSubForms.ContainsKey(sinter.EntityNode.UniqueID))
+                {
+                    Form dialog = (Form)Render(sinter.EntityNode, null);
+                    if (dialog != null)
+                    {
+                        dictFormWindowStatePrev.TryAdd(dialog, FormWindowState.Normal);
+                        root.DisplayDialog(dialog, requestedProcessId);
+                    }
+                }
                 return;
             }
 
@@ -1761,23 +1882,25 @@ namespace WindowsProxy
             // remote/local ratio
             height_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height / height;
             width_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / width;
-            Control ctrl = null;
+
+            dictFormWindowStatePrev.Clear();
             if (this.form == null)
             {
                 this.form = (AppForm)Render(sinter.EntityNode, null);
                 foreach (Entity other_entity in sinter.EntityNodes)
                 {
                     //this comes from mac scraper
-                    ctrl = Render(other_entity, form);
+                    Control ctrl = Render(other_entity, form);
                 }
-                this.prevWindowState = FormWindowState.Normal;
             }
             //now show it
             root.DisplayProxy(form, requestedProcessId);
+            dictFormWindowStatePrev.TryAdd(form, form.WindowState);
 
             foreach (KeyValuePair<string, Form> entry in dictSubForms)
             {
-                root.DisplayProxy(entry.Value, requestedProcessId);
+                root.DisplayDialog(entry.Value, requestedProcessId);
+                dictFormWindowStatePrev.TryAdd(entry.Value, (entry.Value).WindowState);
             }
         }
 
@@ -2074,6 +2197,21 @@ namespace WindowsProxy
             {
                 AdjustProperties(entity, ref control);
             }
+            else if (entity.Name.Equals("Minimize") || entity.Name.Equals("AXMinimizeButton"))
+            {
+                if ((entity.States & States.DISABLED) == 0) //not disabled
+                {
+                    this.form.MinimizeBox = true;
+                }
+            }
+            else if (entity.Name.Equals("Maximize") || entity.Name.Equals("AXZoomButton"))
+            {
+                if ((entity.States & States.DISABLED) == 0) //not disabled
+                {
+                    this.form.MaximizeBox = true;
+                }
+            }
+
             foreach (Entity child in entity.Children)
             {
                 AdjustSubTreeProperties(child);
@@ -2116,22 +2254,37 @@ namespace WindowsProxy
                 Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
                 control.Enabled = false;
             }
-            if ((entity.States & States.CHECKED) != 0)
+            else
             {
-                Console.WriteLine("{0}/{1} states is CHECKED", entity.Type, entity.Name);
-                if (entity.Type == "CheckBox")
+                control.Enabled = true;
+            }
+
+            if (entity.Type == "CheckBox")
+            {
+				Console.WriteLine("{0}/{1} states is CHECKED", entity.Type, entity.Name);
+                if ((entity.States & States.CHECKED) != 0)
                 {
                     ((CheckBox)control).Checked = true;
                 }
+                else
+                {
+                    ((CheckBox)control).Checked = false;
+                }
             }
-            if ((entity.States & States.SELECTED) != 0)
+
+            if (entity.Type == "RadioButton")
             {
                 Console.WriteLine("{0}/{1} states is SELECTED", entity.Type, entity.Name);
-                if (entity.Type == "RadioButton")
+                if ((entity.States & States.SELECTED) != 0)
                 {
                     ((RadioButton)control).Checked = true;
                 }
+                else
+                {
+                    ((RadioButton)control).Checked = false;
+                }
             }
+
             if ((entity.States & States.INVISIBLE) != 0)
             {
                 Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);

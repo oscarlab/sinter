@@ -51,6 +51,21 @@ namespace WindowsProxy {
       form_table = new ConcurrentDictionary<int , object>();
     }
 
+    public void DisplayDialog(dynamic form , int pid) {
+      if (InvokeRequired) {
+        BeginInvoke(new MethodInvoker(() => this.DisplayDialog(form , pid)));
+        return;
+      }
+
+      try {
+                form_table.TryAdd(pid, form);
+                form.ShowDialog();
+      }
+      catch (Exception e) {
+        Console.WriteLine(e.ToString());
+      }
+    }
+
     public void DisplayProxy(dynamic form , int pid) {
       // Before rendering check whether we are in the UI thread 
       if (InvokeRequired) {
@@ -255,7 +270,7 @@ namespace WindowsProxy {
         this.textBoxIP.Enabled = true;
         this.textBoxPort.Enabled = true;
 
-        this.proxy.close_forms();
+        this.proxy.CloseAllForms();
       }
       catch (Exception ex)
       {

@@ -406,6 +406,12 @@ namespace WindowsScraper
         private void OnWindowOpenedLocal(object obj, AutomationEventArgs e)
         {
             AutomationElement element = (AutomationElement)obj;
+            int[] runtimeId = element.GetRuntimeId();
+            if (automationElementTrie.TryGetValue(runtimeId, out Entity oldEntity))
+            {
+                Console.WriteLine(oldEntity.Type + " " + oldEntity.Name + " " + runtimeId[1].ToString());
+            }
+
             try
             {
                 if (element.Current.ProcessId == requestedProcessId)
@@ -434,7 +440,7 @@ namespace WindowsScraper
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
 
-            if (automationElementTrie.ContainsKey(runtimeId))
+            if (automationElementTrie.TryGetValue(runtimeId, out Entity entity))
             {
                 //DeltaForClose(stringRuntimeId);
                 DeltaForClose(null); // targetID = 'null' will make client close all windows of the processID. 
@@ -459,6 +465,7 @@ namespace WindowsScraper
                     if (entity.Type == "Pane")
                     {
                         Console.WriteLine(entity);
+                        Console.WriteLine("Window Closed Globally: " + entity.Type);
                         foreach (Entity child in entity.Children)
                         {
                             Console.WriteLine("Window Closed Globally: " + child.Type);
@@ -467,7 +474,7 @@ namespace WindowsScraper
                     }
                     else
                     {
-                        Console.WriteLine("Window Closed Globally: " + entity.Type);
+                        Console.WriteLine("Window Closed Globally: " + entity.Type + " " + stringRuntimeId);
                         DeltaForClose(stringRuntimeId);
                     }
                 }
@@ -551,6 +558,13 @@ namespace WindowsScraper
         {
             AutomationElement element = (AutomationElement)sender;
 
+            if (element.Current.ControlType == ControlType.Window
+                && e.Property == AutomationElement.IsEnabledProperty)
+            {
+                DeltaGenericWindowPropChange(element);
+                return;
+            }
+
             //Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
 
             // Property: IsOffScreen
@@ -583,7 +597,7 @@ namespace WindowsScraper
                     }
                     else if (element.Current.ControlType == ControlType.Window)
                     {
-                        DeltaGenericWindowSize(element);
+                        DeltaGenericWindowPropChange(element);
                     }
                     else
                     {
@@ -942,7 +956,7 @@ namespace WindowsScraper
             }
         }
 
-        private void DeltaGenericWindowSize(AutomationElement element)
+        private void DeltaGenericWindowPropChange(AutomationElement element)
         {
             Console.WriteLine("Generic Window");
             if (IsCached(element))
@@ -950,30 +964,23 @@ namespace WindowsScraper
                 string id = SinterUtil.GetRuntimeId(element);
                 int[] runtimeId = element.GetRuntimeId();
                 Entity entity;
-                VersionInfo vInfo;
 
                 if ((id == requestedProcessRuntimeId) && automationElementTrie.TryGetValue(runtimeId, out entity))
                 {
-                    Console.WriteLine("Got Id");
-                    vInfo = entity.versionInfo;
-                    //if (vInfo.version == Sintering.Version.Updated)
-                    //{
-                        Sinter sinter = new Sinter
-                        {
-                            HeaderNode = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_prop_change_value"]),
-                            EntityNode = UIAElement2EntityRecursive(element),
-                        };
+                    Sinter sinter = null;
+                    
+                    Console.WriteLine("Sending new Window including children");
+                    sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_prop_change_value"]),
+                        EntityNode = UIAElement2EntityRecursive(element),
+                    };
 
-                        //vInfo.version = Sintering.Version.None;
-
-                        // send
-                        Console.WriteLine("Sending new Window");
-                        if ((sinter.EntityNode.States & States.DISABLED) != 0)
-                        {
-                            return; //'DISABLE' states confuses proxy. if it is disabled, scraper no need to send size change anyway 
-                        }
-                        connection.SendMessage(sinter);
-                    //}
+                    if ((sinter.EntityNode.States & States.DISABLED) != 0)
+                    {
+                        return; //'DISABLE' states confuses proxy. if it is disabled, scraper no need to send size change anyway 
+                    }
+                    connection.SendMessage(sinter);
                 }
             }
         }
@@ -1771,6 +1778,7 @@ namespace WindowsScraper
                     ValuePattern.ValueProperty,
                     SelectionItemPattern.IsSelectedProperty,
                     RangeValuePattern.ValueProperty,
+                    AutomationElement.IsEnabledProperty,
                     /*AutomationElement.IsOffscreenProperty*/
                     /*AutomationElement.ControlTypeProperty*/
             });
