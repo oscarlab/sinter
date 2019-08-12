@@ -208,8 +208,8 @@ namespace Sintering {
 
     private void StopClient() {
       if (clientSocket.Connected) {
-        clientSocket.Close();
         networkStream.Close();
+        clientSocket.Close();
       }
     }
 

@@ -1657,6 +1657,7 @@ namespace WindowsScraper
 
         public void execute_stop_scraping()
         {
+            Automation.RemoveAllEventHandlers();
             bDesktopHookAdded = false;
         }
 

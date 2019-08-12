@@ -50,6 +50,7 @@ namespace WindowsServer {
       serverSocket = new TcpListener(IPAddress.Any, port);
       TcpClient clientSocket = default(TcpClient);
       int counter = 0;
+      WindowsScraper.WindowsScraper scraper = null;
 
 #if !DEBUG
       Random rnd = new Random();
@@ -90,9 +91,18 @@ namespace WindowsServer {
           else
           {
             Console.WriteLine("Client No:" + counter + " started!");
-            ClientHandler client = new ClientHandler(new WindowsScraper.WindowsScraper(passcode), clientSocket, "" + counter, sslStream);
-            clients.Add(client);
-          }
+                        if (scraper == null)
+                        {
+                            scraper = new WindowsScraper.WindowsScraper(passcode);
+                        }
+                        else
+                        {
+                            scraper.execute_stop_scraping(); //restart scraper
+                        }
+                        
+                        ClientHandler client = new ClientHandler(scraper, clientSocket, "" + counter, sslStream);
+                        clients.Add(client);
+                    }
         }
       }
       catch (SocketException e)

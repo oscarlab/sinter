@@ -37,7 +37,7 @@ namespace WindowsProxy {
     string server_ip;
     int server_port;
 
-    TcpClient client;
+    TcpClient client = null;
     ClientHandler client_handle;
     WindowsProxy proxy;
     SslStream sslStream;
@@ -156,6 +156,11 @@ namespace WindowsProxy {
         server_ip = this.textBoxIP.Text;
         server_port = int.Parse(textBoxPort.Text);
         Console.WriteLine("connecting to server {0}:{1}", server_ip, server_port);
+                if(client != null)
+                {
+                    sslStream.Close();
+                    client.Close();
+                }
         client = new TcpClient(server_ip, server_port);
       }
       catch (SocketException ex)
