@@ -387,8 +387,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83ECAB3295EC4BA4B989898BA6C9C3F7"
             {
-            "SourcePath" = "8:..\\..\\..\\WindowsServer\\WindowsServer.pfx"
-            "TargetName" = "8:WindowsServer.pfx"
+            "SourcePath" = "8:..\\..\\..\\WindowsServer\\SinterServer.pfx"
+            "TargetName" = "8:SinterServer.pfx"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
             "Condition" = "8:"

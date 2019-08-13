@@ -33,7 +33,7 @@ namespace WindowsServer {
 
   public static class ServerConfiguration{
     public const int SERVER_PORT = 6832;
-    public const string CERTIFICATE_FILE = @"WindowsServer.pfx"; //The path of x.509 certificate file
+    public const string CERTIFICATE_FILE = @"SinterServer.pfx"; //The path of x.509 certificate file
     public const string DEFAULT_PASSCODE = "123456";
   }
 
