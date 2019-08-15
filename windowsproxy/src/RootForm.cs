@@ -26,6 +26,7 @@ using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.IO;
 
 using Sintering;
 
@@ -44,9 +45,15 @@ namespace WindowsProxy {
     public String passcode;
     const SslPolicyErrors acceptedSslPolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch // we do not check server host name
                                                   | SslPolicyErrors.RemoteCertificateChainErrors; // for test certificate we ignore chain error
+        private static log4net.ILog log = log4net.LogManager.GetLogger("Proxy");
 
     // constructor
     public RootForm() {
+
+            /* store log to tmp folder: C:\Users\UserName\AppData\Local\Temp\  */
+            log4net.GlobalContext.Properties["LogFileName"] = Path.GetTempPath() + @"\sinterproxy.log"; //log file path
+            log4net.GlobalContext.Properties["XMLFileName"] = Path.GetTempPath() + @"\sinterproxy.xml"; //xml log file path
+
       InitializeComponent();
       form_table = new ConcurrentDictionary<int , object>();
     }
@@ -62,7 +69,7 @@ namespace WindowsProxy {
                 form.ShowDialog();
       }
       catch (Exception e) {
-        Console.WriteLine(e.ToString());
+        log.Error(e.ToString());
       }
     }
 
@@ -78,7 +85,7 @@ namespace WindowsProxy {
         form.Show();
       }
       catch (Exception e) {
-        Console.WriteLine(e.ToString());
+        log.Error(e.ToString());
       }
     }
 
@@ -100,7 +107,7 @@ namespace WindowsProxy {
         }
       }
       catch (Exception e) {
-        Console.WriteLine(e.ToString());
+        log.Error(e.ToString());
       }
     }
 
@@ -127,7 +134,7 @@ namespace WindowsProxy {
       }
       catch (Exception e)
       {
-        Console.WriteLine(e.ToString());
+        log.Error(e.ToString());
       }
     }
 
@@ -139,8 +146,8 @@ namespace WindowsProxy {
           SslPolicyErrors sslPolicyErrors)
     {
 
-      Console.WriteLine("SSL Certificate validate results: {0}({1})", (int)sslPolicyErrors, sslPolicyErrors);
-      Console.WriteLine("SSL acceptedSslPolicyErrors:      {0}", acceptedSslPolicyErrors);
+      log.InfoFormat("SSL Certificate validate results: {0}({1})", (int)sslPolicyErrors, sslPolicyErrors);
+      log.InfoFormat("SSL acceptedSslPolicyErrors:      {0}", acceptedSslPolicyErrors);
 
       if ((sslPolicyErrors &(~acceptedSslPolicyErrors)) == 0)
         return true;
@@ -155,7 +162,7 @@ namespace WindowsProxy {
       {
         server_ip = this.textBoxIP.Text;
         server_port = int.Parse(textBoxPort.Text);
-        Console.WriteLine("connecting to server {0}:{1}", server_ip, server_port);
+        log.InfoFormat("connecting to server {0}:{1}", server_ip, server_port);
                 if(client != null)
                 {
                     sslStream.Close();
@@ -165,7 +172,7 @@ namespace WindowsProxy {
       }
       catch (SocketException ex)
       {
-        Console.WriteLine("SocketException: {0}", ex);
+        log.Error("SocketException: {0}", ex);
         MessageBox.Show("Not able to reach sinter server");
         return;
       }
@@ -187,27 +194,27 @@ namespace WindowsProxy {
         }
         catch (AuthenticationException ee)
         {
-          Console.WriteLine("SSL AuthenticationException: {0}", ee.Message);
+          log.ErrorFormat("SSL AuthenticationException: {0}", ee.Message);
           if (ee.InnerException != null)
           {
-            Console.WriteLine("SSL Inner exception: {0}", ee.InnerException.Message);
+            log.ErrorFormat("SSL Inner exception: {0}", ee.InnerException.Message);
           }
-          Console.WriteLine("SSL Authentication failed - closing the connection.");
+          log.Error("SSL Authentication failed - closing the connection.");
           client.Close();
           return;
         }
         catch (InvalidOperationException ee)
         {
-          Console.WriteLine("InvalidOperationException: {0}", ee.Message);
+          log.ErrorFormat("InvalidOperationException: {0}", ee.Message);
           if (ee.InnerException != null)
           {
-            Console.WriteLine("InvalidOperationException Inner exception: {0}", ee.InnerException.Message);
+            log.ErrorFormat("InvalidOperationException Inner exception: {0}", ee.InnerException.Message);
           }
-          Console.WriteLine("closing the connection.");
+          log.Error("closing the connection.");
           client.Close();
           return;
         }
-        Console.WriteLine("SSL Authentication successful!!");
+        log.Info("SSL Authentication successful!!");
 
         //client_handle = new ClientHandler(proxy, client, "WinProxy Client");
         client_handle = new ClientHandler(proxy, client, "WinProxy Client", sslStream);
@@ -279,7 +286,7 @@ namespace WindowsProxy {
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex.ToString());
+        log.Error(ex.ToString());
       }
     }
 

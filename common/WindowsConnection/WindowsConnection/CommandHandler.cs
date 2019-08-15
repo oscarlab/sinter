@@ -27,6 +27,7 @@ using System.Threading;
 
 namespace Sintering {
   class CommandHandler {
+    private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Command");
     Dictionary<string , object> serviceCodes;
     Dictionary<object , string> serviceCodesRev;
     Type type;
@@ -42,7 +43,7 @@ namespace Sintering {
       if (serviceCodes != null) {
         serviceCodesRev = serviceCodes.ToDictionary(kp => kp.Value , kp => kp.Key);
       } else {
-        Console.WriteLine("Unable to load service_codes dictionary");
+        log.Error("Unable to load service_codes dictionary");
       }
       //type = GetType();
       type = typeof(IWinCommands);
@@ -80,7 +81,7 @@ namespace Sintering {
       while (!_shouldStop) {
         try {
           Sinter sinter = messageQueue.Take();
-          Console.WriteLine("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+          log.InfoFormat("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
           if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
             invoking_method_name = "execute_" + requested_service.Trim();
             if (actuator.bPasscodeVerified == true 
@@ -92,19 +93,19 @@ namespace Sintering {
               }
               else
               {
-                Console.WriteLine("invoke error: " + invoking_method_name + " doesn't exist");
+                log.Error("invoke error: " + invoking_method_name + " doesn't exist");
               }
             }
             else{
-              Console.WriteLine("passcode not verified yet, ignore the msg!");
+              log.Warn("passcode not verified yet, ignore the msg!");
             }
           } else {
-            Console.WriteLine("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
+            log.Error("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
           }
           invoking_method = null;
         }
         catch (Exception ex) {
-          Console.WriteLine(ex.Message);
+          log.Error(ex.Message);
         }
       }
     }

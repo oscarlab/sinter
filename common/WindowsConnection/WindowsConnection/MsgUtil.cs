@@ -20,6 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using log4net.Config;
 
 namespace Sintering
 {
@@ -51,8 +53,12 @@ namespace Sintering
 
     static Dictionary<string, int> serviceCodes;
     static Dictionary<int, string> serviceCodesRev;
+    static log4net.ILog log = log4net.LogManager.GetLogger("MsgUtil");
 
     static MsgUtil() {
+
+      FileInfo fi1 = new FileInfo("log4net.config");
+      XmlConfigurator.Configure(fi1);
 
       // loading the service_code dictionary
       Dictionary<string, object> serviceCodesTemp = Config.getConfig("service_code");
@@ -60,11 +66,17 @@ namespace Sintering
       {
         serviceCodes = serviceCodesTemp.ToDictionary(pair => pair.Key, pair => (int)pair.Value);
         serviceCodesRev = serviceCodes.ToDictionary(pair => pair.Value, pair => pair.Key);
+        log.Debug("Successfully load serviceCodes");
       }
       else
       {
-        Console.WriteLine("Unable to load service_code dictionary");
+        log.Error("Unable to load service_code dictionary");
       }
+    }
+
+    public static void StartLogger()
+    {
+        
     }
 
     #region Build Header helper

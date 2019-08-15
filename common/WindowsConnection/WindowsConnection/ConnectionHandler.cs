@@ -33,10 +33,8 @@ namespace Sintering {
     public TcpClient clientSocket;
     public Stream networkStream; //SSL Implementation
     string clientId;
-#if DEBUG
-    string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
-#endif
-
+    private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Connect");
+    private static readonly log4net.ILog xmlLogger = log4net.LogManager.GetLogger("XML");
     XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
     XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
     XmlWriterSettings settings = new XmlWriterSettings() {
@@ -62,13 +60,6 @@ namespace Sintering {
       ns.Add("" , "");
       serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
       serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
-
-#if DEBUG
-      using (StreamWriter sw = File.CreateText(xmlFilePath))
-      {
-         sw.WriteLine(DateTime.Now.ToLongTimeString());
-      }
-#endif
 
     }
 
@@ -100,6 +91,7 @@ namespace Sintering {
     public void StopConnectionHandling()
     {
       ShouldStop = true;
+      log.Warn("Client No:" + this.clientId + " stopped");
     }
 
     public int RequestedProcessId {get; set;}
@@ -119,22 +111,10 @@ namespace Sintering {
           // serialize
           serializer.Serialize(writer , sinter , ns);
         }
-#if DEBUG
-       try
-       {
-                    byte[] bytesToFile = ms.ToArray();
-                    string filestring = Encoding.ASCII.GetString(bytesToFile);
-                    using (StreamWriter sw = File.AppendText(xmlFilePath))
-                    {
-                        sw.WriteLine(filestring);
-                    }
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine("Exception: {0}", e);
-          return;
-        }
-#endif
+
+                byte[] bytesToFile = ms.ToArray();
+                string filestring = Encoding.ASCII.GetString(bytesToFile);
+                xmlLogger.Debug(filestring);
         
         try
         {
@@ -142,15 +122,17 @@ namespace Sintering {
         }
         catch (Exception e)
         {
-          Console.WriteLine("Exception: {0}", e);
+#if DEBUG
+          log.ErrorFormat("Exception: {0}", e);
+#endif
           this.StopConnectionHandling();
           return;
         }
         networkStream.Flush();
 
         // Debug statement
-        Console.WriteLine("sent: " + (int)ms.Length + " bytes");
-        Console.WriteLine("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+        log.Debug("sent: " + (int)ms.Length + " bytes");
+        log.InfoFormat("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
       }
 
       // Debug statement
@@ -195,11 +177,11 @@ namespace Sintering {
       }
       catch (IOException ex)
       {
-         Console.WriteLine(ex.Message);
+         log.Error(ex.Message);
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex.Message);
+        log.Error(ex.Message);
       }
       
       // Terminate
@@ -244,12 +226,8 @@ namespace Sintering {
 
     private void AddToMessageQueue(string xml) {
 
-#if DEBUG
-      using (StreamWriter sw = File.AppendText(xmlFilePath))
-      {
-            sw.WriteLine(xml);
-      }
-#endif
+      xmlLogger.Debug(xml);
+
       using (XmlReader reader = XmlReader.Create(new StringReader(xml))) {
         Sinter sinter = (Sinter)serializer.Deserialize(reader);
         messageQueue.Add(sinter);
@@ -258,12 +236,12 @@ namespace Sintering {
 
     // error handling
     protected void Serializer_UnknownNode(object sender , XmlNodeEventArgs e) {
-      Console.WriteLine("Unknown Node:" + e.Name + "\t" + e.Text);
+      log.Error("Unknown Node:" + e.Name + "\t" + e.Text);
     }
 
     protected void Serializer_UnknownAttribute(object sender , XmlAttributeEventArgs e) {
       XmlAttribute attr = e.Attr;
-      Console.WriteLine("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
+      log.Error("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
     }
   }
 }

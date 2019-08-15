@@ -60,6 +60,8 @@ namespace WindowsProxy
 
     public class WindowsProxy : IWinCommands
     {
+        private static log4net.ILog log = log4net.LogManager.GetLogger("Proxy");
+
         RootForm root;
         AppForm form;
 
@@ -169,7 +171,7 @@ namespace WindowsProxy
 
         Control Render(Entity entity, Control parent_control = null)
         {
-            Console.WriteLine("Rendering: {0}/{1}", entity.Type, entity.Name);
+            log.DebugFormat("Rendering: {0}/{1}", entity.Type, entity.Name);
 
             entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
             invoking_method_name = string.Format("Render{0}", entity.Type);
@@ -203,14 +205,14 @@ namespace WindowsProxy
 
             invoking_method = type.GetMethod(invoking_method_name,
               BindingFlags.NonPublic | BindingFlags.Instance);
-            //Console.WriteLine("Method {0}", invoking_method);
+            //log.DebugFormat("Method {0}", invoking_method);
             Control current_control = null;
             if (invoking_method != null)
             {
                 if (hash.TryGetValue(entity.UniqueID, out Control prev))
                 {
                     hash.TryRemove(entity.UniqueID, out Control rem);
-                    //Console.WriteLine("Remove previous control from parent");
+                    //log.DebugFormat("Remove previous control from parent");
                     if (parent_control != null)
                         parent_control.Controls.Remove(prev);
                 }
@@ -220,7 +222,7 @@ namespace WindowsProxy
 
                 if (current_control == null)
                 {
-                    Console.WriteLine("Current control is null?");
+                    log.DebugFormat("Current control is null?");
                     return null;
                 }
 
@@ -244,11 +246,11 @@ namespace WindowsProxy
             }
             else
             {
-                Console.WriteLine("[ERROR] invoking_method is null");
+                log.Error("[ERROR] invoking_method is null");
             }
 
             // check children
-            Console.WriteLine("{0}/{1} has {2} children", entity.Type, entity.Name, entity.Children.Count);
+            log.DebugFormat("{0}/{1} has {2} children", entity.Type, entity.Name, entity.Children.Count);
             if (!HasChildren(entity))
                 return current_control;
 
@@ -291,11 +293,11 @@ namespace WindowsProxy
         private Control RenderButton(Entity entity, Control parent)
         {
 
-            Console.WriteLine("RenderButton entity.UniqueId: {0} {1}", entity.UniqueID, entity.Name);
+            log.DebugFormat("RenderButton entity.UniqueId: {0} {1}", entity.UniqueID, entity.Name);
             /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
-                Console.WriteLine("Remove");
+                log.DebugFormat("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
@@ -354,7 +356,7 @@ namespace WindowsProxy
 
             Control control = new Button();
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderButton");
+            log.DebugFormat("Executing RenderButton");
 
             control.Tag = entity;
             control.Click += Control_Click_Button;
@@ -367,7 +369,7 @@ namespace WindowsProxy
             /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
-                Console.WriteLine("Remove");
+                log.DebugFormat("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
@@ -375,7 +377,7 @@ namespace WindowsProxy
 
             Control control = new RadioButton();
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderRadioButton");
+            log.DebugFormat("Executing RenderRadioButton");
 
             control.Tag = entity;
             control.Click += Control_ClickRadioButton;
@@ -392,7 +394,7 @@ namespace WindowsProxy
         {
             Control control = new DateTimePicker();
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderDateTimePicker");
+            log.DebugFormat("Executing RenderDateTimePicker");
             control.Tag = entity;
 
             DateTimePicker dateTimePicker = (DateTimePicker)control;
@@ -407,7 +409,7 @@ namespace WindowsProxy
         {
             Control control = new CheckBox();
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderCheckBox");
+            log.DebugFormat("Executing RenderCheckBox");
 
             control.Tag = entity;
             ((CheckBox)control).Click += Control_Click_Button;
@@ -417,7 +419,7 @@ namespace WindowsProxy
 
         private Control RenderComboBox(Entity entity, Control parent)
         {
-            Console.WriteLine("Rendering ComboBox");
+            log.DebugFormat("Rendering ComboBox");
             Control control = new ComboBox();
             AdjustProperties(entity, ref control);
             control.Text = entity.Value;
@@ -426,7 +428,7 @@ namespace WindowsProxy
 
             foreach (Entity child_entity in entity.Children)
             {
-                Console.WriteLine("{0} {1}", child_entity.Name, child_entity.Type);
+                log.DebugFormat("{0} {1}", child_entity.Name, child_entity.Type);
                 if (child_entity.Type == "List")
                 {
                     foreach (Entity listItem in child_entity.Children)
@@ -446,7 +448,7 @@ namespace WindowsProxy
                 }
             }
             ((ComboBox)control).SelectedIndexChanged += Control_ComboBox_SelectedIndexChanged;
-            Console.WriteLine("Rendered ComboBox");
+            log.DebugFormat("Rendered ComboBox");
             return control;
         }
 
@@ -501,7 +503,7 @@ namespace WindowsProxy
         private Control RenderEdit(Entity entity, Control parent)
         {
             Control control = null;
-            Console.WriteLine("Executing RenderEdit");
+            log.DebugFormat("Executing RenderEdit");
 
             control = new TextBox();
             AdjustProperties(entity, ref control);
@@ -547,7 +549,7 @@ namespace WindowsProxy
             int i = 0; 
             foreach (Entity child in entity.Children)
             {
-                Console.WriteLine("Rendered ListItem: {0}", child.Name);
+                log.DebugFormat("Rendered ListItem: {0}", child.Name);
                 ListViewItem li = new ListViewItem(child.Name);
                 listView.Items.Add(li);
                 if ((child.States & States.SELECTED) != 0)
@@ -558,7 +560,7 @@ namespace WindowsProxy
             }
             Control control = (Control)listView;
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderList");
+            log.DebugFormat("Executing RenderList");
             control.Tag = entity;
             control.Click += Control_Click_Button;
             listView.EndUpdate();
@@ -567,7 +569,7 @@ namespace WindowsProxy
 
         private Control RenderListItem(Entity entity, Control parent)
         {
-            //Console.WriteLine("Rendered ListItem");
+            //log.DebugFormat("Rendered ListItem");
             return parent;
         }
 
@@ -579,8 +581,8 @@ namespace WindowsProxy
         private Control RenderMenuBar(Entity entity, Control parent)
         {
             // From http://www.c-sharpcorner.com/blogs/create-menustrip-dynamically-in-c-sharp1
-            Console.WriteLine("Executing RenderMenuBar");
-            Console.WriteLine("entity.Type: {0}", entity.Type);
+            log.DebugFormat("Executing RenderMenuBar");
+            log.DebugFormat("entity.Type: {0}", entity.Type);
 
             if (entity.Name == "System Menu Bar")
                 return parent;
@@ -594,7 +596,7 @@ namespace WindowsProxy
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.menustrip.-ctor?view=netframework-4.8
             foreach (Entity child_entity in entity.Children)
             {
-                Console.WriteLine("menuHashEntity.TryAdd(Name: {0}, entity: {0}", child_entity.Name, child_entity);
+                log.DebugFormat("menuHashEntity.TryAdd(Name: {0}, entity: {0}", child_entity.Name, child_entity);
                 menuHashEntity.TryAdd(child_entity.Name, child_entity);
                 menuHash.TryAdd(child_entity.Name, control);
 
@@ -630,7 +632,7 @@ namespace WindowsProxy
         {
             /*Control control = new Button();
             AdjustProperties(entity, ref control);
-            Console.WriteLine("Executing RenderButton");
+            log.DebugFormat("Executing RenderButton");
 
             control.Tag = entity;
             control.Click += Control_Click;
@@ -714,7 +716,7 @@ namespace WindowsProxy
         private Control RenderText(Entity entity, Control parent)
         {
             Control control = new TextBox();
-            Console.WriteLine("Executing RenderText");
+            log.DebugFormat("Executing RenderText");
 
             if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("Calculator") == true))
             {
@@ -796,9 +798,9 @@ namespace WindowsProxy
             {
                 //"NS" means comes from OSX "window__NS:476"
                 // OSX usually have more than 8 menu items so we set larger windows to accommodate them  
-                Console.WriteLine("original width = {0}", form.Width);
+                log.DebugFormat("original width = {0}", form.Width);
                 form.Width = 500;
-                Console.WriteLine("new width = {0}", form.Width);
+                log.DebugFormat("new width = {0}", form.Width);
             }
 
             //register event listener and delegate
@@ -887,7 +889,7 @@ namespace WindowsProxy
                 ),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat("send action default: {0}", sinter.HeaderNode.ParamsInfo.ToString());
             execute_mouse(sinter);
 
             isSent = true;
@@ -919,7 +921,7 @@ namespace WindowsProxy
                 ),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_mouse(sinter);
 
             isSent = true;
@@ -931,23 +933,23 @@ namespace WindowsProxy
             e.Cancel = flagDeferMenuExpansion;
             if (e.Cancel)
             {
-                Console.WriteLine("ContextMenu_Opening(): flagDeferMenuExpansion = " + flagDeferMenuExpansion);
+                log.DebugFormat("ContextMenu_Opening(): flagDeferMenuExpansion = " + flagDeferMenuExpansion);
             }
         }
 
         private void Control_MenuItem_Expanded(object sender, EventArgs e)
         {
             ToolStripDropDownItem item = sender as ToolStripDropDownItem;
-            Console.WriteLine("MenuItem {0} Expanded", item.Text);
+            log.DebugFormat("MenuItem {0} Expanded", item.Text);
 
             menuHashEntity.TryGetValue(item.Text, out Entity entity);
 
             if (entity == null)
             {
-                Console.WriteLine("[Warning!] cannot find entity");
+                log.DebugFormat("[Warning!] cannot find entity");
                 return;
             }
-            Console.WriteLine("MenuItem ID {0}", entity.UniqueID);
+            log.DebugFormat("MenuItem ID {0}", entity.UniqueID);
 
             Sinter sinter = sinter = new Sinter
             {
@@ -957,7 +959,7 @@ namespace WindowsProxy
                       entity.UniqueID),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_action(sinter);
 
             isSent = true;
@@ -966,23 +968,23 @@ namespace WindowsProxy
             if (RemotePlatform != null && RemotePlatform.StartsWith("Microsoft"))
             {
                 flagDeferMenuExpansion = true;
-                Console.WriteLine("set FLAG flagDeferMenuExpansion");
+                log.DebugFormat("set FLAG flagDeferMenuExpansion");
             }
         }
 
         private void Control_MenuItem_Collapsed(object sender, EventArgs e)
         {
             ToolStripDropDownItem item = sender as ToolStripDropDownItem;
-            Console.WriteLine("MenuItem {0} Collapsed", item.Text);
+            log.DebugFormat("MenuItem {0} Collapsed", item.Text);
 
             menuHashEntity.TryGetValue(item.Text, out Entity entity);
 
             if (entity == null)
             {
-                Console.WriteLine("[Warning!] cannot find entity");
+                log.DebugFormat("[Warning!] cannot find entity");
                 return;
             }
-            Console.WriteLine("MenuItem ID {0}", entity.UniqueID);
+            log.DebugFormat("MenuItem ID {0}", entity.UniqueID);
 
             Sinter sinter = sinter = new Sinter
             {
@@ -992,7 +994,7 @@ namespace WindowsProxy
                       entity.UniqueID),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_action(sinter);
 
             isSent = true;
@@ -1037,26 +1039,26 @@ namespace WindowsProxy
 
         private void Control_Click_ComboBox(object sender, EventArgs e)
         {
-            Console.WriteLine("Begin Control_Click_Combo_Box");
+            log.DebugFormat("Begin Control_Click_Combo_Box");
             if (isSent)
                 return;
 
             ComboBox item = (ComboBox)sender;
             // Entity entity;
-            Console.WriteLine("MenuItem Click {0}", item.Text);
+            log.DebugFormat("MenuItem Click {0}", item.Text);
             comboBoxEntities.TryGetValue(item.Text, out Entity entity);
             if (entity == null)
                 return;
-            Console.WriteLine("MenuItem ID {0}", entity.UniqueID);
+            log.DebugFormat("MenuItem ID {0}", entity.UniqueID);
             List<string[]> lists = new List<string[]>();
             string name = item.Name;
 
             string id = null;
             comboBoxParent.TryGetValue(name, out Entity test);
-            Console.WriteLine("{0}", test.UniqueID);
+            log.DebugFormat("{0}", test.UniqueID);
 
             Point start = GetCenter(entity);
-            Console.WriteLine("Adding {0} to list...", entity.Name);
+            log.DebugFormat("Adding {0} to list...", entity.Name);
             lists.Add(new string[] { start.X.ToString(), start.Y.ToString() });
 
             while (comboBoxParent.TryGetValue(name, out Entity parent))
@@ -1064,18 +1066,18 @@ namespace WindowsProxy
                 if (!comboBoxParent.TryGetValue(parent.Name, out Entity stop))
                 {
                     id = parent.UniqueID;
-                    Console.WriteLine("FInal Name: {0}", parent.Name);
+                    log.DebugFormat("FInal Name: {0}", parent.Name);
                     break;
                 }
                 Point tmp = GetCenter(parent);
-                Console.WriteLine("Adding {0} to list...", parent.Name);
+                log.DebugFormat("Adding {0} to list...", parent.Name);
                 lists.Add(new string[] { tmp.X.ToString(), tmp.Y.ToString() });
                 name = parent.Name;
             }
 
             lists.Reverse();
 
-            Console.WriteLine("Menu Item {0}", id);
+            log.DebugFormat("Menu Item {0}", id);
 
             Point center = GetCenter(entity);
 
@@ -1092,7 +1094,7 @@ namespace WindowsProxy
                 ),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_action(sinter);
 
             isSent = true;
@@ -1102,11 +1104,11 @@ namespace WindowsProxy
         private void Control_Click_MenuItem(object sender, EventArgs e)
         {
             ToolStripMenuItem targetMenuItem = (ToolStripMenuItem)sender;
-            Console.WriteLine("MenuItem Click {0}", targetMenuItem.Text);
+            log.DebugFormat("MenuItem Click {0}", targetMenuItem.Text);
             menuHashEntity.TryGetValue(targetMenuItem.Text, out Entity entity);
             if (entity == null)
             {
-                Console.WriteLine("entity for clicked MenuItem not found");
+                log.DebugFormat("entity for clicked MenuItem not found");
                 return;
             }
 
@@ -1134,7 +1136,7 @@ namespace WindowsProxy
                 {
                     parentRuntimeID = parent.UniqueID;
                     name = parent.Name;
-                    Console.WriteLine("Final Parent Name: {0}, RuntimeID: {1}", parent.Name, parentRuntimeID);
+                    log.DebugFormat("Final Parent Name: {0}, RuntimeID: {1}", parent.Name, parentRuntimeID);
                     
                     break;
                 }
@@ -1156,7 +1158,7 @@ namespace WindowsProxy
                 ),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_action(sinter);
 
             isSent = true;
@@ -1165,7 +1167,7 @@ namespace WindowsProxy
             if (RemotePlatform != null && RemotePlatform.StartsWith("Microsoft"))
             {
                 flagTriggerByMenuItemClick = true;
-                Console.WriteLine("set FLAG flagTriggerByMenuItemClick");
+                log.DebugFormat("set FLAG flagTriggerByMenuItemClick");
             }
         }
 
@@ -1194,7 +1196,7 @@ namespace WindowsProxy
                 ),
             };
 
-            Console.WriteLine(sinter.HeaderNode.ParamsInfo.ToString());
+            log.DebugFormat(sinter.HeaderNode.ParamsInfo.ToString());
             execute_mouse(sinter);
 
             isSent = true;
@@ -1354,7 +1356,7 @@ namespace WindowsProxy
             FormWindowState prevState;
             if (!dictFormWindowStatePrev.TryGetValue(form1, out prevState))
             {
-                Console.WriteLine("ERROR - no entry for dictFormWindowStatePrev");
+                log.DebugFormat("ERROR - no entry for dictFormWindowStatePrev");
             }
 
 
@@ -1498,17 +1500,17 @@ namespace WindowsProxy
             bool res = Boolean.Parse(sinter.HeaderNode.ParamsInfo.Data1);
             if (res == false)
             {
-                Console.WriteLine("Passcode not accepted by server - Close Connection");
+                log.Error("Passcode not accepted by server - Close Connection");
                 root.Disconnect(null, null);
                 MessageBox.Show("Passcode not correct!");
             }
             else
             {
-                Console.WriteLine("Passcode Verified");
+                log.DebugFormat("Passcode Verified");
                 this.bPasscodeVerified = true;
                 root.ShowConnected();
                 this.RemotePlatform = sinter.HeaderNode.ParamsInfo.Data2;
-                Console.WriteLine("RemotePlatform = {0}", this.RemotePlatform);
+                log.DebugFormat("RemotePlatform = {0}", this.RemotePlatform);
             }
 
 
@@ -1544,7 +1546,7 @@ namespace WindowsProxy
         public void execute_delta(Sinter sinter)
         {
             int subCode = sinter.HeaderNode.SubCode;
-            Console.WriteLine("Execute Delta {0}", subCode);
+            log.DebugFormat("Execute Delta {0}", subCode);
 
             // TargetId is optional
             string targetId = null;
@@ -1575,10 +1577,10 @@ namespace WindowsProxy
                     return; //ignore, the msg is due to proxy asked scraper to minimize
                 }
                 root_entity = sinter.EntityNode;
-                // Console.WriteLine("{0}", root_entity.Type);
+                // log.DebugFormat("{0}", root_entity.Type);
                 if (sinter.EntityNode != null)
                 {
-                    Console.WriteLine("Prop Change {0}", sinter.EntityNode.Type);
+                    log.DebugFormat("Prop Change {0}", sinter.EntityNode.Type);
                     if (sinter.EntityNode.Type.Equals("Window", StringComparison.Ordinal))
                     {
                         ((Control)form).BeginInvoke((Action)(() =>
@@ -1598,7 +1600,7 @@ namespace WindowsProxy
                             form.Height += (30 + 8);
                             form.Height += 25;
 
-                            Console.WriteLine("Window form adjusted");
+                            log.DebugFormat("Window form adjusted");
                             foreach (Entity child in sinter.EntityNode.Children)
                             {
                                 AdjustSubTreeProperties(child);
@@ -1635,42 +1637,42 @@ namespace WindowsProxy
                 if (flagDeferMenuExpansion == true)
                 {
                     flagDeferMenuExpansion = false;
-                    Console.WriteLine("clear FLAG flagDeferMenuExpansion");
+                    log.DebugFormat("clear FLAG flagDeferMenuExpansion");
                 }
 
                 if (flagTriggerByMenuItemClick == true)
                 {
                     // the expansion is triggered by sinter (not user) when MenuItem clicked, so do not process/show to User
-                    Console.WriteLine("clear FLAG flagTriggerByMenuItemClick");
+                    log.DebugFormat("clear FLAG flagTriggerByMenuItemClick");
                     flagTriggerByMenuItemClick = false;
                     return;
                 }
 
                 if (sinter.EntityNode.Type.Equals("menubar"))
                 {
-                    Console.WriteLine("ignore {0} from mac", subCode);
+                    log.DebugFormat("ignore {0} from mac", subCode);
                     return;
                 }
                 else if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem"))
                 {
-                    Console.WriteLine("delta_subtree_expand: {0}/{1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
+                    log.DebugFormat("delta_subtree_expand: {0}/{1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
                     UpdateMenu(sinter);
                     return;
                 }
             }
             else if (subCode == serviceCodes["delta_subtree_menu"])
             {
-                Console.WriteLine("506 - delta_subtree_menu Not handled");
+                log.DebugFormat("506 - delta_subtree_menu Not handled");
                 //UpdateMenu(sinter);
             }
             else if (subCode == serviceCodes["delta_subtree_add"])
             {
-                Console.WriteLine("501 - delta_subtree_add Not handled");
+                log.DebugFormat("501 - delta_subtree_add Not handled");
                 // Not Implemented
             }
             else if (subCode == serviceCodes["delta_subtree_remove"])
             {
-                Console.WriteLine("503 - delta_subtree_remove Not handled");
+                log.DebugFormat("503 - delta_subtree_remove Not handled");
                 // Not Implemented
             }
             else if (subCode == serviceCodes["delta_subtree_replace"])
@@ -1688,15 +1690,15 @@ namespace WindowsProxy
             {
                 case "Pane":
                 {
-                    Console.WriteLine("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                    log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
                     ((Control)form).BeginInvoke((Action)(() =>
                     {
-                        Console.WriteLine("Remove All ctrl elements");
+                        log.DebugFormat("Remove All ctrl elements");
                         Control[] arr = new Control[form.Controls.Count];
                         form.Controls.CopyTo(arr, 0);
                         foreach (Control element in arr)
                         {
-                            //Console.WriteLine("{0}", ((Entity)element.Tag).Type);
+                            //log.DebugFormat("{0}", ((Entity)element.Tag).Type);
                             if (!((Entity)element.Tag).Type.Equals("MenuBar"))
                             {
                                 form.Controls.Remove(element);
@@ -1704,14 +1706,14 @@ namespace WindowsProxy
                         }
                         // form.Controls.Clear();
 
-                        Console.WriteLine("Render New Elements");
+                        log.DebugFormat("Render New Elements");
                         Render(entity, form);
                     }));
                     break;
                 }
                 case "List":
                 {
-                    Console.WriteLine("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                    log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
                     if (hash.TryGetValue(entity.UniqueID, out Control ctrl))
                     {
                         ctrl.BeginInvoke((Action)(() =>
@@ -1722,11 +1724,11 @@ namespace WindowsProxy
                                 && parent_entity.Type.Equals("ComboBox")
                                 && hash.TryGetValue(parent_entity.UniqueID, out comboBoxControl))
                             {
-                                Console.WriteLine("Found Combobox Parent {0}", parent_entity.Name);
+                                log.DebugFormat("Found Combobox Parent {0}", parent_entity.Name);
 
                                 foreach (ToolStripMenuItem oldLi in ((ComboBox)comboBoxControl).Items)
                                 {
-                                    Console.WriteLine("oldlistItem {0}", oldLi.Text);
+                                    log.DebugFormat("oldlistItem {0}", oldLi.Text);
                                     comboBoxParent.TryRemove(oldLi.Text, out Entity _);
                                     comboBoxEntities.TryRemove(oldLi.Text, out Entity _);
                                 }
@@ -1734,7 +1736,7 @@ namespace WindowsProxy
 
                                 foreach (Entity child in entity.Children)
                                 {
-                                    Console.WriteLine("Rendered ToolStripMenuItem: {0}", child.Name);
+                                    log.DebugFormat("Rendered ToolStripMenuItem: {0}", child.Name);
                                     ToolStripMenuItem mi = new ToolStripMenuItem();
                                     mi.Name = child.Name;
                                     mi.Text = child.Name;
@@ -1756,13 +1758,13 @@ namespace WindowsProxy
 
                                 foreach (ListViewItem oldLi in listView.Items)
                                 {
-                                    Console.WriteLine("oldlistItem {0}", oldLi.Text);
+                                    log.DebugFormat("oldlistItem {0}", oldLi.Text);
                                 }
                                 listView.Items.Clear();
 
                                 foreach (Entity child in entity.Children)
                                 {
-                                    Console.WriteLine("Rendered ListItem: {0}", child.Name);
+                                    log.DebugFormat("Rendered ListItem: {0}", child.Name);
                                     ListViewItem li = new ListViewItem(child.Name);
                                     listView.Items.Add(li);
                                     if ((child.States & States.SELECTED) != 0)
@@ -1780,7 +1782,7 @@ namespace WindowsProxy
                 case "MenuItem": //another 504 msg will be handled for Menu
                 case "Text":
                 default:
-                    Console.WriteLine("502 - delta_subtree_replace Not handled for {0} {1}", entity.Type, entity.Name);
+                    log.DebugFormat("502 - delta_subtree_replace Not handled for {0} {1}", entity.Type, entity.Name);
                     return;
             }
 
@@ -1805,7 +1807,7 @@ namespace WindowsProxy
                     }
                     else
                     {
-                        Console.WriteLine("CloseForm: Form closed");
+                        log.DebugFormat("CloseForm: Form closed");
                         form.Close();
                     }
                 }
@@ -1911,7 +1913,7 @@ namespace WindowsProxy
 
         public void execute_kbd(Sinter sinter)
         {
-            Console.WriteLine("kbd: " + sinter.HeaderNode.ParamsInfo);
+            log.DebugFormat("kbd: " + sinter.HeaderNode.ParamsInfo);
 
             connection.SendMessage(sinter);
         }
@@ -1960,7 +1962,7 @@ namespace WindowsProxy
                 if (sinter.EntityNode.Type.Equals("MenuItem")
                     && (sinter.EntityNode.Children.Count > 0))
                 {
-                    if (sinter.EntityNode.Children.Count > 1) Console.WriteLine("MenuItem has {0} children", sinter.EntityNode.Children.Count);
+                    if (sinter.EntityNode.Children.Count > 1) log.DebugFormat("MenuItem has {0} children", sinter.EntityNode.Children.Count);
                     if (sinter.EntityNode.Children[0].Type.Equals("Menu"))
                     {
                         entity = sinter.EntityNode.Children[0];
@@ -1997,7 +1999,7 @@ namespace WindowsProxy
             /* mac : the entity is "menubaritem"/menu/menuitem (we cant use menu since the <name> of menu from osx is empty unlike windows)
             /* windows: the entity is type "menu"/menuitem */
 
-            Console.WriteLine("entity.Name: {0}", entity.Name);
+            log.DebugFormat("entity.Name: {0}", entity.Name);
 
             if (ctrl == null)
             {
@@ -2005,13 +2007,13 @@ namespace WindowsProxy
                 {
                     if (!ctrl.IsHandleCreated)
                     {
-                        Console.WriteLine("handle not created yet");
+                        log.Warn("handle not created yet");
                         return;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("cannot find control");
+                    log.Error("cannot find control");
                     return;
                 }
             }
@@ -2023,7 +2025,7 @@ namespace WindowsProxy
 
                 if (!menuHashMenuItem.TryGetValue(entity.Name, out targetMenuItem))
                 {
-                    Console.WriteLine("matched menu not found");
+                    log.Error("matched menu not found");
                     return;
                 }
 
@@ -2032,7 +2034,7 @@ namespace WindowsProxy
                     removeSubMenuItems(targetMenuItem);
                 }
 
-                Console.WriteLine("new Children Count for SubMenu: {0}", entity.Children.Count);
+                log.DebugFormat("new Children Count for SubMenu: {0}", entity.Children.Count);
                 foreach (Entity child in entity.Children)
                 {
                     addSubMenuItem(child, mStrip, targetMenuItem);
@@ -2042,7 +2044,7 @@ namespace WindowsProxy
                 {
                     if (FindSubMenuItem(entity.Name, mi, out targetMenuItem))
                     {
-                        Console.WriteLine("Found {0} in {1}, Show '{1}' Drop Down", entity.Name, mi.Name);
+                        log.DebugFormat("Found {0} in {1}, Show '{1}' Drop Down", entity.Name, mi.Name);
                         mi.DropDown.Show();
                         targetMenuItem.DropDown.Show();
                         break;
@@ -2054,13 +2056,14 @@ namespace WindowsProxy
 
         private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
         {
-#if !DEBUG  //this is for 1st release version for Calculator. MessageBox 
+            /*
             if (this.RemoteProcessName.Contains("Calculator") && entity_mi.Name.Equals("About Calculator"))
             {
-                Console.WriteLine("skip menu: {0}", entity_mi.Name); 
+                log.DebugFormat("skip menu: {0}", entity_mi.Name); 
                 return;
             }
-#endif
+            */
+
             ToolStripMenuItem newMenu = new ToolStripMenuItem(entity_mi.Name);
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
@@ -2085,7 +2088,7 @@ namespace WindowsProxy
 
             if (!newMenu.Name.Equals("separator", StringComparison.Ordinal) && parent_mi.DropDownItems.IndexOfKey(newMenu.Name) == -1)
             {
-                Console.WriteLine("Adding menuitem: {0}", entity_mi.Name);
+                log.DebugFormat("Adding menuitem: {0}", entity_mi.Name);
                 parent_mi.DropDownItems.Add(newMenu);
                 menuHash.TryAdd(newMenu.Name, (Control)ms);
                 menuHashEntity.TryAdd(newMenu.Name, entity_mi);
@@ -2108,13 +2111,13 @@ namespace WindowsProxy
             }
             else
             {
-                Console.WriteLine("skip menu: {0}", entity_mi.Name);
+                log.DebugFormat("skip menu: {0}", entity_mi.Name);
             }
         }
 
         private void removeSubMenuItems(ToolStripMenuItem parentMenuItem)
         {
-            Console.WriteLine("removeSubMenuItems in {0}", parentMenuItem.Name);
+            log.DebugFormat("removeSubMenuItems in {0}", parentMenuItem.Name);
             foreach (ToolStripMenuItem mi in parentMenuItem.DropDownItems)
             {
                 menuHash.TryRemove(mi.Name, out Control _);
@@ -2133,7 +2136,7 @@ namespace WindowsProxy
                 foreach (string s in keys)
                 {
                     s.Trim();
-                    Console.WriteLine("key = {0}", s);
+                    log.DebugFormat("key = {0}", s);
                     switch (s)
                     {
                         case ("Ctrl"):
@@ -2247,11 +2250,11 @@ namespace WindowsProxy
 
             control.Top = (int)((entity.Top - rootPoint.Y) * height_ratio);
             control.Left = (int)((entity.Left - rootPoint.X) * width_ratio);
-            //Console.WriteLine("AdjustProperties {0}/{1}/{2}, Top: {3}", entity.Type, entity.Name, entity.UniqueID, control.Top);
+            //log.DebugFormat("AdjustProperties {0}/{1}/{2}, Top: {3}", entity.Type, entity.Name, entity.UniqueID, control.Top);
 
             if ((entity.States & States.DISABLED) != 0)
             {
-                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
+                log.DebugFormat("{0}/{1} states is not enabled", entity.Type, entity.Name);
                 control.Enabled = false;
             }
             else
@@ -2261,7 +2264,7 @@ namespace WindowsProxy
 
             if (entity.Type == "CheckBox")
             {
-				Console.WriteLine("{0}/{1} states is CHECKED", entity.Type, entity.Name);
+				log.DebugFormat("{0}/{1} states is CHECKED", entity.Type, entity.Name);
                 if ((entity.States & States.CHECKED) != 0)
                 {
                     ((CheckBox)control).Checked = true;
@@ -2274,7 +2277,7 @@ namespace WindowsProxy
 
             if (entity.Type == "RadioButton")
             {
-                Console.WriteLine("{0}/{1} states is SELECTED", entity.Type, entity.Name);
+                log.DebugFormat("{0}/{1} states is SELECTED", entity.Type, entity.Name);
                 if ((entity.States & States.SELECTED) != 0)
                 {
                     ((RadioButton)control).Checked = true;
@@ -2287,7 +2290,7 @@ namespace WindowsProxy
 
             if ((entity.States & States.INVISIBLE) != 0)
             {
-                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
+                log.DebugFormat("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
                 control.Visible = false;
             }
             

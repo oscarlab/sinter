@@ -28,7 +28,6 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Sintering;
 
-
 namespace WindowsServer {
 
   public static class ServerConfiguration{
@@ -43,9 +42,13 @@ namespace WindowsServer {
     private static List<ClientHandler> clients = new List<ClientHandler>();
     private static TcpListener serverSocket;
     private static X509Certificate serverCertificate = new X509Certificate2(ServerConfiguration.CERTIFICATE_FILE, ServerConfiguration.DEFAULT_PASSCODE, X509KeyStorageFlags.MachineKeySet);
-
+    private static log4net.ILog log = log4net.LogManager.GetLogger("Server");
     public static void StartServer()
     {
+      log4net.GlobalContext.Properties["LogFileName"] = Path.GetTempPath() + @"\sinterserver.log"; //log file path
+      log4net.GlobalContext.Properties["XMLFileName"] = Path.GetTempPath() + @"\sinterserver.xml"; //xml log file path
+      MsgUtil.StartLogger();
+
       SslStream sslStream = null; 
       serverSocket = new TcpListener(IPAddress.Any, port);
       TcpClient clientSocket = default(TcpClient);
@@ -57,23 +60,12 @@ namespace WindowsServer {
       string passcode = rnd.Next(1, 999999).ToString();
 #else
       string passcode = ServerConfiguration.DEFAULT_PASSCODE;
-
-            string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
-            try
-            {
-                File.Delete(xmlFilePath);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
 #endif
 
       serverSocket.Start();
-      Console.WriteLine("Sinter Scrapper Started");
-      Console.WriteLine("");
-      Console.WriteLine("Passcode = {0}", passcode);
-      Console.WriteLine("Let the Sinter proxy client know this passcode.");
+      log.Info("Sinter Scrapper Started");
+      log.InfoFormat("Passcode = {0}", passcode);
+      Console.WriteLine("\nLet the Sinter proxy client know this passcode : {0}", passcode);
 
       try
       {
@@ -85,12 +77,12 @@ namespace WindowsServer {
           sslStream = ProcessClient(clientSocket);
           if (sslStream == null)
           {
-            Console.WriteLine("Client No:" + counter + " rejected!");
+            log.Info("Client No:" + counter + " rejected!");
             clientSocket.Close();
           }
           else
           {
-            Console.WriteLine("Client No:" + counter + " started!");
+                        log.Info("Client No:" + counter + " connected!");
                         if (scraper == null)
                         {
                             scraper = new WindowsScraper.WindowsScraper(passcode);
@@ -102,16 +94,16 @@ namespace WindowsServer {
                         
                         ClientHandler client = new ClientHandler(scraper, clientSocket, "" + counter, sslStream);
                         clients.Add(client);
-                    }
+           }
         }
       }
       catch (SocketException e)
       {
-        Console.WriteLine("SocketException: {0}", e);
+        log.Error("SocketException: {0}", e);
       }
       catch (ArgumentException e)
       {
-        Console.WriteLine("ArgumentException: {0}", e);
+        log.Error("ArgumentException: {0}", e);
       }
     }
 
@@ -136,7 +128,7 @@ namespace WindowsServer {
       try
       {
 
-        Console.WriteLine("\n[SSL] server cert was issued to {0} and is valid from {1} until {2}.",
+        log.InfoFormat("[SSL] server cert was issued to {0} and is valid from {1} until {2}.",
         serverCertificate.Subject,
         serverCertificate.GetEffectiveDateString(),
         serverCertificate.GetExpirationDateString());
@@ -144,7 +136,7 @@ namespace WindowsServer {
         sslStream.AuthenticateAsServer(serverCertificate, clientCertificateRequired: false, enabledSslProtocols:SslProtocols.Tls12, checkCertificateRevocation: true);
 
         // Display the properties and settings for the authenticated stream.
-        Console.WriteLine("[SSL] Protocol: {0}", sslStream.SslProtocol);
+        log.InfoFormat("[SSL] Protocol: {0}", sslStream.SslProtocol);
 
         DisplaySecurityLevel(sslStream);
         //DisplaySecurityServices(sslStream);
@@ -153,12 +145,12 @@ namespace WindowsServer {
       }
       catch (Exception e)
       {
-        Console.WriteLine("Exception: {0}", e.Message);
+        log.ErrorFormat("Exception: {0}", e.Message);
         if (e.InnerException != null)
         {
-          Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
+          log.ErrorFormat("Inner exception: {0}", e.InnerException.Message);
         }
-        Console.WriteLine("Authentication failed - closing the connection.");
+        log.Error("Authentication failed - closing the connection.");
         sslStream.Close();
         return null;
       }
@@ -170,49 +162,49 @@ namespace WindowsServer {
     /* development code - need to move to log file */
     static void DisplaySecurityLevel(SslStream stream)
     {
-      Console.WriteLine("[SSL] Cipher: {0} strength {1}", stream.CipherAlgorithm, stream.CipherStrength);
-      Console.WriteLine("[SSL] Hash: {0} strength {1}", stream.HashAlgorithm, stream.HashStrength);
-      Console.WriteLine("[SSL] Key exchange: {0} strength {1}", stream.KeyExchangeAlgorithm, stream.KeyExchangeStrength);
+      log.InfoFormat("[SSL] Cipher: {0} strength {1}", stream.CipherAlgorithm, stream.CipherStrength);
+      log.InfoFormat("[SSL] Hash: {0} strength {1}", stream.HashAlgorithm, stream.HashStrength);
+      log.InfoFormat("[SSL] Key exchange: {0} strength {1}", stream.KeyExchangeAlgorithm, stream.KeyExchangeStrength);
     }
     static void DisplaySecurityServices(SslStream stream)
     {
-      Console.WriteLine("[SSL] Is authenticated: {0} as server? {1}", stream.IsAuthenticated, stream.IsServer);
-      Console.WriteLine("[SSL] IsSigned: {0}", stream.IsSigned);
-      Console.WriteLine("[SSL] Is Encrypted: {0}", stream.IsEncrypted);
+      log.InfoFormat("[SSL] Is authenticated: {0} as server? {1}", stream.IsAuthenticated, stream.IsServer);
+      log.InfoFormat("[SSL] IsSigned: {0}", stream.IsSigned);
+      log.InfoFormat("[SSL] Is Encrypted: {0}", stream.IsEncrypted);
     }
     static void DisplayStreamProperties(SslStream stream)
     {
-      Console.WriteLine("[SSL] Can read: {0}, write {1}", stream.CanRead, stream.CanWrite);
-      Console.WriteLine("[SSL] Can timeout: {0}", stream.CanTimeout);
+      log.InfoFormat("[SSL] Can read: {0}, write {1}", stream.CanRead, stream.CanWrite);
+      log.InfoFormat("[SSL] Can timeout: {0}", stream.CanTimeout);
     }
     static void DisplayCertificateInformation(SslStream stream)
     {
-      Console.WriteLine("[SSL] Certificate revocation list checked: {0}", stream.CheckCertRevocationStatus);
+      log.InfoFormat("[SSL] Certificate revocation list checked: {0}", stream.CheckCertRevocationStatus);
 
       X509Certificate localCertificate = stream.LocalCertificate;
       if (stream.LocalCertificate != null)
       {
-        Console.WriteLine("[SSL] Local cert was issued to {0} and is valid from {1} until {2}.",
+        log.InfoFormat("[SSL] Local cert was issued to {0} and is valid from {1} until {2}.",
             localCertificate.Subject,
             localCertificate.GetEffectiveDateString(),
             localCertificate.GetExpirationDateString());
       }
       else
       {
-        Console.WriteLine("[SSL] Local certificate is null.");
+        log.InfoFormat("[SSL] Local certificate is null.");
       }
       // Display the properties of the client's certificate.
       X509Certificate remoteCertificate = stream.RemoteCertificate;
       if (stream.RemoteCertificate != null)
       {
-        Console.WriteLine("[SSL] Remote cert was issued to {0} and is valid from {1} until {2}.",
+        log.InfoFormat("[SSL] Remote cert was issued to {0} and is valid from {1} until {2}.",
             remoteCertificate.Subject,
             remoteCertificate.GetEffectiveDateString(),
             remoteCertificate.GetExpirationDateString());
       }
       else
       {
-        Console.WriteLine("[SSL] Remote certificate is null.");
+        log.InfoFormat("[SSL] Remote certificate is null.");
       }
     }
     /* development code - need to move to log file */

@@ -15,8 +15,26 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_006832B53E7A43D6960992930CDCDEC6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_07BDABD49574E1682DAE87AEDAEA36AF"
         "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_28BE12C4B09FABECA8E1FDEFDD644F6E"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_28BE12C4B09FABECA8E1FDEFDD644F6E"
+        "OwnerKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,12 +88,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_826D30B645BAEF871B09D13D423E5D38"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -95,6 +107,18 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_3DE84BE857F93F191151428CBBD1A406"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_28BE12C4B09FABECA8E1FDEFDD644F6E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -184,7 +208,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.6.1"
+                "FrameworkVersion" = "8:v4.6.1 "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=671728"
                 }
@@ -192,6 +216,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_006832B53E7A43D6960992930CDCDEC6"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\common\\WindowsConnection\\WindowsConnection\\log4net.config"
+            "TargetName" = "8:log4net.config"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_07BDABD49574E1682DAE87AEDAEA36AF"
             {
             "AssemblyRegister" = "3:1"
@@ -206,6 +250,37 @@
                     }
                 }
             "SourcePath" = "8:LinqDemo.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_28BE12C4B09FABECA8E1FDEFDD644F6E"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_28BE12C4B09FABECA8E1FDEFDD644F6E"
+                    {
+                    "Name" = "8:log4net.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
@@ -428,7 +503,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Sinter Proxy"
         "ProductCode" = "8:{7FF59DF6-9BB8-47C2-AA78-45E216CA2EE0}"
-        "PackageCode" = "8:{5EA3E915-B984-4E30-9566-11E0D9161D94}"
+        "PackageCode" = "8:{877CF42D-36BE-4BFC-B946-2C43749C84F2}"
         "UpgradeCode" = "8:{DBF89A57-58DF-4B99-812A-5366F5BF5ED8}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"

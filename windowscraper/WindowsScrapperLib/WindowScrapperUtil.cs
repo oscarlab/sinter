@@ -24,11 +24,6 @@ using System.Windows.Automation;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Diagnostics;
-using log4net;
-using log4net.Repository.Hierarchy;
-using log4net.Core;
-using log4net.Appender;
-using log4net.Layout;
 using System.Runtime.InteropServices;
 
 namespace WindowsScraper
@@ -111,6 +106,8 @@ namespace WindowsScraper
     }
 
     class UIAction {
+
+      static log4net.ILog log = log4net.LogManager.GetLogger("UIAction");
       public static void PerformDefaultAction(AutomationElement element)
       {
         if (element.TryGetCurrentPattern(InvokePattern.Pattern, out object invokePattern))
@@ -133,7 +130,7 @@ namespace WindowsScraper
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                log.Error(ex.ToString());
             }
         }
       }
@@ -156,7 +153,7 @@ namespace WindowsScraper
 
       public static void PerformExpandAction(AutomationElement element)
       {
-        Console.WriteLine("Expand {0}", element.GetRuntimeId());
+        log.InfoFormat("Expand {0}/{1}", element.GetRuntimeId()[0], element.GetRuntimeId()[1]);
         if (element.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
         {
                     try
@@ -165,26 +162,26 @@ namespace WindowsScraper
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        log.Error(ex.ToString());
                     }
         }
       }
 
             public static void PerformExpandAndSelectAction(string runtimeId, List<string[]> menuList)
             {
-                Console.WriteLine("Executing ExpandAndSelectAction {0}", runtimeId);
+                log.DebugFormat("Executing ExpandAndSelectAction {0}", runtimeId);
                 AutomationElement parentElement = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
 
                 if (parentElement.TryGetCurrentPattern(ExpandCollapsePatternIdentifiers.Pattern, out object expandCollapsePattern))
                 {
-                    Console.WriteLine("ExpandAndSelect: expanding {0}", parentElement.Current.Name);
+                    log.InfoFormat("ExpandAndSelect: expanding {0}", parentElement.Current.Name);
                     try
                     {
                         ((ExpandCollapsePattern)expandCollapsePattern).Expand();
                     }
                     catch(Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        log.Error(e.ToString());
                     }
                 }
 
@@ -198,7 +195,7 @@ namespace WindowsScraper
                     }
                     else
                     {
-                        Console.WriteLine("targetElement {0} not found", menu[0]);
+                        log.ErrorFormat("targetElement {0} not found", menu[0]);
                         break;
                     }
                 }
@@ -224,7 +221,8 @@ namespace WindowsScraper
 
     class SinterUtil
     {
-      public static Dictionary<string, string> UIAutomationToARIA =
+       static log4net.ILog log = log4net.LogManager.GetLogger("SinterUtil");
+       public static Dictionary<string, string> UIAutomationToARIA =
           new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase)
               {
                 {"button","button"},
@@ -383,7 +381,7 @@ namespace WindowsScraper
         }
         catch (Exception ex)
         {
-          Console.WriteLine("Exception in getting runtime_id {0}", ex.Message);
+          log.ErrorFormat("Exception in getting runtime_id {0}", ex.Message);
         }
 
         return runtimeIdStr;
@@ -538,7 +536,7 @@ namespace WindowsScraper
         }
         catch
         {
-          //System.Console.WriteLine("@IgnoreExistingElements: " + ex.Message);
+          //System.log.Info("@IgnoreExistingElements: " + ex.Message);
         }
       }
 
@@ -563,74 +561,13 @@ namespace WindowsScraper
           count_after = keys.Count;
 
           DeleteStaleElements(ref keys);
-          //System.Console.WriteLine("#keys:: before:{0}, stale:{1}, after:{2}", count_before, count_after, currentElements.Count);
+          //System.log.Info("#keys:: before:{0}, stale:{1}, after:{2}", count_before, count_after, currentElements.Count);
 
           Thread.Sleep(sleepTimeMs);
         }
       }
     }*/
 
-    public class Logger
-    {
-      private PatternLayout _layout = new PatternLayout();
-      private const string LOG_PATTERN = "%d [%t] %-5p %m%n";
 
-      public string DefaultPattern
-      {
-        get { return LOG_PATTERN; }
-      }
-
-      public Logger()
-      {
-        _layout.ConversionPattern = DefaultPattern;
-        _layout.ActivateOptions();
-      }
-
-      public PatternLayout DefaultLayout
-      {
-        get { return _layout; }
-      }
-
-      public void AddAppender(IAppender appender)
-      {
-        Hierarchy hierarchy =
-            (Hierarchy)LogManager.GetRepository();
-
-        hierarchy.Root.AddAppender(appender);
-      }
-
-      static Logger()
-      {
-        Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
-        TraceAppender tracer = new TraceAppender();
-        PatternLayout patternLayout = new PatternLayout();
-
-        patternLayout.ConversionPattern = LOG_PATTERN;
-        patternLayout.ActivateOptions();
-
-        tracer.Layout = patternLayout;
-        tracer.ActivateOptions();
-        hierarchy.Root.AddAppender(tracer);
-
-        RollingFileAppender roller = new RollingFileAppender();
-        roller.Layout = patternLayout;
-        roller.AppendToFile = true;
-        roller.RollingStyle = RollingFileAppender.RollingMode.Size;
-        roller.MaxSizeRollBackups = 4;
-        roller.MaximumFileSize = "1MB";
-        roller.StaticLogFileName = true;
-        roller.File = "WinScaper.log";
-        roller.ActivateOptions();
-        hierarchy.Root.AddAppender(roller);
-
-        hierarchy.Root.Level = Level.All;
-        hierarchy.Configured = true;
-      }
-
-      public static ILog Create()
-      {
-        return LogManager.GetLogger("winScraper");
-      }
-    }
   }
 }
