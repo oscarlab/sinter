@@ -52,10 +52,18 @@ namespace WindowsProxy
         // constructor
         public RootForm()
         {
+            using (XmlReader reader = new XmlTextReader("config.xml"))
+            {
+                reader.MoveToContent();
+                string logfolder = Environment.ExpandEnvironmentVariables(reader.GetAttribute("logfolder"));
+                string logfilepath = Path.Combine(logfolder, reader.GetAttribute("logfile")); //log file path
+                string xmlfilepath = Path.Combine(logfolder, reader.GetAttribute("xml_logfile")); //xml log file path
+                log4net.GlobalContext.Properties["LogFileName"] = logfilepath;
+                log4net.GlobalContext.Properties["XMLFileName"] = xmlfilepath;
+                Console.WriteLine("logfile: {0}", logfilepath);
+                Console.WriteLine("xmlfile: {0}", xmlfilepath);
+            }
 
-            /* store log to tmp folder: C:\Users\UserName\AppData\Local\Temp\  */
-            log4net.GlobalContext.Properties["LogFileName"] = Path.GetTempPath() + @"\sinterproxy.log"; //log file path
-            log4net.GlobalContext.Properties["XMLFileName"] = Path.GetTempPath() + @"\sinterproxy.xml"; //xml log file path
 
             InitializeComponent();
             form_table = new ConcurrentDictionary<int, object>();
@@ -262,12 +270,10 @@ namespace WindowsProxy
         {
             using (XmlReader reader = new XmlTextReader("config.xml"))
             {
-                reader.ReadToFollowing("server");
-                reader.MoveToFirstAttribute();
-                server_ip = reader.Value;
+                reader.MoveToContent();
+                server_ip = reader.GetAttribute("server_ip");
                 this.textBoxIP.Text = server_ip.ToString();
-                reader.MoveToNextAttribute();
-                server_port = int.Parse(reader.Value);
+                server_port = int.Parse(reader.GetAttribute("server_port"));
                 this.textBoxPort.Text = server_port.ToString();
             }
         }

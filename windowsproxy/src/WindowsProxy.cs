@@ -233,7 +233,7 @@ namespace WindowsProxy
                         Form form = (Form)parent_control;
                         form.MainMenuStrip = (MenuStrip)current_control;
                     }
-                    if (invoking_method_name != "RenderDialog")
+                    if (invoking_method_name != "RenderDialog" && invoking_method_name != "RenderWindow")
                         parent_control.Controls.Add(current_control);
                 }
                 if (parent_control != current_control)

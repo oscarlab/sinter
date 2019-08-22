@@ -22,7 +22,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using WindowsScraper;
+using System.Xml;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -33,23 +33,39 @@ namespace WindowsServer
 
     public static class ServerConfiguration
     {
-        public const int SERVER_PORT = 6832;
-        public const string CERTIFICATE_FILE = @"SinterServer.pfx"; //The path of x.509 certificate file
         public const string DEFAULT_PASSCODE = "123456";
     }
 
     public class SinterServer
     {
-        private static int port = ServerConfiguration.SERVER_PORT;
+        private static int port;
         private static List<ClientHandler> clients = new List<ClientHandler>();
         private static TcpListener serverSocket;
-        private static X509Certificate serverCertificate = new X509Certificate2(ServerConfiguration.CERTIFICATE_FILE, ServerConfiguration.DEFAULT_PASSCODE, X509KeyStorageFlags.MachineKeySet);
+        private static string certfile;
+        private static X509Certificate serverCertificate;
         private static log4net.ILog log = log4net.LogManager.GetLogger("Server");
         public static void StartServer()
         {
-            log4net.GlobalContext.Properties["LogFileName"] = Path.GetTempPath() + @"\sinterserver.log"; //log file path
-            log4net.GlobalContext.Properties["XMLFileName"] = Path.GetTempPath() + @"\sinterserver.xml"; //xml log file path
+            string logfilepath, xmlfilepath, logfolder;
+            using (XmlReader reader = new XmlTextReader("Server_config.xml"))
+            {
+                reader.MoveToContent();
+                port = Int32.Parse(reader.GetAttribute("port"));
+
+                //read log settings
+                logfolder = Environment.ExpandEnvironmentVariables(reader.GetAttribute("logfolder"));
+                logfilepath = Path.Combine(logfolder, reader.GetAttribute("logfile")); //log file path
+                xmlfilepath = Path.Combine(logfolder, reader.GetAttribute("xml_logfile")); //xml log file path
+                log4net.GlobalContext.Properties["LogFileName"] = logfilepath;
+                log4net.GlobalContext.Properties["XMLFileName"] = xmlfilepath;
+                certfile = reader.GetAttribute("cert");
+            }
+
+            serverCertificate = new X509Certificate2(certfile, ServerConfiguration.DEFAULT_PASSCODE, X509KeyStorageFlags.MachineKeySet);
             MsgUtil.StartLogger();
+            log.Info("port = " + port);
+            log.InfoFormat("logfile: {0}", logfilepath);
+            log.InfoFormat("xmlfile: {0}", xmlfilepath);
 
             SslStream sslStream = null;
             serverSocket = new TcpListener(IPAddress.Any, port);

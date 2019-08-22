@@ -29,7 +29,7 @@ using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Sintering;
 using LinqAndTrie;
-
+using System.Xml;
 using System.Linq;
 using WindowsScraper.Util;
 
@@ -64,6 +64,7 @@ namespace WindowsScraper
 
         private string passcode;
         public bool bPasscodeVerified { get; private set; }
+        private string[] supportedProcesses;
 
         public WindowsScraper(string passcode)
         {
@@ -101,6 +102,14 @@ namespace WindowsScraper
             if (keyCodesTemp != null)
             {
                 sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
+            }
+
+            using (XmlTextReader reader = new XmlTextReader("Scraper_config.xml"))
+            {
+                reader.MoveToContent();
+                supportedProcesses = reader.GetAttribute("program_type").Split();
+                log.Info("Support program types: ");
+                log.Info(supportedProcesses);
             }
         }
 
@@ -1702,15 +1711,20 @@ namespace WindowsScraper
 
         public void execute_ls_req(Sinter _)
         {
-            // demo: only fetch explorer app for now
-            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad" };
-
             Dictionary<string, string> processes = new Dictionary<string, string>();
             foreach (string pname in supportedProcesses)
             {
                 Process[] p = Process.GetProcessesByName(pname);
                 if (p.Length > 0)
                     processes[p[0].Id.ToString()] = pname;
+            }
+
+            string metro_support;
+            using (XmlTextReader reader = new XmlTextReader("Scraper_config.xml"))
+            {
+                reader.MoveToContent();
+                metro_support = reader.GetAttribute("metro_support");
+                log.Info("metro_support = " + metro_support);
             }
 
             List<Entity> entityNodes = new List<Entity>();
@@ -1724,14 +1738,19 @@ namespace WindowsScraper
                     if (node == null)
                         continue;
 
-                    if (processes.ContainsKey(node.Process) || processes.ContainsValue(node.Name))
+                    foreach (var process in processes)
                     {
-                        //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes. 
-                        if (!(processes.ContainsValue(node.Name)))
+                        if (process.Key.Equals(node.Process))
                         {
-                            node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                            entityNodes.Add(node);
+                            break;
                         }
-                        entityNodes.Add(node);
+                        else if (metro_support.Equals("true") && process.Value.Equals(node.Name))
+                        {
+                            //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes
+                            entityNodes.Add(node);
+                            break;
+                        }
                     }
                 }
                 element = treeWalker.GetNextSibling(element);
