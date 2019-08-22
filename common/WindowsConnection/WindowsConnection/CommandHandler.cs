@@ -25,89 +25,105 @@ using System.Reflection;
 using System.Threading;
 
 
-namespace Sintering {
-  class CommandHandler {
-    private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Command");
-    Dictionary<string , object> serviceCodes;
-    Dictionary<object , string> serviceCodesRev;
-    Type type;
-
-    ConnectionHandler connectionHandler;
-    BlockingCollection<Sinter> messageQueue;
-
-    IWinCommands actuator; // could be a server or a client
-
-    public CommandHandler(ConnectionHandler connectionHandler , BlockingCollection<Sinter> messageQueue, IWinCommands actuator) {
-      // load service-code key-values
-      serviceCodes = Config.getConfig("service_code");
-      if (serviceCodes != null) {
-        serviceCodesRev = serviceCodes.ToDictionary(kp => kp.Value , kp => kp.Key);
-      } else {
-        log.Error("Unable to load service_codes dictionary");
-      }
-      //type = GetType();
-      type = typeof(IWinCommands);
-
-      this.connectionHandler = connectionHandler;
-      this.messageQueue = messageQueue;
-      this.actuator = actuator;
-    }
-
-    Thread exeThread;
-    public void StartCommandHandling() {
-      exeThread = new Thread(CommandExecutor);
-      exeThread.Start();
-    }
-
-    public void StopCommandHandling()
+namespace Sintering
+{
+    class CommandHandler
     {
-      ShouldStop = true;
-    }
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Command");
+        Dictionary<string, object> serviceCodes;
+        Dictionary<object, string> serviceCodesRev;
+        Type type;
 
-    public bool ShouldStop
-    {
-      set
-      {
-        _shouldStop = value;
-      }
-    }
+        ConnectionHandler connectionHandler;
+        BlockingCollection<Sinter> messageQueue;
 
-    private volatile bool _shouldStop = false;
+        IWinCommands actuator; // could be a server or a client
 
-    private void CommandExecutor() {
-      string requested_service, invoking_method_name;
-      MethodInfo invoking_method;
-
-      while (!_shouldStop) {
-        try {
-          Sinter sinter = messageQueue.Take();
-          log.InfoFormat("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
-          if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode , out requested_service)) {
-            invoking_method_name = "execute_" + requested_service.Trim();
-            if (actuator.bPasscodeVerified == true 
-                || requested_service.Equals(@"verify_passcode")) {
-              invoking_method = type.GetMethod(invoking_method_name);
-              if (invoking_method != null)
-              {
-                invoking_method.Invoke(actuator, new Sinter[] { sinter });
-              }
-              else
-              {
-                log.Error("invoke error: " + invoking_method_name + " doesn't exist");
-              }
+        public CommandHandler(ConnectionHandler connectionHandler, BlockingCollection<Sinter> messageQueue, IWinCommands actuator)
+        {
+            // load service-code key-values
+            serviceCodes = Config.getConfig("service_code");
+            if (serviceCodes != null)
+            {
+                serviceCodesRev = serviceCodes.ToDictionary(kp => kp.Value, kp => kp.Key);
             }
-            else{
-              log.Warn("passcode not verified yet, ignore the msg!");
+            else
+            {
+                log.Error("Unable to load service_codes dictionary");
             }
-          } else {
-            log.Error("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
-          }
-          invoking_method = null;
+            //type = GetType();
+            type = typeof(IWinCommands);
+
+            this.connectionHandler = connectionHandler;
+            this.messageQueue = messageQueue;
+            this.actuator = actuator;
         }
-        catch (Exception ex) {
-          log.Error(ex.Message);
+
+        Thread exeThread;
+        public void StartCommandHandling()
+        {
+            exeThread = new Thread(CommandExecutor);
+            exeThread.Start();
         }
-      }
+
+        public void StopCommandHandling()
+        {
+            ShouldStop = true;
+        }
+
+        public bool ShouldStop
+        {
+            set
+            {
+                _shouldStop = value;
+            }
+        }
+
+        private volatile bool _shouldStop = false;
+
+        private void CommandExecutor()
+        {
+            string requested_service, invoking_method_name;
+            MethodInfo invoking_method;
+
+            while (!_shouldStop)
+            {
+                try
+                {
+                    Sinter sinter = messageQueue.Take();
+                    log.InfoFormat("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+                    if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out requested_service))
+                    {
+                        invoking_method_name = "execute_" + requested_service.Trim();
+                        if (actuator.bPasscodeVerified == true
+                            || requested_service.Equals(@"verify_passcode"))
+                        {
+                            invoking_method = type.GetMethod(invoking_method_name);
+                            if (invoking_method != null)
+                            {
+                                invoking_method.Invoke(actuator, new Sinter[] { sinter });
+                            }
+                            else
+                            {
+                                log.Error("invoke error: " + invoking_method_name + " doesn't exist");
+                            }
+                        }
+                        else
+                        {
+                            log.Warn("passcode not verified yet, ignore the msg!");
+                        }
+                    }
+                    else
+                    {
+                        log.Error("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
+                    }
+                    invoking_method = null;
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex.Message);
+                }
+            }
+        }
     }
-  }
 }

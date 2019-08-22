@@ -60,7 +60,7 @@ namespace WindowsScraper
 
         Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
-      	Dictionary<int, string> sendKeysCodes;
+        Dictionary<int, string> sendKeysCodes;
 
         private string passcode;
         public bool bPasscodeVerified { get; private set; }
@@ -98,10 +98,10 @@ namespace WindowsScraper
 
             Dictionary<string, object> keyCodesTemp = Config.getConfig("send_key_codes");
 
-        	  if (keyCodesTemp != null)
-        	  {
-            		sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
-        	  }
+            if (keyCodesTemp != null)
+            {
+                sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
+            }
         }
 
         public void LogTime(string arg)
@@ -407,7 +407,7 @@ namespace WindowsScraper
             int[] runtimeId = element.GetRuntimeId();
             if (automationElementTrie.TryGetValue(runtimeId, out Entity oldEntity))
             {
-                log.Debug("OnWindowOpenedLocal() "+ oldEntity.Type + " " + oldEntity.Name + " " + runtimeId[1].ToString());
+                log.Debug("OnWindowOpenedLocal() " + oldEntity.Type + " " + oldEntity.Name + " " + runtimeId[1].ToString());
             }
 
             try
@@ -426,7 +426,7 @@ namespace WindowsScraper
                     connection.SendMessage(sinter);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex);
             }
@@ -538,11 +538,11 @@ namespace WindowsScraper
         }
         private void OnFocusChanged(object src, AutomationFocusChangedEventArgs e)
         {
-        /*    AutomationElement element = (AutomationElement)src;
-            if (element.Current.ProcessId != requestedProcessId)
-            {
-                return;
-            } */
+            /*    AutomationElement element = (AutomationElement)src;
+                if (element.Current.ProcessId != requestedProcessId)
+                {
+                    return;
+                } */
             /*
           if (element.Current.ControlType == ControlType.Text) {
               DeltaGeneric(element);
@@ -599,7 +599,8 @@ namespace WindowsScraper
                         // not required
                     }
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     log.Error(ex);
                 }
             }
@@ -656,12 +657,12 @@ namespace WindowsScraper
             if (e.Property == AutomationElement.BoundingRectangleProperty)
             {
                 // Subproperty: List
-              /*  if (element.Current.ControlType == ControlType.List)
-                {
-                    log.Debug("PropertyChange: Delta");
-                    DeltaSpecialList(element);
+                /*  if (element.Current.ControlType == ControlType.List)
+                  {
+                      log.Debug("PropertyChange: Delta");
+                      DeltaSpecialList(element);
 
-                } */ //  Subproperty: ComboBox
+                  } */ //  Subproperty: ComboBox
             }
         }
 
@@ -705,7 +706,7 @@ namespace WindowsScraper
             }
         }
 
-        
+
         private void OnStructureChangedLocal(object sender, StructureChangedEventArgs e)
         {
             if (e.StructureChangeType != StructureChangeType.ChildAdded)
@@ -826,7 +827,7 @@ namespace WindowsScraper
                 return;
 
             //if (anchor.Current.ControlType != ControlType.Pane)
-              //  return;
+            //  return;
 
             if (!IsCached(element))
                 anchor = GetAnchorElementFromCache(element);
@@ -963,7 +964,7 @@ namespace WindowsScraper
                 if ((id == requestedProcessRuntimeId) && automationElementTrie.TryGetValue(runtimeId, out entity))
                 {
                     Sinter sinter = null;
-                    
+
                     log.Debug("Sending new Window including children");
                     sinter = new Sinter
                     {
@@ -1277,13 +1278,13 @@ namespace WindowsScraper
 
             String uniqueId;
 
-           /* if (element.Current.ControlType == ControlType.Button || element.Current.ControlType == ControlType.RadioButton)
-            {
-                uniqueId = SinterUtil.GetRuntimeId(element, true, true);
-            } else
-            {*/
-                uniqueId = SinterUtil.GetRuntimeId(element, true);
-           // }
+            /* if (element.Current.ControlType == ControlType.Button || element.Current.ControlType == ControlType.RadioButton)
+             {
+                 uniqueId = SinterUtil.GetRuntimeId(element, true, true);
+             } else
+             {*/
+            uniqueId = SinterUtil.GetRuntimeId(element, true);
+            // }
 
             int[] runtimeId = element.GetRuntimeId();
             if (uniqueId == null)
@@ -1322,12 +1323,12 @@ namespace WindowsScraper
             // entity.Type = current.ClassName;//.ToLower();
             //else //sizeof("ControlType.") = 11
             entity.Type = current.ControlType.ProgrammaticName.Substring(12);//.ToLower();
-            
+
             if (current.ControlType == ControlType.Window && current.LocalizedControlType.Equals("Dialog"))
             {
                 entity.Type = current.LocalizedControlType.ToString();
             }
-            
+
 
             if (current.ControlType == ControlType.Pane && current.ClassName.Equals("SysDateTimePick32"))
             {
@@ -1388,7 +1389,7 @@ namespace WindowsScraper
                 }
             }
 
-            
+
             /* //Debug
            AutomationPattern[] patterns = element.GetSupportedPatterns();
            log.Debug("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
@@ -1447,7 +1448,8 @@ namespace WindowsScraper
             {
                 //Assign shortcut keys (ex Alt+V) to value of Menuitem/Menubar 
                 entity.Value = current.AcceleratorKey;
-                if (entity.Value == "" && current.AccessKey.Contains("+")){
+                if (entity.Value == "" && current.AccessKey.Contains("+"))
+                {
                     entity.Value = current.AccessKey;
                 }
             }
@@ -1663,33 +1665,33 @@ namespace WindowsScraper
             log.DebugFormat("client passcode: {0}", clientPasscode);
 
             bool result = false;
-            if(clientPasscode == this.passcode)
+            if (clientPasscode == this.passcode)
             {
-              result = true;
-              log.Info("client passcode match.");
-              this.bPasscodeVerified = true;
+                result = true;
+                log.Info("client passcode match.");
+                this.bPasscodeVerified = true;
             }
             log.InfoFormat("OSVersion: {0}", Environment.OSVersion.ToString());
 
             Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode"], serviceCodes["verify_passcode_res"]);
             header.ParamsInfo = new Params
             {
-              Data1 = result.ToString(),
-              Data2 = Environment.OSVersion.ToString(),
+                Data1 = result.ToString(),
+                Data2 = Environment.OSVersion.ToString(),
             };
 
             Sinter sintermsg = new Sinter()
             {
-              HeaderNode = header,
+                HeaderNode = header,
             };
 
             connection.SendMessage(sintermsg);
 
 
-            if(result == false)
+            if (result == false)
             {
-              log.Error("client passcode not match!");
-              connection.StopConnectionHandling();
+                log.Error("client passcode not match!");
+                connection.StopConnectionHandling();
             }
             else
             {
@@ -1701,7 +1703,7 @@ namespace WindowsScraper
         public void execute_ls_req(Sinter _)
         {
             // demo: only fetch explorer app for now
-            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad"};
+            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad" };
 
             Dictionary<string, string> processes = new Dictionary<string, string>();
             foreach (string pname in supportedProcesses)
@@ -1725,7 +1727,7 @@ namespace WindowsScraper
                     if (processes.ContainsKey(node.Process) || processes.ContainsValue(node.Name))
                     {
                         //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes. 
-                        if (!(processes.ContainsValue(node.Name))) 
+                        if (!(processes.ContainsValue(node.Name)))
                         {
                             node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
                         }
@@ -1830,27 +1832,28 @@ namespace WindowsScraper
             // To Do
         }
 
-    public void execute_kbd(Sinter sinter)
-    {
-	  /*link: https://msdn.microsoft.com/en-us/library/system.windows.forms.sendkeys.send(v=vs.110).aspx*/
-	  //Modifier values indicate if control, shift, or alt has been pressed
-	  string runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
-	  char key;
-	  SetFocus(runtimeId);
-	  //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
-	  Thread.Sleep(10);
-	  key = sinter.HeaderNode.ParamsInfo.KeyPress;
+        public void execute_kbd(Sinter sinter)
+        {
+            /*link: https://msdn.microsoft.com/en-us/library/system.windows.forms.sendkeys.send(v=vs.110).aspx*/
+            //Modifier values indicate if control, shift, or alt has been pressed
+            string runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            char key;
+            SetFocus(runtimeId);
+            //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
+            Thread.Sleep(10);
+            key = sinter.HeaderNode.ParamsInfo.KeyPress;
             if (key != 0)
             {
                 string keyPress = key.ToString();
                 log.Debug("execute_kbd " + key);
                 SendKeys.SendWait(keyPress);
             }
-            else{
+            else
+            {
                 log.Debug("execute_kbd " + sinter.HeaderNode.ParamsInfo.Data1);
                 SendKeys.SendWait(sinter.HeaderNode.ParamsInfo.Data1);
             }
-    }
+        }
 
         public void execute_mouse(Sinter sinter)
         {

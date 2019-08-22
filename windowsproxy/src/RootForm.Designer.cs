@@ -25,10 +25,10 @@ namespace WindowsProxy
 {
     partial class RootForm
     {
-    /// <summary>
-    /// Required designer variable.
-    /// </summary>
-    private System.ComponentModel.IContainer components = null;
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -206,7 +206,7 @@ namespace WindowsProxy
 
         }
 
-       
+
 
         #endregion
 
@@ -216,11 +216,11 @@ namespace WindowsProxy
         private Button connect_button;
         private Button disconnect_button;
         private DataGridViewTextBoxColumn Process;
-    private TextBox textBoxPasscode;
-    private Label passcode_label;
-    private Label label1;
-    private TextBox textBoxIP;
-    private Label label2;
-    private TextBox textBoxPort;
-  }
+        private TextBox textBoxPasscode;
+        private Label passcode_label;
+        private Label label1;
+        private TextBox textBoxIP;
+        private Label label2;
+        private TextBox textBoxPort;
+    }
 }

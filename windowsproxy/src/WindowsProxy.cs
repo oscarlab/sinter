@@ -195,10 +195,10 @@ namespace WindowsProxy
             {
                 /* trick for window7 calc statistic mode (window/pane/window)
                    treat sub window as pane instead of dialog so it will show correctly */
-                if (this.RemoteProcessName.Contains("Calculator") && 
-                    this.RemotePlatform.StartsWith("Microsoft") && 
+                if (this.RemoteProcessName.Contains("Calculator") &&
+                    this.RemotePlatform.StartsWith("Microsoft") &&
                     !entity.Name.Equals("About Calculator"))
-                { 
+                {
                     invoking_method_name = "RenderPane";
                 }
             }
@@ -320,7 +320,7 @@ namespace WindowsProxy
 
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
-                string[] controlbuttonIDs; 
+                string[] controlbuttonIDs;
                 if (!dictFormCtrlButtons.TryGetValue((Form)parent, out controlbuttonIDs))
                 {   //no entry yet, create new one
                     controlbuttonIDs = new string[3];
@@ -477,11 +477,14 @@ namespace WindowsProxy
 
             control.Name = entity.Name;
             List<Word> words = entity.words;
-            foreach (Word w in words) {
+            foreach (Word w in words)
+            {
                 if (w.newline == "1")
                 {
                     control.Text += "\r";
-                } else {
+                }
+                else
+                {
                     control.Text += w.text;
                 }
             }
@@ -546,7 +549,7 @@ namespace WindowsProxy
 
             listView.BeginUpdate();
 
-            int i = 0; 
+            int i = 0;
             foreach (Entity child in entity.Children)
             {
                 log.DebugFormat("Rendered ListItem: {0}", child.Name);
@@ -677,7 +680,7 @@ namespace WindowsProxy
         private Control RenderSpinner(Entity entity, Control parent)
         {
             //return parent;
-			entity.Width -= 18; //not to cover the bottons of spinner
+            entity.Width -= 18; //not to cover the bottons of spinner
             return RenderEdit(entity, parent);
             /* 
             //possible tweak: in case we want to have better user experience in release version
@@ -724,7 +727,7 @@ namespace WindowsProxy
                 ((TextBox)control).ReadOnly = true;
                 ((TextBox)control).BorderStyle = 0;
             }
-            
+
             AdjustProperties(entity, ref control);
 
             control.Tag = entity;
@@ -1137,7 +1140,7 @@ namespace WindowsProxy
                     parentRuntimeID = parent.UniqueID;
                     name = parent.Name;
                     log.DebugFormat("Final Parent Name: {0}, RuntimeID: {1}", parent.Name, parentRuntimeID);
-                    
+
                     break;
                 }
                 lists.Add(new string[] { parent.Name, parent.UniqueID });
@@ -1242,11 +1245,11 @@ namespace WindowsProxy
             {
                 dictFormCtrlButtons.TryRemove(form1, out _);
                 dictFormWindowStatePrev.TryRemove(form1, out _);
-                
+
                 if (form1.IsHandleCreated)
                 {
                     form1.BeginInvoke((Action)(() =>
-                    { 
+                    {
                         form1.Close();
                     }));
                 }
@@ -1324,16 +1327,16 @@ namespace WindowsProxy
             if (dictFormCtrlButtons.TryGetValue(closingForm, out string[] controlbuttonIDs)
                 && e.CloseReason == CloseReason.UserClosing)
             {
-                    e.Cancel = true;
-                    Sinter sinter = new Sinter
-                    {
-                        HeaderNode = MsgUtil.BuildHeader(
-                                      serviceCodes["action"],
-                                      serviceCodes["action_default"],
-                                      controlbuttonIDs[getButtonIndex("Close")]
-                                    ),
-                    };
-                    execute_action(sinter);
+                e.Cancel = true;
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                                  serviceCodes["action"],
+                                  serviceCodes["action_default"],
+                                  controlbuttonIDs[getButtonIndex("Close")]
+                                ),
+                };
+                execute_action(sinter);
             }
             else
             {
@@ -1462,11 +1465,13 @@ namespace WindowsProxy
 
         public void ProcessKeyPress(string keypresses)
         {
-            Sinter sinter = new Sinter {
+            Sinter sinter = new Sinter
+            {
                 HeaderNode = MsgUtil.BuildHeader(serviceCodes["kbd"]),
             };
 
-            sinter.HeaderNode.ParamsInfo = new Params() {
+            sinter.HeaderNode.ParamsInfo = new Params()
+            {
                 TargetId = "",
                 Data1 = keypresses,
             };
@@ -1572,7 +1577,7 @@ namespace WindowsProxy
             }
             else if (subCode == serviceCodes["delta_prop_change_value"])
             {
-                if (this.form!= null && this.form.WindowState == FormWindowState.Minimized)
+                if (this.form != null && this.form.WindowState == FormWindowState.Minimized)
                 {
                     return; //ignore, the msg is due to proxy asked scraper to minimize
                 }
@@ -1607,7 +1612,7 @@ namespace WindowsProxy
                             }
                         }));
                     }
-                    else 
+                    else
                     {
                         AdjustSubTreeProperties(sinter.EntityNode);
                     }
@@ -1619,7 +1624,7 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
-                            if (this.RemoteProcessName.Contains("Calculator") && 
+                            if (this.RemoteProcessName.Contains("Calculator") &&
                                 (newValue.Equals("Memory") || newValue.Equals("Running History")))
                             {
                                 newValue = "";
@@ -1689,95 +1694,95 @@ namespace WindowsProxy
             switch (entity.Type)
             {
                 case "Pane":
-                {
-                    log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
-                    ((Control)form).BeginInvoke((Action)(() =>
                     {
-                        log.DebugFormat("Remove All ctrl elements");
-                        Control[] arr = new Control[form.Controls.Count];
-                        form.Controls.CopyTo(arr, 0);
-                        foreach (Control element in arr)
+                        log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                        ((Control)form).BeginInvoke((Action)(() =>
                         {
+                            log.DebugFormat("Remove All ctrl elements");
+                            Control[] arr = new Control[form.Controls.Count];
+                            form.Controls.CopyTo(arr, 0);
+                            foreach (Control element in arr)
+                            {
                             //log.DebugFormat("{0}", ((Entity)element.Tag).Type);
                             if (!((Entity)element.Tag).Type.Equals("MenuBar"))
-                            {
-                                form.Controls.Remove(element);
+                                {
+                                    form.Controls.Remove(element);
+                                }
                             }
-                        }
                         // form.Controls.Clear();
 
                         log.DebugFormat("Render New Elements");
-                        Render(entity, form);
-                    }));
-                    break;
-                }
-                case "List":
-                {
-                    log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
-                    if (hash.TryGetValue(entity.UniqueID, out Control ctrl))
-                    {
-                        ctrl.BeginInvoke((Action)(() =>
-                        {
-                            /* Calculator - Unit Converter "From Unit" and "To Unit" */
-                            Control comboBoxControl;
-                            if (comboBoxParent.TryGetValue(entity.Name, out Entity parent_entity)
-                                && parent_entity.Type.Equals("ComboBox")
-                                && hash.TryGetValue(parent_entity.UniqueID, out comboBoxControl))
-                            {
-                                log.DebugFormat("Found Combobox Parent {0}", parent_entity.Name);
-
-                                foreach (ToolStripMenuItem oldLi in ((ComboBox)comboBoxControl).Items)
-                                {
-                                    log.DebugFormat("oldlistItem {0}", oldLi.Text);
-                                    comboBoxParent.TryRemove(oldLi.Text, out Entity _);
-                                    comboBoxEntities.TryRemove(oldLi.Text, out Entity _);
-                                }
-                                ((ComboBox)comboBoxControl).Items.Clear();
-
-                                foreach (Entity child in entity.Children)
-                                {
-                                    log.DebugFormat("Rendered ToolStripMenuItem: {0}", child.Name);
-                                    ToolStripMenuItem mi = new ToolStripMenuItem();
-                                    mi.Name = child.Name;
-                                    mi.Text = child.Name;
-                                    if ((child.States & States.SELECTED) != 0)
-                                    {
-                                        ((ComboBox)comboBoxControl).Text = child.Name;
-                                    }
-                                    ((ComboBox)comboBoxControl).Items.Add(mi);
-                                    comboBoxParent.TryAdd(child.Name, entity);
-                                    comboBoxEntities.TryAdd(child.Name, child);
-                                }
-                            }
-                            else
-                            {
-                                /* Calculator - History window */
-                                ctrl.Focus();
-                                int i = 0;
-                                ListView listView = (ListView)ctrl;
-
-                                foreach (ListViewItem oldLi in listView.Items)
-                                {
-                                    log.DebugFormat("oldlistItem {0}", oldLi.Text);
-                                }
-                                listView.Items.Clear();
-
-                                foreach (Entity child in entity.Children)
-                                {
-                                    log.DebugFormat("Rendered ListItem: {0}", child.Name);
-                                    ListViewItem li = new ListViewItem(child.Name);
-                                    listView.Items.Add(li);
-                                    if ((child.States & States.SELECTED) != 0)
-                                    {
-                                        listView.Items[i].Selected = true;
-                                    }
-                                    i++;
-                                }
-                            }
+                            Render(entity, form);
                         }));
+                        break;
                     }
-                    break;
-                }
+                case "List":
+                    {
+                        log.DebugFormat("502 - delta_subtree_replace {0}/{1}", entity.Type, entity.Name);
+                        if (hash.TryGetValue(entity.UniqueID, out Control ctrl))
+                        {
+                            ctrl.BeginInvoke((Action)(() =>
+                            {
+                            /* Calculator - Unit Converter "From Unit" and "To Unit" */
+                                Control comboBoxControl;
+                                if (comboBoxParent.TryGetValue(entity.Name, out Entity parent_entity)
+                                    && parent_entity.Type.Equals("ComboBox")
+                                    && hash.TryGetValue(parent_entity.UniqueID, out comboBoxControl))
+                                {
+                                    log.DebugFormat("Found Combobox Parent {0}", parent_entity.Name);
+
+                                    foreach (ToolStripMenuItem oldLi in ((ComboBox)comboBoxControl).Items)
+                                    {
+                                        log.DebugFormat("oldlistItem {0}", oldLi.Text);
+                                        comboBoxParent.TryRemove(oldLi.Text, out Entity _);
+                                        comboBoxEntities.TryRemove(oldLi.Text, out Entity _);
+                                    }
+                                    ((ComboBox)comboBoxControl).Items.Clear();
+
+                                    foreach (Entity child in entity.Children)
+                                    {
+                                        log.DebugFormat("Rendered ToolStripMenuItem: {0}", child.Name);
+                                        ToolStripMenuItem mi = new ToolStripMenuItem();
+                                        mi.Name = child.Name;
+                                        mi.Text = child.Name;
+                                        if ((child.States & States.SELECTED) != 0)
+                                        {
+                                            ((ComboBox)comboBoxControl).Text = child.Name;
+                                        }
+                                        ((ComboBox)comboBoxControl).Items.Add(mi);
+                                        comboBoxParent.TryAdd(child.Name, entity);
+                                        comboBoxEntities.TryAdd(child.Name, child);
+                                    }
+                                }
+                                else
+                                {
+                                /* Calculator - History window */
+                                    ctrl.Focus();
+                                    int i = 0;
+                                    ListView listView = (ListView)ctrl;
+
+                                    foreach (ListViewItem oldLi in listView.Items)
+                                    {
+                                        log.DebugFormat("oldlistItem {0}", oldLi.Text);
+                                    }
+                                    listView.Items.Clear();
+
+                                    foreach (Entity child in entity.Children)
+                                    {
+                                        log.DebugFormat("Rendered ListItem: {0}", child.Name);
+                                        ListViewItem li = new ListViewItem(child.Name);
+                                        listView.Items.Add(li);
+                                        if ((child.States & States.SELECTED) != 0)
+                                        {
+                                            listView.Items[i].Selected = true;
+                                        }
+                                        i++;
+                                    }
+                                }
+                            }));
+                        }
+                        break;
+                    }
                 case "Menu": //another 504 msg will be handled for Menu
                 case "MenuItem": //another 504 msg will be handled for Menu
                 case "Text":
@@ -1819,7 +1824,7 @@ namespace WindowsProxy
         {
             //server send this msg to indicate app is closed in server side
             if ((sinter.HeaderNode.ParamsInfo == null)
-                ||(sinter.HeaderNode.ParamsInfo.TargetId == null))
+                || (sinter.HeaderNode.ParamsInfo.TargetId == null))
             {
                 CloseAllForms();
                 //re-load the list from server
@@ -1928,9 +1933,9 @@ namespace WindowsProxy
 
         }
 
-#endregion
+        #endregion
 
-#region Utility Methods
+        #region Utility Methods
 
         private Point GetCenter(Entity entity)
         {
@@ -1983,7 +1988,7 @@ namespace WindowsProxy
             {
                 foreach (ToolStripMenuItem subMenuItem in parentMenuItem.DropDownItems)
                 {
-                    if(FindSubMenuItem(menuItemName, subMenuItem, out ToolStripMenuItem target))
+                    if (FindSubMenuItem(menuItemName, subMenuItem, out ToolStripMenuItem target))
                     {
                         targetMenuItem = target;
                         return true;
@@ -2068,11 +2073,11 @@ namespace WindowsProxy
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
             newMenu.Name = entity_mi.Name;
-            if ((entity_mi.States & States.DISABLED) != 0 )
+            if ((entity_mi.States & States.DISABLED) != 0)
             {
                 newMenu.Enabled = false;
             }
-            if ((entity_mi.States & States.CHECKED) != 0 )
+            if ((entity_mi.States & States.CHECKED) != 0)
             {
                 newMenu.Checked = true;
             }
@@ -2128,7 +2133,8 @@ namespace WindowsProxy
             parentMenuItem.DropDownItems.Clear();
         }
 
-        private Keys ParseShortcutKeys(string ShortcutString){
+        private Keys ParseShortcutKeys(string ShortcutString)
+        {
             Keys ShortcutKeys = Keys.None;
             if (ShortcutString != null)
             {
@@ -2190,7 +2196,7 @@ namespace WindowsProxy
                     }
                 }
             }
-            return ShortcutKeys;    
+            return ShortcutKeys;
         }
 
 
@@ -2264,7 +2270,7 @@ namespace WindowsProxy
 
             if (entity.Type == "CheckBox")
             {
-				log.DebugFormat("{0}/{1} states is CHECKED", entity.Type, entity.Name);
+                log.DebugFormat("{0}/{1} states is CHECKED", entity.Type, entity.Name);
                 if ((entity.States & States.CHECKED) != 0)
                 {
                     ((CheckBox)control).Checked = true;
@@ -2293,7 +2299,7 @@ namespace WindowsProxy
                 log.DebugFormat("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
                 control.Visible = false;
             }
-            
+
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }
 
@@ -2303,6 +2309,6 @@ namespace WindowsProxy
               entity.Children.Count > 0;
         }
 
-#endregion
+        #endregion
     }
 }

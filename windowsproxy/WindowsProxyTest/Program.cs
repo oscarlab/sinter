@@ -11,12 +11,12 @@ namespace WindowsProxyTest
 {
     class Program
     {
+        Sinter baseXML;
+        WindowsProxy.WindowsProxy windowsProxy;
+        int window_count;
 
-         Sinter baseXML;
-         WindowsProxy.WindowsProxy windowsProxy;
-         int window_count;
-
-        static void Main(String[] args){
+        static void Main(String[] args)
+        {
             Program program = new Program();
             program.verifyDisplay();
         }
