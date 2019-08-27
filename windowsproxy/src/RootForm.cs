@@ -52,7 +52,7 @@ namespace WindowsProxy
         // constructor
         public RootForm()
         {
-            using (XmlReader reader = new XmlTextReader("config.xml"))
+            using (XmlReader reader = new XmlTextReader("proxyconfig.xml"))
             {
                 reader.MoveToContent();
                 string logfolder = Environment.ExpandEnvironmentVariables(reader.GetAttribute("logfolder"));
@@ -268,7 +268,7 @@ namespace WindowsProxy
 
         private void RootForm_Load(object sender, EventArgs e)
         {
-            using (XmlReader reader = new XmlTextReader("config.xml"))
+            using (XmlReader reader = new XmlTextReader("proxyconfig.xml"))
             {
                 reader.MoveToContent();
                 server_ip = reader.GetAttribute("server_ip");

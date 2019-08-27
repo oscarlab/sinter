@@ -19,7 +19,14 @@ Currently, Sinter runs as a stand-alone application on the client and
 server.  We eventually plan to make Sinter a plug-in for Remote
 Desktop Protocol (RDP) and other remote-desktop systems.
 
+## How to use Sinter?
+
+Please refer to this user tutorial [tutorial.md](tutorial.md) to download and run Sinter.
+
+
 ## How to build Sinter?
+
+For developers who would like to build Sinter.
 
 Sinter consists of two major entities:
 * **Scraper** - constructs the semantic hierarchy of UI elements representing an app in a *remote* Windows or Mac machine, and ships that hierarchy as an XML to the Proxy.
@@ -104,3 +111,4 @@ over time.
 This project is currently maintained by:
   - __Syed Masum Billah__ <sbillah@cs.stonybrook.edu>
   - __Don Porter__ <porter@cs.unc.edu>
+  - __Erica Fu__ <ericafu@renci.org>
