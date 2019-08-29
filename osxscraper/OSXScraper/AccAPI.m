@@ -36,11 +36,15 @@
 
 
 static NSDictionary * roleMappings;
+static NSArray* valid_apps;
 
 @implementation AccAPI
 
 + (void) initialize {
     roleMappings = [Config getRoleMappings];
+    
+    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];
+    valid_apps = [settings objectForKey:@"support_apps"];
 }
 
 + (NSArray *) getAllProcessesIDs {
@@ -91,8 +95,6 @@ static NSDictionary * roleMappings;
     sinter.header.service_code = [serviceCodes objectForKey:STRLsRes];
     sinter.header.sub_code = [serviceCodes objectForKey:STRLsRes];
     
-    //NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",@"Chrome",@"Finder",nil];
-    NSArray * valid_apps = [NSArray arrayWithObjects:@"Calculator",@"TextEdit",nil];
     NSArray * processes =  [self getAllProcessesIDs];
     for ( NSNumber * process_id in processes){
         Entity * e = [self getEntityForApp: (pid_t) [process_id integerValue]];
