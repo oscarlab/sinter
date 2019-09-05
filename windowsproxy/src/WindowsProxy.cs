@@ -18,6 +18,7 @@
 */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Sintering;
@@ -62,6 +63,9 @@ namespace WindowsProxy
         RootForm root;
         AppForm form;
         string RemoteCloseButtonUID; //UniqueID of remote close button
+        string RemoteMinimizeButtonUID; //UniqueID of remote close button
+        string RemoteZoomButtonUID; //UniqueID of remote close button
+        FormWindowState prevWindowState; 
 
         Point rootPoint;
         Entity root_entity;
@@ -87,7 +91,7 @@ namespace WindowsProxy
 
         Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
-        Dictionary<int, string> sendKeysCodes;
+        //Dictionary<int, string> sendKeysCodes;
 
         public bool bPasscodeVerified { get; private set; }
         public Sinter baseXML { get; set; }
@@ -99,9 +103,10 @@ namespace WindowsProxy
         ConcurrentDictionary<string, ToolStripMenuItem> menuHashMenuItem = new ConcurrentDictionary<string, ToolStripMenuItem>();
         ConcurrentDictionary<string, Entity> menuItemParent = new ConcurrentDictionary<string, Entity>();
         ConcurrentDictionary<string, Entity> comboBoxParent = new ConcurrentDictionary<string, Entity>();
-        ConcurrentDictionary<string, Entity> comboBoxEntity = new ConcurrentDictionary<string, Entity>();
+        ConcurrentDictionary<string, Entity> comboBoxEntities = new ConcurrentDictionary<string, Entity>();
+        Dictionary<string, Form> dictSubForms = new Dictionary<string, Form>();
 
-        Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
+        //Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
 
         public WindowsProxy(RootForm r)
         { // Form
@@ -133,6 +138,12 @@ namespace WindowsProxy
             timer.Tick += Timer_Tick;
 
             this.bPasscodeVerified = false;
+            this.prevWindowState = FormWindowState.Normal;
+
+#if DEBUG
+            string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//sinterxml.txt";
+            File.Delete(xmlFilePath);
+#endif
         }
 
         private int requestedProcessId = 0;
@@ -159,26 +170,6 @@ namespace WindowsProxy
         {
             Console.WriteLine("Rendering: {0}/{1}", entity.Type, entity.Name);
 
-            if ((entity.States & States.DISABLED) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.FOCUSABLE) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is FOCUSABLE", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.FOCUSED) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is FOCUSED", entity.Type, entity.Name);
-            }
-
-            if ((entity.States & States.INVISIBLE) != 0)
-            {
-                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
-            }
-
             entity.Type = entity.Type.First().ToString().ToUpper() + entity.Type.Substring(1); //turn "window" to "Window"
             invoking_method_name = string.Format("Render{0}", entity.Type);
             /* tweak for Mac Scraper*/
@@ -196,12 +187,34 @@ namespace WindowsProxy
                 invoking_method_name = "RenderMenuItem";
             }
             /* tweak for Mac Scraper: End */
+
+            if (invoking_method_name.Equals("RenderDialog") && parent_control != null)
+            {
+                /* trick for window7 calc statistic mode (window/pane/window)
+                   treat sub window as pane so it will not be rendered.
+                   otherwise exception in below session when window added under pane:
+                   parent_control.Controls.Add(current_control); */
+                invoking_method_name = "RenderPane";
+                if (entity.Name.Equals("About Calculator"))
+                {
+                    return null; //to finish the implement MessageBox later
+                }
+            }
+
             invoking_method = type.GetMethod(invoking_method_name,
               BindingFlags.NonPublic | BindingFlags.Instance);
             Console.WriteLine("Method {0}", invoking_method);
             Control current_control = null;
             if (invoking_method != null)
             {
+
+                if (hash.TryGetValue(entity.UniqueID, out Control prev))
+                {
+                    Console.WriteLine("Remove previous control from parent");
+                    parent_control.Controls.Remove(prev);
+                    hash.TryRemove(entity.UniqueID, out Control rem);
+                }
+
                 current_control = (Control)invoking_method.Invoke(this,
                   new object[] { entity, parent_control });
 
@@ -230,8 +243,16 @@ namespace WindowsProxy
             if (!HasChildren(entity))
                 return current_control;
 
-            foreach (Entity child_entity in entity.Children)
-                Render(child_entity, current_control);
+            if (entity.Type == "Spinner")
+            {
+                foreach (Entity child_entity in entity.Children)
+                    Render(child_entity, parent_control); //otherwise "Botton"s won't show as children of "Edit"
+            }
+            else
+            {
+                foreach (Entity child_entity in entity.Children)
+                    Render(child_entity, current_control);
+            }
 
             return current_control;
         }
@@ -242,18 +263,36 @@ namespace WindowsProxy
         {
 
             Console.WriteLine("RenderButton entity.UniqueId: {0} {1}", entity.UniqueID, entity.Name);
+            /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
                 Console.WriteLine("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
+            */
 
             if (entity.Name.Equals("Maximize") || entity.Name.Equals("Minimize") || entity.Name.Equals("Close"))
             {
-                if (entity.Name.Equals("AXCloseButton"))
+                if (entity.Name.Equals("Close"))
                 {
                     RemoteCloseButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("Minimize"))
+                {
+                    RemoteMinimizeButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) != 0)
+                    {
+                        this.form.MinimizeBox = false;
+                    }
+                }
+                else if (entity.Name.Equals("Maximize"))
+                {
+                    RemoteZoomButtonUID = entity.UniqueID;
+                    if ((entity.States & States.DISABLED) != 0)
+                    {
+                        this.form.MaximizeBox = false;
+                    }
                 }
                 return parent;
             }
@@ -263,6 +302,14 @@ namespace WindowsProxy
                 if (entity.Name.Equals("AXCloseButton"))
                 {
                     RemoteCloseButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("AXMinimizeButton"))
+                {
+                    RemoteMinimizeButtonUID = entity.UniqueID;
+                }
+                else if (entity.Name.Equals("AXZoomButton"))
+                {
+                    RemoteZoomButtonUID = entity.UniqueID;
                 }
                 return parent;
             }
@@ -279,13 +326,14 @@ namespace WindowsProxy
 
         private Control RenderRadioButton(Entity entity, Control parent)
         {
-
+            /*
             if (hash.TryGetValue(entity.UniqueID, out Control res))
             {
                 Console.WriteLine("Remove");
                 parent.Controls.Remove(res);
                 hash.TryRemove(entity.UniqueID, out Control rem);
             }
+            */
 
             Control control = new RadioButton();
             AdjustProperties(entity, ref control);
@@ -302,9 +350,31 @@ namespace WindowsProxy
             return parent;
         }
 
+        private Control RenderDateTimePicker(Entity entity, Control parent)
+        {
+            Control control = new DateTimePicker();
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderDateTimePicker");
+            control.Tag = entity;
+
+            DateTimePicker dateTimePicker = (DateTimePicker)control;
+            dateTimePicker.CustomFormat = "MM/dd/yyyy";
+            dateTimePicker.Format = DateTimePickerFormat.Custom;
+            dateTimePicker.Value = DateTime.Parse(entity.Name);
+
+            return control;
+        }
+
         private Control RenderCheckBox(Entity entity, Control parent)
         {
-            return parent;
+            Control control = new CheckBox();
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderCheckBox");
+
+            control.Tag = entity;
+            ((CheckBox)control).Click += Control_Click_Button;
+
+            return control;
         }
 
         private Control RenderComboBox(Entity entity, Control parent)
@@ -312,6 +382,7 @@ namespace WindowsProxy
             Console.WriteLine("Rendering ComboBox");
             Control control = new ComboBox();
             AdjustProperties(entity, ref control);
+            control.Text = entity.Value;
 
             control.Tag = entity;
 
@@ -325,13 +396,17 @@ namespace WindowsProxy
                         ToolStripMenuItem tmp = new ToolStripMenuItem();
                         tmp.Name = listItem.Name;
                         tmp.Text = listItem.Name;
-                        tmp.Click += Control_Click_ComboBox;
+                        if ((listItem.States & States.SELECTED) != 0)
+                        {
+                            control.Text = listItem.Name;
+                        }
                         ((ComboBox)control).Items.Add(tmp);
                         comboBoxParent.TryAdd(listItem.Name, child_entity);
-                        comboBoxEntity.TryAdd(listItem.Name, listItem);
+                        comboBoxEntities.TryAdd(listItem.Name, listItem);
                     }
                 }
             }
+            ((ComboBox)control).SelectedIndexChanged += Control_ComboBox_SelectedIndexChanged;
             Console.WriteLine("Rendered ComboBox");
             return control;
         }
@@ -386,7 +461,16 @@ namespace WindowsProxy
 
         private Control RenderEdit(Entity entity, Control parent)
         {
-            return parent;
+            Control control = null;
+            Console.WriteLine("Executing RenderEdit");
+
+            control = new TextBox();
+            AdjustProperties(entity, ref control);
+
+            control.Text = entity.Value;
+            control.Tag = entity;
+            control.KeyPress += Control_KeyPress;
+            return control;
         }
 
         private Control RenderGroup(Entity entity, Control parent)
@@ -416,12 +500,35 @@ namespace WindowsProxy
 
         private Control RenderList(Entity entity, Control parent)
         {
-            return parent;
+            ListView listView = new ListView();
+            listView.View = View.List;
+
+            listView.BeginUpdate();
+
+            int i = 0; 
+            foreach (Entity child in entity.Children)
+            {
+                Console.WriteLine("Rendered ListItem: {0}", child.Name);
+                ListViewItem li = new ListViewItem(child.Name);
+                listView.Items.Add(li);
+                if ((child.States & States.SELECTED) != 0)
+                {
+                    listView.Items[i].Selected = true;
+                }
+                i++;
+            }
+            Control control = (Control)listView;
+            AdjustProperties(entity, ref control);
+            Console.WriteLine("Executing RenderList");
+            control.Tag = entity;
+            control.Click += Control_Click_Button;
+            listView.EndUpdate();
+            return control;
         }
 
         private Control RenderListItem(Entity entity, Control parent)
         {
-            Console.WriteLine("Rendered ListItem");
+            //Console.WriteLine("Rendered ListItem");
             return parent;
         }
 
@@ -523,7 +630,16 @@ namespace WindowsProxy
 
         private Control RenderSpinner(Entity entity, Control parent)
         {
-            return parent;
+            //return parent;
+			entity.Width -= 18; //not to cover the bottons of spinner
+            return RenderEdit(entity, parent);
+            /* 
+            //possible tweak: in case we want to have better user experience in release version
+            Control control = RenderText(entity, parent);
+            ((TextBox)control).ReadOnly = true;
+            ((TextBox)control).Text = entity.Value;
+            return control;
+            */
         }
 
         private Control RenderSplitButton(Entity entity, Control parent)
@@ -553,25 +669,17 @@ namespace WindowsProxy
 
         private Control RenderText(Entity entity, Control parent)
         {
-            Control control = null;
+            Control control = new TextBox();
             Console.WriteLine("Executing RenderText");
 
-            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("calc --Calculator") == true))
+            if (((entity.States & States.SELECTABLE) == 0) && (this.RemoteProcessName.Contains("Calculator") == true))
             {
-                control = new Label(); //windows 7 calculator will fall to here
+                //windows 7 calculator will fall to here
+                ((TextBox)control).ReadOnly = true;
+                ((TextBox)control).BorderStyle = 0;
             }
-            else
-            {
-                control = new TextBox();
-            }
+            
             AdjustProperties(entity, ref control);
-
-            if (this.RemoteProcessName.Contains("calc --Calculator") && control.Text.Equals("Memory"))
-            {
-                control.Text = "";
-            }
-
-
 
             control.Tag = entity;
             control.KeyPress += Control_KeyPress;
@@ -651,8 +759,28 @@ namespace WindowsProxy
 
             //register event listener and delegate
             form.FormClosing += Form_Closing;
+            form.SizeChanged += Form_SizeChanged;
             form.delegateKeyPresses = ProcessKeyPress;
+            return control;
+        }
 
+        private Control RenderDialog(Entity entity, Control parent)
+        {
+                Form localForm = new Form();
+                Control control = localForm as Control;
+                AdjustProperties(entity, ref control);
+                localForm.Font = new Font("Segoe UI", 8);
+                localForm.TopLevel = false;
+
+                localForm.Width += 100;
+                localForm.Height += 200;
+
+                control.Tag = entity;
+                dictSubForms.Add(entity.UniqueID, localForm);
+
+                //register event listener and delegate
+                localForm.FormClosing += Form_Closing;
+                localForm.SizeChanged += Form_SizeChanged;
             return control;
         }
 
@@ -698,7 +826,7 @@ namespace WindowsProxy
             if (isSent)
                 return;
 
-            Button button = (Button)sender;
+            Control button = (Control)sender;
             Entity entity = (Entity)button.Tag;
             if (entity == null)
                 return;
@@ -810,6 +938,42 @@ namespace WindowsProxy
             timer.Enabled = true;
         }
 
+        private void Control_ComboBox_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            int selectedIndex = comboBox.SelectedIndex;
+            Object selectedItem = comboBox.SelectedItem;
+
+            if (comboBoxEntities.TryGetValue(selectedItem.ToString(), out Entity listItem))
+            {
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                  serviceCodes["action"],
+                  serviceCodes["action_default"],
+                  listItem.UniqueID
+                ),
+                };
+                execute_mouse(sinter);
+            }
+            else
+            {
+                Entity comboBox_entity = (Entity)((Control)comboBox).Tag;
+                if (comboBox_entity == null)
+                    return;
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                  serviceCodes["action"],
+                  serviceCodes["action_select"],
+                  comboBox_entity.UniqueID,
+                  selectedIndex.ToString()
+                ),
+                };
+                execute_mouse(sinter);
+            }
+        }
+
         private void Control_Click_ComboBox(object sender, EventArgs e)
         {
             Console.WriteLine("Begin Control_Click_Combo_Box");
@@ -819,7 +983,7 @@ namespace WindowsProxy
             ComboBox item = (ComboBox)sender;
             // Entity entity;
             Console.WriteLine("MenuItem Click {0}", item.Text);
-            comboBoxEntity.TryGetValue(item.Text, out Entity entity);
+            comboBoxEntities.TryGetValue(item.Text, out Entity entity);
             if (entity == null)
                 return;
             Console.WriteLine("MenuItem ID {0}", entity.UniqueID);
@@ -1015,6 +1179,7 @@ namespace WindowsProxy
         #region AppForm handler/helper
         public void close_forms()
         {
+            this.RemoteCloseButtonUID = null;
             if (this.form != null)
             {
                 this.form.Invoke(new Action(() => this.form.Close()));
@@ -1024,27 +1189,94 @@ namespace WindowsProxy
 
         private void Form_Closing(object sender, FormClosingEventArgs e)
         {
-            Console.WriteLine("CloseButton is pressed, this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
-
-            if (this.RemoteCloseButtonUID != null)
+            Console.WriteLine("Form_Closing(), this.RemoteCloseButtonUID = {0}", this.RemoteCloseButtonUID);
+            if (this.RemoteCloseButtonUID == null)
             {
-                e.Cancel = true;
+                //just the local window
+                this.form = null;
+                root.Remove_Dict_Item(requestedProcessId);
+                return;
+            }
+            else {
+                const string message =
+                    "Do you want to close the remote window as well?";
+                string caption = this.RemoteProcessName;
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.YesNoCancel,
+                                             MessageBoxIcon.Question,
+                                             MessageBoxDefaultButton.Button2);
+
+                // If the yes button was pressed, sends to remote
+                if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+                else if (result == DialogResult.Yes)
+                {
+                    // cancel the closure of the form.
+                    e.Cancel = true;
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_default"],
+                                      this.RemoteCloseButtonUID
+                                    ),
+                    };
+                    execute_action(sinter);
+                }
+                else
+                {
+                    //just the local window
+                    this.form = null;
+                    root.Remove_Dict_Item(requestedProcessId);
+                }
+            }
+        }
+
+        private void Form_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.form.WindowState == FormWindowState.Minimized)
+            {
                 Sinter sinter = new Sinter
                 {
                     HeaderNode = MsgUtil.BuildHeader(
-                                  serviceCodes["action"],
-                                  serviceCodes["action_default"],
-                                  this.RemoteCloseButtonUID
-                                ),
+                                      serviceCodes["action"],
+                                      serviceCodes["action_default"],
+                                      this.RemoteMinimizeButtonUID
+                                    ),
                 };
                 execute_action(sinter);
             }
-            else
+            else if (this.form.WindowState == FormWindowState.Normal)
             {
-                Console.WriteLine("Form closed\n");
-                this.form = null;
-                root.Remove_Dict_Item(requestedProcessId);
+                if (this.prevWindowState == FormWindowState.Minimized)
+                {
+                    //bring it back 
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(
+                                          serviceCodes["action"],
+                                          serviceCodes["action_foreground"]
+                                        ),
+                    };
+                    execute_action(sinter);
+                }
             }
+            else if (this.form.WindowState == FormWindowState.Maximized)
+            {
+                Sinter sinter = new Sinter
+                {
+                    HeaderNode = MsgUtil.BuildHeader(
+                                      serviceCodes["action"],
+                                      serviceCodes["action_foreground"],
+                                      this.RemoteZoomButtonUID
+                                    ),
+                };
+                execute_action(sinter);
+            }
+            this.prevWindowState = this.form.WindowState;
+
         }
 
         public void ProcessKeyPress(string keypresses, string targetId)
@@ -1202,17 +1434,20 @@ namespace WindowsProxy
                     control.BeginInvoke((Action)(() =>
                     {
                         control.Name = newName;
+                        control.Text = newName;
                     }));
                 }
             }
             else if (subCode == serviceCodes["delta_prop_change_value"])
             {
+                if (this.form!= null && this.form.WindowState == FormWindowState.Minimized)
+                {
+                    return; //ignore, the msg is due to proxy asked scraper to minimize
+                }
                 root_entity = sinter.EntityNode;
                 // Console.WriteLine("{0}", root_entity.Type);
                 if (sinter.EntityNode != null)
                 {
-
-
                     Console.WriteLine("Prop Change {0}", sinter.EntityNode.Type);
                     if (sinter.EntityNode.Type.Equals("Window", StringComparison.Ordinal))
                     {
@@ -1233,10 +1468,17 @@ namespace WindowsProxy
                             form.Height += (30 + 8);
                             form.Height += 25;
 
-                            Console.WriteLine("Form adjusted");
+                            Console.WriteLine("Window form adjusted");
+                            foreach (Entity child in sinter.EntityNode.Children)
+                            {
+                                AdjustSubTreeProperties(child);
+                            }
                         }));
                     }
-
+                    else 
+                    {
+                        AdjustSubTreeProperties(sinter.EntityNode);
+                    }
                 }
                 else
                 {
@@ -1245,7 +1487,8 @@ namespace WindowsProxy
                         string newValue = sinter.HeaderNode.ParamsInfo.Data2;
                         control.BeginInvoke((Action)(() =>
                         {
-                            if (this.RemoteProcessName.Contains("calc --Calculator") && newValue.Equals("Memory"))
+                            if (this.RemoteProcessName.Contains("Calculator") && 
+                                (newValue.Equals("Memory") || newValue.Equals("Running History")))
                             {
                                 newValue = "";
                             }
@@ -1287,10 +1530,45 @@ namespace WindowsProxy
                     return;
 
                 Console.WriteLine("Type: {0}", sinter.EntityNode.Type);
-                if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem"))
+                if (sinter.EntityNode.Type.Equals("Menu") || sinter.EntityNode.Type.Equals("MenuItem") || sinter.EntityNode.Type.Equals("Text"))
                 {
-                    Console.WriteLine("delta_subtree_replace Not handled");
+                    Console.WriteLine("delta_subtree_replace Not handled for type {0}", sinter.EntityNode.Type);
                     //UpdateMenu(sinter);
+                    return;
+                }
+                else if (sinter.EntityNode.Type.Equals("List"))
+                {
+                    if (hash.TryGetValue(sinter.EntityNode.UniqueID, out Control ctrl))
+                    {
+                            ctrl.BeginInvoke((Action)(() =>
+                            {
+                                ctrl.Focus();
+                                int i = 0;
+                                ListView listView = (ListView)ctrl;
+
+                                foreach (ListViewItem oldLi in listView.Items)
+                                {
+                                    Console.WriteLine("Remove oldlistItem {0}", oldLi.Name);
+                                    listView.Items.Remove(oldLi);
+                                }
+
+                                foreach (Entity child in sinter.EntityNode.Children)
+                                {
+                                    Console.WriteLine("Rendered ListItem: {0}", child.Name);
+                                    ListViewItem li = new ListViewItem(child.Name);
+                                    listView.Items.Add(li);
+                                    if ((child.States & States.SELECTED) != 0)
+                                    {
+                                        listView.Items[i].Selected = true;
+                                    }
+                                    i++;
+                                }
+                            }));
+                    }
+                    return;
+                }
+                else if (!sinter.EntityNode.Type.Equals("Pane")){
+                    Console.WriteLine("delta_subtree_replace Not handled for type {0}", sinter.EntityNode.Type);
                     return;
                 }
 
@@ -1358,18 +1636,31 @@ namespace WindowsProxy
 
         public void execute_event(Sinter sinter)
         {
-            // Entity e = sinter.EntityNode;
-
             //server send this msg to indicate app is closed in server side
-            if ((sinter.HeaderNode.ParamsInfo == null) && (this.form != null))
+            if ((sinter.HeaderNode.ParamsInfo == null)
+                ||(sinter.HeaderNode.ParamsInfo.TargetId == null))
             {
                 this.RemoteCloseButtonUID = null;
-                this.form.Invoke(new Action(() => this.form.Close()));
-            }
-            this.form = null;
+                if (this.form != null)
+                {
+                    this.form.Invoke(new Action(() => this.form.Close()));
+                }
+                this.form = null;
 
-            //re-load the list from server
-            this.execute_ls_req(null);
+                //re-load the list from server
+                this.execute_ls_req(null);
+            }
+            else
+            {
+                if ((hash.TryGetValue(sinter.HeaderNode.ParamsInfo.TargetId, out Control control))
+                    && (control != null))
+                {
+                    Control parent_control = control.Parent;
+                    parent_control.Invoke(new Action(() => parent_control.Controls.Remove(control)));
+                    hash.TryRemove(sinter.HeaderNode.ParamsInfo.TargetId, out Control old_control);
+                    root.DisplayProxy(form, requestedProcessId);
+                }
+            }
         }
 
         // client related calls
@@ -1397,17 +1688,23 @@ namespace WindowsProxy
             height_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height / height;
             width_ratio = (float)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / width;
             Control ctrl = null;
-            if (form == null)
+            if (this.form == null)
             {
-                form = (AppForm)Render(sinter.EntityNode, null);
+                this.form = (AppForm)Render(sinter.EntityNode, null);
                 foreach (Entity other_entity in sinter.EntityNodes)
                 {
                     //this comes from mac scraper
                     ctrl = Render(other_entity, form);
                 }
+                this.prevWindowState = FormWindowState.Normal;
             }
             //now show it
             root.DisplayProxy(form, requestedProcessId);
+
+            foreach (KeyValuePair<string, Form> entry in dictSubForms)
+            {
+                root.DisplayProxy(entry.Value, requestedProcessId);
+            }
         }
 
         public void execute_action(Sinter sinter)
@@ -1541,13 +1838,32 @@ namespace WindowsProxy
 
         private void addSubMenuItem(Entity entity_mi, MenuStrip ms, ToolStripMenuItem parent_mi)
         {
+#if !DEBUG  //this is for 1st release version for Calculator. MessageBox 
+            if (this.RemoteProcessName.Contains("Calculator") && entity_mi.Name.Equals("About Calculator"))
+            {
+                Console.WriteLine("skip menu: {0}", entity_mi.Name); 
+                return;
+            }
+#endif
             ToolStripMenuItem newMenu = new ToolStripMenuItem(entity_mi.Name);
             menuHashEntity.TryGetValue(parent_mi.Text, out Entity parent);
 
             newMenu.Name = entity_mi.Name;
-            if ((entity_mi.States & States.DISABLED) != 0 || (entity_mi.States & States.INVISIBLE) != 0)
+            if ((entity_mi.States & States.DISABLED) != 0 )
             {
                 newMenu.Enabled = false;
+            }
+            if ((entity_mi.States & States.CHECKED) != 0 )
+            {
+                newMenu.Checked = true;
+            }
+            if ((entity_mi.States & States.INVISIBLE) != 0)
+            {
+                newMenu.Visible = false;
+            }
+            if ((entity_mi.States & States.FOCUSED) != 0)
+            {
+                newMenu.Select();
             }
             newMenu.Click += Control_Click_MenuItem;
             newMenu.ShortcutKeys = ParseShortcutKeys(entity_mi.Value);
@@ -1632,22 +1948,77 @@ namespace WindowsProxy
             return ShortcutKeys;    
         }
 
+
+        void AdjustSubTreeProperties(Entity entity)
+        {
+            if (hash.TryGetValue(entity.UniqueID, out Control control))
+            {
+                AdjustProperties(entity, ref control);
+            }
+            foreach (Entity child in entity.Children)
+            {
+                AdjustSubTreeProperties(child);
+            }
+        }
+
         void AdjustProperties(Entity entity, ref Control control)
         {
             control.Height = (int)(entity.Height * height_ratio);
             control.Width = (int)(entity.Width * width_ratio);
 
             control.Name = entity.Name;
-            control.Text = entity.Name;
+            if (entity.Type == "Edit")
+            {
+                control.Text = entity.Value;
+            }
+            else
+            {
+                control.Text = entity.Name;
+            }
+
+            /* following are treak for windows 7 calculator */
+            if (this.RemoteProcessName.Contains("Calculator") &&
+                (control.Text.Equals("Memory") || control.Text.Equals("Running History")))
+            {
+                control.Text = "";
+            }
+            if (this.RemoteProcessName.Contains("Calculator") && entity.Type == "Text"
+                && entity.Name == "" && entity.Value == "")
+            {
+                control.Visible = false;
+            }
 
             control.Top = (int)((entity.Top - rootPoint.Y) * height_ratio);
             control.Left = (int)((entity.Left - rootPoint.X) * width_ratio);
+            Console.WriteLine("AdjustProperties {0}/{1}/{2}, Top: {3}", entity.Type, entity.Name, entity.UniqueID, control.Top);
 
             if ((entity.States & States.DISABLED) != 0)
             {
+                Console.WriteLine("{0}/{1} states is not enabled", entity.Type, entity.Name);
                 control.Enabled = false;
             }
-
+            if ((entity.States & States.CHECKED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is CHECKED", entity.Type, entity.Name);
+                if (entity.Type == "CheckBox")
+                {
+                    ((CheckBox)control).Checked = true;
+                }
+            }
+            if ((entity.States & States.SELECTED) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is SELECTED", entity.Type, entity.Name);
+                if (entity.Type == "RadioButton")
+                {
+                    ((RadioButton)control).Checked = true;
+                }
+            }
+            if ((entity.States & States.INVISIBLE) != 0)
+            {
+                Console.WriteLine("{0}/{1} states is INVISIBLE", entity.Type, entity.Name);
+                control.Visible = false;
+            }
+            
             //control.Tag = new TagInfo(entity.UniqueID , GetCenter(entity));
         }
 

@@ -37,13 +37,13 @@ namespace Sintering
         public const uint COLLAPSED = 0x400;
         public const uint BUSY = 0x800;
         public const uint INVISIBLE = 0x8000;
-        public const uint VISITED = 0x800000;
-        public const uint LINKED = 0x400000;
-        public const uint HASPOPUP = 0x40000000;
-        public const uint PROTECTED = 0x20000000;
-        public const uint OFFSCREEN = 0x10000;
+        public const uint OFFSCREEN = 0x10000; //65536
+        public const uint FOCUSABLE = 0x100000; //1048576
         public const uint SELECTABLE = 0x200000;
-        public const uint FOCUSABLE = 0x100000;
+        public const uint LINKED = 0x400000;
+        public const uint VISITED = 0x800000;
+        public const uint PROTECTED = 0x20000000;
+        public const uint HASPOPUP = 0x40000000;
     }
 
     public static class MsgUtil
