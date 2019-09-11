@@ -57,6 +57,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_BB70D7005AE94DFD82781E8BD6411403"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BCFBD615DB4C023AE3F4E76A95EF5E6E"
+        "OwnerKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BCFBD615DB4C023AE3F4E76A95EF5E6E"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
         "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
@@ -65,12 +83,6 @@
         {
         "MsmKey" = "8:_E0ADF852D0414519B4858052F67491E6"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -88,6 +100,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_BCFBD615DB4C023AE3F4E76A95EF5E6E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_C431C87424E8724090E4AE12420CC1BB"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -95,6 +113,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_3DE84BE857F93F191151428CBBD1A406"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9114F349EFF743A7B93B93173BAD89DC"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -105,7 +129,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\WindowsProxy.msi"
+        "OutputFilename" = "8:Debug\\SinterProxy.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -137,7 +161,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\Setup.msi"
+        "OutputFilename" = "8:Release\\SinterProxy.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -184,7 +208,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.6.1"
+                "FrameworkVersion" = "8:v4.6.1   "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=671728"
                 }
@@ -225,8 +249,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_348B43D6AD7D4C97AE231806A5C4CBB4"
             {
-            "SourcePath" = "8:..\\src\\config.xml"
-            "TargetName" = "8:config.xml"
+            "SourcePath" = "8:..\\src\\proxyconfig.xml"
+            "TargetName" = "8:proxyconfig.xml"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
             "Condition" = "8:"
@@ -308,6 +332,57 @@
                     }
                 }
             "SourcePath" = "8:Gma.System.MouseKeyHook.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BB70D7005AE94DFD82781E8BD6411403"
+            {
+            "SourcePath" = "8:..\\..\\common\\WindowsConnection\\WindowsConnection\\log4net.config"
+            "TargetName" = "8:log4net.config"
+            "Tag" = "8:"
+            "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BCFBD615DB4C023AE3F4E76A95EF5E6E"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_BCFBD615DB4C023AE3F4E76A95EF5E6E"
+                    {
+                    "Name" = "8:log4net.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"
@@ -428,7 +503,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Sinter Proxy"
         "ProductCode" = "8:{7FF59DF6-9BB8-47C2-AA78-45E216CA2EE0}"
-        "PackageCode" = "8:{5EA3E915-B984-4E30-9566-11E0D9161D94}"
+        "PackageCode" = "8:{877CF42D-36BE-4BFC-B946-2C43749C84F2}"
         "UpgradeCode" = "8:{DBF89A57-58DF-4B99-812A-5366F5BF5ED8}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -949,7 +1024,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9114F349EFF743A7B93B93173BAD89DC"
             {
-            "SourcePath" = "8:..\\src\\obj\\x86\\Release\\WindowsProxy.exe"
+            "SourcePath" = "8:..\\src\\obj\\Release\\WindowsProxy.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_5DA911B8B12B49D18E687330D82AE06D"

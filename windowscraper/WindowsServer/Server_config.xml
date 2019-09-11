@@ -1,0 +1,2 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<server port="6832" logfolder="%TEMP%" logfile="sinterserver.log" xml_logfile="sinterserver.xml" cert="SinterServer.pfx"></server>
