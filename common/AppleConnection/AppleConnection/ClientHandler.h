@@ -65,7 +65,7 @@
 + (id) sharedConnectionWith:(NSString *)_ipAddress andPort:(int)_port;
 - (void) setIPAndPort:(NSString *)_ipAddress andPort:(int)_port;
 - (void) initForClientSocket;
-- (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier ;
+- (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier certificatePath:(NSString *)certificatePath certPasscode: (NSString*)certPass;
 - (void) dispatchMessage:(NSMutableData *) part;
 - (void) close;
 
