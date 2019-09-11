@@ -113,7 +113,7 @@ static ClientHandler* shared       = nil;
     NSLog(@"connecting to server %@:%i", ipAddress, _port);
 }
 
-- (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier {
+- (id) initForServerSocketWithtInputStream:(NSInputStream *) inStream outputStream:(NSOutputStream *) outStream andId:(int) identifier certificatePath:(NSString *)certificatePath certPasscode: (NSString*)certPass{
     if (self = [self init]) {
         // set identifier for notification
         [self setIdentifier:identifier];
@@ -125,12 +125,11 @@ static ClientHandler* shared       = nil;
         
         runLoopMode = NSDefaultRunLoopMode;
         
-        NSString *certificatePath = [[NSBundle mainBundle] pathForResource:@"osxsinter" ofType:@"p12"];
         NSData *pkcs12data = [NSData dataWithContentsOfFile:certificatePath];
         CFArrayRef keyref = NULL;
         OSStatus sanityChesk = SecPKCS12Import((__bridge CFDataRef)pkcs12data,
                                                (__bridge CFDictionaryRef)[NSDictionary
-                                                                          dictionaryWithObject:@"osxsinter"
+                                                                          dictionaryWithObject:certPass
                                                                           forKey:(__bridge id)kSecImportExportPassphrase],
                                                                           &keyref);
         if (sanityChesk != noErr) {

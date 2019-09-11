@@ -25,10 +25,22 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import "ScraperServer.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+@property (strong) ScraperServer * server;
+
 @property (assign) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextField *passcodeTextField;
+@property (weak) IBOutlet NSTextField *portTextField;
+@property (weak) IBOutlet NSButton *startButton;
+@property (weak) IBOutlet NSButton *stopButton;
+
+@property (nonatomic, strong, readonly ) NSDictionary *settings;
+
+- (IBAction)startScraper:(id)sender;
+- (IBAction)StopScraper:(id)sender;
+
 
 @end
