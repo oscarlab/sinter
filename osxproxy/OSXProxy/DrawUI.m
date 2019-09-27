@@ -716,7 +716,7 @@ static  ClientHandler  * sharedConnection;
             [label setNeedsDisplay:YES];
         }else{
             if (![model.name isEqualToString:@"Running History"] && ![model.name isEqualToString:@"Memory"]){
-                [label setHidden:YES];//ignore the other result text field from windows calculator
+                //[label setHidden:YES];//ignore the other result text field from windows calculator
             }
             if ([model.name isEqualToString:@"Memory"]){
                 [label setStrValue:@""]; /* tweak for windows calculator @"Calc" */
