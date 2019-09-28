@@ -157,7 +157,9 @@
 
 - (void) populateListHeader{
     [self removeAllColumns];
-    
+    if (!header) {
+        return;
+    }
     if (!header.child_count) {
         [self addColumnFromUI:header];
         return;
