@@ -42,6 +42,7 @@
 @synthesize process_id;
 @synthesize shouldClose;
 @synthesize localWinFrame;
+@synthesize closeCancelled;
 
 @synthesize rmUiRoot;
 @synthesize isChild;
@@ -73,11 +74,49 @@ int L, mask;
     fontSize = defaultfontSize * scalingFactor;
 }
 
+- (void) showWarningMessageBox {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Close"];
+    [alert addButtonWithTitle:@"Close Remote App as well"];
+    [alert setMessageText:@"Warning"];
+    [alert setInformativeText:@"Are you sure that you want to close this app? You can close remote app as well."];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    NSInteger returnCode = [alert runModal];
+    if (returnCode == 1000) {
+        self.closeCancelled = YES;
+    }
+    else if (returnCode == 1001) {
+        self.closeCancelled = NO;
+        self.shouldClose = YES;
+        
+    }
+    else {
+        self.closeCancelled = NO;
+        self.shouldClose = NO;
+    }
+    return;
+    
+}
+
 - (BOOL)windowShouldClose:(id)sender {
     // closing a window is a complex process:
     // first send a 'close' event to remote window.
     // if it's closed, then it returns a close-ack in appDelegate
     // AppDelegate sets 'ShoudlClose' to YES.
+    
+    if(![self shouldClose]) {
+        [self showWarningMessageBox];
+        if([self closeCancelled]) {
+            closeCancelled = NO;
+            return NO;
+        }
+        else if([self shouldClose]){
+            return YES;
+        }
+    }
+    
     if(![self shouldClose] && [sharedConnection isConnected]){
         [sharedConnection sendActionMsg:(rmUiRoot.unique_id) targetId:(rmUiRoot.unique_id) actionType:STRActionClose data:nil];
         return NO;
@@ -328,6 +367,7 @@ int L, mask;
         [self setXmlDOM:entity];
         [self setProcess_id:processId];
         [self setShouldClose:NO];
+        [self setCloseCancelled:NO];
         
         // do the rendering in the background
         dispatch_async(dispatch_get_main_queue(), ^{ //
@@ -386,6 +426,13 @@ int L, mask;
         return self;
     }
     return nil;
+}
+
+- (void) comeIntoView {
+    [self setShouldClose:NO];
+    [[self.window contentView] setNeedsDisplay:YES];
+    [self showWindow:nil];
+    [[NSApplication sharedApplication] setMainMenu:self->remoteMenu];
 }
 
 
