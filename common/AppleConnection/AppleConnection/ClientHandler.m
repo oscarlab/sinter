@@ -488,8 +488,14 @@ static ClientHandler* shared       = nil;
 }
 
 
-- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text {
+- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text processId: (NSString *) processId {
+    /*
     Sinter * sinter = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRActionSetText] andKbdOrActionWithTarget:uniqueId andData:text];
+    */
+    Params * params = [[Params alloc] init];
+    params.target_id = uniqueId;
+    params.data1 = text;
+    Sinter * sinter = [[Sinter alloc] initWithServiceCode: [serviceCodes objectForKey: STRAction] subCode:[serviceCodes objectForKey:STRActionSetText] processId:processId params:params];
     [self sendSinter:sinter];
 }
 

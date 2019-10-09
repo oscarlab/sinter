@@ -627,7 +627,7 @@ static  ClientHandler  * sharedConnection;
 - (void)controlTextDidChange:(NSNotification *)notification {
     //NSTextView *textView = notification.userInfo[@"NSFieldEditor"];
     NSTextField * textField = [notification object];
-    [sharedConnection setTextAt:textField.identifier text:[textField stringValue]];
+    [sharedConnection setTextAt:textField.identifier text:[textField stringValue] processId: process_id];
     //NSLog(@"text-field %@", [textField stringValue]);
 }
 
@@ -648,7 +648,7 @@ static  ClientHandler  * sharedConnection;
         
         Model* control = [idTable objectForKey:combobox.identifier];
         if (control && control.user_data){//
-            [sharedConnection setTextAt:[control.user_data objectForKey:@"edit"] text:[combobox stringValue]];
+            [sharedConnection setTextAt:[control.user_data objectForKey:@"edit"] text:[combobox stringValue] processId: process_id ];
         }
     }
 }
@@ -848,7 +848,7 @@ static  ClientHandler  * sharedConnection;
 
 # pragma mark NSSearchField Delegate
 - (void)searchFieldDidEndSearching:(NSSearchField *)sender {
-    [sharedConnection setTextAt:[sender identifier] text:[sender stringValue]];
+    [sharedConnection setTextAt:[sender identifier] text:[sender stringValue] processId: process_id];
 }
 
 #pragma mark Group
@@ -1140,11 +1140,34 @@ static  ClientHandler  * sharedConnection;
 }
 
 #pragma mark COMBO-BOX
+- (void) setSelectedItem:(Model *) control comboBox: comboBox {
+    if(control.user_data) {
+        Model * list;
+        for(Model * item in control.children){
+            if([item.type isEqualToString:@"List"]){
+                list = item;
+                break;
+            }
+        }
+        
+        for(int i=0; i<list.child_count; ++i){
+            Model * item = list.children[i];
+            if((item.states & STATE_SELECTED) == STATE_SELECTED) {
+                [comboBox selectItemAtIndex:i];
+                break;
+            }
+        }
+    }
+}
+
 - (NSComboBox *) drawComboBox:(Model*) control frame:(NSRect)frame parentView:(NSView*) parent {
     NSComboBox * comboBox = [idToUITable objectForKey:control.unique_id];
     if (comboBox) {
-        //[self updateComboBoxData:comboBox];
+        BOOL hasList = [self updateComboBoxData:comboBox];
         [comboBox reloadData];
+        if(hasList){
+            [self setSelectedItem: control comboBox: comboBox];
+        }
         [comboBox setHidden:NO];
         if (control.version) {
             control.version--;
@@ -1179,10 +1202,11 @@ static  ClientHandler  * sharedConnection;
     [self addToScreenMapTable:control];
     
     // request load
-    //[self updateComboBoxData:comboBox];
+    [self updateComboBoxData:comboBox];
     [comboBox reloadData];
-    [comboBox selectItemAtIndex:0];
-
+    //[comboBox selectItemAtIndex:0];
+    [self setSelectedItem: control comboBox: comboBox];
+    
     return comboBox;
 }
 
