@@ -17,31 +17,33 @@
    with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace Sintering {
+namespace Sintering
+{
 
-  public interface IWinCommands {
+    public interface IWinCommands
+    {
 
-    // common parts
-    ConnectionHandler connection { get; set; }
+        // common parts
+        ConnectionHandler connection { get; set; }
 
-    bool bPasscodeVerified { get; }
+        bool bPasscodeVerified { get; }
 
-    void execute_stop_scraping();
+        void execute_stop_scraping();
 
-    void execute_verify_passcode(Sinter sinter);
+        void execute_verify_passcode(Sinter sinter);
 
-    // server related calls
-    void execute_ls_req(Sinter sinter);
-    void execute_ls_l_req(Sinter sinter);
-    void execute_delta(Sinter sinter);
-    void execute_event(Sinter sinter);
+        // server related calls
+        void execute_ls_req(Sinter sinter);
+        void execute_ls_l_req(Sinter sinter);
+        void execute_delta(Sinter sinter);
+        void execute_event(Sinter sinter);
 
-    // client related calls
-    void execute_ls_res(Sinter sinter);
-    void execute_ls_l_res(Sinter sinter);
-    void execute_action(Sinter sinter);
-    void execute_kbd(Sinter sinter);
-    void execute_mouse(Sinter sinter);
-    void execute_listener(Sinter sinter);
-  }
+        // client related calls
+        void execute_ls_res(Sinter sinter);
+        void execute_ls_l_res(Sinter sinter);
+        void execute_action(Sinter sinter);
+        void execute_kbd(Sinter sinter);
+        void execute_mouse(Sinter sinter);
+        void execute_listener(Sinter sinter);
+    }
 }

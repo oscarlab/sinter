@@ -57,6 +57,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_71C457ABBFA1445A810A9C5207F284A2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7BE12EDE4F52A98F64C20C043AF58412"
         "OwnerKey" = "8:_BF6730D36AB941B08464878E25399F54"
         "MsmSig" = "8:_UNDEFINED"
@@ -70,6 +76,12 @@
         "Entry"
         {
         "MsmKey" = "8:_83ECAB3295EC4BA4B989898BA6C9C3F7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AA479D05E0B64A52A56B13B4BC4F8A3B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -113,6 +125,12 @@
         {
         "MsmKey" = "8:_F55A22BBAE6450300F03B38C1095D0B2"
         "OwnerKey" = "8:_D412326B829ADC0E441650CD2B92F035"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F5F1BE7D31B7442CB216BEAB29734FA0"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -165,7 +183,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\WindowsServer.msi"
+        "OutputFilename" = "8:Debug\\SinterServer.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -197,7 +215,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\Setup.msi"
+        "OutputFilename" = "8:Release\\SinterServer.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -244,7 +262,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.6.1"
+                "FrameworkVersion" = "8:v4.6.1  "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=671728"
                 }
@@ -259,11 +277,6 @@
             "AssemblyAsmDisplayName" = "8:WindowsConnection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4A1020EFA53EA632CC744B5A543E3786"
-                    {
-                    "Name" = "8:WindowsConnection.exe"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WindowsConnection.exe"
             "TargetName" = "8:"
@@ -290,11 +303,6 @@
             "AssemblyAsmDisplayName" = "8:log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_6A124A6D98BDFD5E6B7C33B07FB09ACF"
-                    {
-                    "Name" = "8:log4net.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
@@ -354,6 +362,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_71C457ABBFA1445A810A9C5207F284A2"
+            {
+            "SourcePath" = "8:..\\..\\..\\WindowsServer\\Server_config.xml"
+            "TargetName" = "8:Server_config.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7BE12EDE4F52A98F64C20C043AF58412"
             {
             "AssemblyRegister" = "3:1"
@@ -361,11 +389,6 @@
             "AssemblyAsmDisplayName" = "8:LinqDemo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_7BE12EDE4F52A98F64C20C043AF58412"
-                    {
-                    "Name" = "8:LinqDemo.exe"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:LinqDemo.exe"
             "TargetName" = "8:"
@@ -387,8 +410,28 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83ECAB3295EC4BA4B989898BA6C9C3F7"
             {
-            "SourcePath" = "8:..\\..\\..\\WindowsServer\\WindowsServer.pfx"
-            "TargetName" = "8:WindowsServer.pfx"
+            "SourcePath" = "8:..\\..\\..\\WindowsServer\\SinterServer.pfx"
+            "TargetName" = "8:SinterServer.pfx"
+            "Tag" = "8:"
+            "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA479D05E0B64A52A56B13B4BC4F8A3B"
+            {
+            "SourcePath" = "8:..\\..\\..\\WindowsScrapperLib\\Scraper_config.xml"
+            "TargetName" = "8:Scraper_config.xml"
             "Tag" = "8:"
             "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
             "Condition" = "8:"
@@ -412,11 +455,6 @@
             "AssemblyAsmDisplayName" = "8:WindowsServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D412326B829ADC0E441650CD2B92F035"
-                    {
-                    "Name" = "8:WindowsServer.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WindowsServer.dll"
             "TargetName" = "8:"
@@ -443,11 +481,6 @@
             "AssemblyAsmDisplayName" = "8:PListLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D88C4AAB4196A72FEC12C2D1480CB88B"
-                    {
-                    "Name" = "8:PListLib.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:PListLib.dll"
             "TargetName" = "8:"
@@ -474,11 +507,6 @@
             "AssemblyAsmDisplayName" = "8:WindowsScrapperLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_F55A22BBAE6450300F03B38C1095D0B2"
-                    {
-                    "Name" = "8:WindowsScrapperLib.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WindowsScrapperLib.dll"
             "TargetName" = "8:"
@@ -496,6 +524,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F5F1BE7D31B7442CB216BEAB29734FA0"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\common\\WindowsConnection\\WindowsConnection\\log4net.config"
+            "TargetName" = "8:log4net.config"
+            "Tag" = "8:"
+            "Folder" = "8:_13EC8A8C94BB4426931FD6F51D5F904C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }

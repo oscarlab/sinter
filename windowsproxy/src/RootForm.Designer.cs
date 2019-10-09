@@ -25,10 +25,10 @@ namespace WindowsProxy
 {
     partial class RootForm
     {
-    /// <summary>
-    /// Required designer variable.
-    /// </summary>
-    private System.ComponentModel.IContainer components = null;
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -65,18 +65,7 @@ namespace WindowsProxy
             this.textBoxPort = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.remoteProcessesView)).BeginInit();
             this.SuspendLayout();
-            // 
-            // ls_button
-            // 
-            this.ls_button.ImageAlign = System.Drawing.ContentAlignment.TopRight;
-            this.ls_button.Location = new System.Drawing.Point(28, 210);
-            this.ls_button.Name = "ls_button";
-            this.ls_button.Size = new System.Drawing.Size(107, 46);
-            this.ls_button.TabIndex = 8;
-            this.ls_button.Text = "Show Remote Applications";
-            this.ls_button.UseVisualStyleBackColor = true;
-            this.ls_button.Visible = false;
-            this.ls_button.Click += new System.EventHandler(this.FetchRemoteProcesses);
+
             // 
             // remoteProcessesView
             // 
@@ -117,42 +106,15 @@ namespace WindowsProxy
             this.connect_button.Text = "Connect";
             this.connect_button.UseVisualStyleBackColor = true;
             this.connect_button.Click += new System.EventHandler(this.Connect);
-            // 
-            // disconnect_button
-            // 
-            this.disconnect_button.Enabled = false;
-            this.disconnect_button.Location = new System.Drawing.Point(28, 271);
-            this.disconnect_button.Name = "disconnect_button";
-            this.disconnect_button.Size = new System.Drawing.Size(107, 30);
-            this.disconnect_button.TabIndex = 12;
-            this.disconnect_button.Text = "Disconnect";
-            this.disconnect_button.UseVisualStyleBackColor = true;
-            this.disconnect_button.Click += new System.EventHandler(this.Disconnect);
-            // 
-            // textBoxPasscode
-            // 
-            this.textBoxPasscode.Location = new System.Drawing.Point(90, 139);
-            this.textBoxPasscode.Name = "textBoxPasscode";
-            this.textBoxPasscode.Size = new System.Drawing.Size(45, 23);
-            this.textBoxPasscode.TabIndex = 13;
-            this.textBoxPasscode.Text = "123456";
-            // 
-            // passcode_label
-            // 
-            this.passcode_label.AutoSize = true;
-            this.passcode_label.Location = new System.Drawing.Point(25, 142);
-            this.passcode_label.Name = "passcode_label";
-            this.passcode_label.Size = new System.Drawing.Size(59, 15);
-            this.passcode_label.TabIndex = 14;
-            this.passcode_label.Text = "Passcode:";
+            
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(25, 69);
-            this.label1.Name = "label1";
+            this.label1.Name = "label_IP";
             this.label1.Size = new System.Drawing.Size(55, 15);
-            this.label1.TabIndex = 16;
+            this.label1.TabIndex = 15;
             this.label1.Text = "Server IP:";
             // 
             // textBoxIP
@@ -160,15 +122,15 @@ namespace WindowsProxy
             this.textBoxIP.Location = new System.Drawing.Point(28, 87);
             this.textBoxIP.Name = "textBoxIP";
             this.textBoxIP.Size = new System.Drawing.Size(107, 23);
-            this.textBoxIP.TabIndex = 15;
+            this.textBoxIP.TabIndex = 16;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(25, 116);
-            this.label2.Name = "label2";
+            this.label2.Name = "label_Port";
             this.label2.Size = new System.Drawing.Size(67, 15);
-            this.label2.TabIndex = 18;
+            this.label2.TabIndex = 17;
             this.label2.Text = "Server Port:";
             // 
             // textBoxPort
@@ -176,7 +138,47 @@ namespace WindowsProxy
             this.textBoxPort.Location = new System.Drawing.Point(95, 113);
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(40, 23);
-            this.textBoxPort.TabIndex = 17;
+            this.textBoxPort.TabIndex = 18;
+            // 
+            // passcode_label
+            // 
+            this.passcode_label.AutoSize = true;
+            this.passcode_label.Location = new System.Drawing.Point(25, 142);
+            this.passcode_label.Name = "passcode_label";
+            this.passcode_label.Size = new System.Drawing.Size(59, 15);
+            this.passcode_label.TabIndex = 19;
+            this.passcode_label.Text = "Passcode:";
+            // 
+            // textBoxPasscode
+            // 
+            this.textBoxPasscode.Location = new System.Drawing.Point(90, 139);
+            this.textBoxPasscode.Name = "textBoxPasscode";
+            this.textBoxPasscode.Size = new System.Drawing.Size(45, 23);
+            this.textBoxPasscode.TabIndex = 20;
+            this.textBoxPasscode.Text = "123456";
+            // 
+            // ls_button
+            // 
+            this.ls_button.ImageAlign = System.Drawing.ContentAlignment.TopRight;
+            this.ls_button.Location = new System.Drawing.Point(28, 210);
+            this.ls_button.Name = "ls_button";
+            this.ls_button.Size = new System.Drawing.Size(107, 46);
+            this.ls_button.TabIndex = 21;
+            this.ls_button.Text = "Show Remote Applications";
+            this.ls_button.UseVisualStyleBackColor = true;
+            this.ls_button.Visible = false;
+            this.ls_button.Click += new System.EventHandler(this.FetchRemoteProcesses);
+            // 
+            // disconnect_button
+            // 
+            this.disconnect_button.Enabled = false;
+            this.disconnect_button.Location = new System.Drawing.Point(28, 271);
+            this.disconnect_button.Name = "disconnect_button";
+            this.disconnect_button.Size = new System.Drawing.Size(107, 30);
+            this.disconnect_button.TabIndex = 22;
+            this.disconnect_button.Text = "Disconnect";
+            this.disconnect_button.UseVisualStyleBackColor = true;
+            this.disconnect_button.Click += new System.EventHandler(this.Disconnect);
             // 
             // RootForm
             // 
@@ -206,7 +208,7 @@ namespace WindowsProxy
 
         }
 
-       
+
 
         #endregion
 
@@ -216,11 +218,11 @@ namespace WindowsProxy
         private Button connect_button;
         private Button disconnect_button;
         private DataGridViewTextBoxColumn Process;
-    private TextBox textBoxPasscode;
-    private Label passcode_label;
-    private Label label1;
-    private TextBox textBoxIP;
-    private Label label2;
-    private TextBox textBoxPort;
-  }
+        private TextBox textBoxPasscode;
+        private Label passcode_label;
+        private Label label1;
+        private TextBox textBoxIP;
+        private Label label2;
+        private TextBox textBoxPort;
+    }
 }

@@ -26,242 +26,297 @@ using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.IO;
 
 using Sintering;
 
-namespace WindowsProxy {
+namespace WindowsProxy
+{
 
-  public partial class RootForm : Form {
-
-    ConcurrentDictionary<int , object> form_table;
-    string server_ip;
-    int server_port;
-
-    TcpClient client;
-    ClientHandler client_handle;
-    WindowsProxy proxy;
-    SslStream sslStream;
-    public String passcode;
-    const SslPolicyErrors acceptedSslPolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch // we do not check server host name
-                                                  | SslPolicyErrors.RemoteCertificateChainErrors; // for test certificate we ignore chain error
-
-    // constructor
-    public RootForm() {
-      InitializeComponent();
-      form_table = new ConcurrentDictionary<int , object>();
-    }
-
-    public void DisplayProxy(dynamic form , int pid) {
-      // Before rendering check whether we are in the UI thread 
-      if (InvokeRequired) {
-        BeginInvoke(new MethodInvoker(() => this.DisplayProxy(form , pid)));
-        return;
-      }
-
-      try {
-        form_table.TryAdd(pid , form);
-        form.Show();
-      }
-      catch (Exception e) {
-        Console.WriteLine(e.ToString());
-      }
-    }
-
-    public void PopulateGridView(List<Entity> new_processes) {
-      /* Before rendering check whether we are in the UI thread */
-      if (InvokeRequired) {
-        BeginInvoke(new MethodInvoker(() => PopulateGridView(new_processes)));
-        return;
-      }
-
-      try {
-        remoteProcessesView.Rows.Clear();
-        remoteProcessesView.Refresh();
-        foreach (Entity proc in new_processes) {
-          DataGridViewRow row = (DataGridViewRow)remoteProcessesView.Rows[0].Clone();
-          row.Tag = proc;
-          row.Cells [0].Value = proc.Name;
-          remoteProcessesView.Rows.Add(row);
-        }
-      }
-      catch (Exception e) {
-        Console.WriteLine(e.ToString());
-      }
-    }
-
-
-    public void ShowConnected()
-    {
-      /* Before rendering check whether we are in the UI thread */
-      if (InvokeRequired)
-      {
-        BeginInvoke(new MethodInvoker(() => ShowConnected()));
-        return;
-      }
-
-      try
-      {
-        this.ls_button.Visible = true;
-        this.remoteProcessesView.Visible = false;
-        this.connect_button.Enabled = false;
-        this.disconnect_button.Enabled = true;
-        this.textBoxPasscode.Enabled = false;
-        this.textBoxIP.Enabled = false;
-        this.textBoxPort.Enabled = false;
-        
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e.ToString());
-      }
-    }
-
-    // The following method is invoked by the RemoteCertificateValidationDelegate.
-    public static bool ValidateServerCertificate(
-          object sender,
-          X509Certificate certificate,
-          X509Chain chain,
-          SslPolicyErrors sslPolicyErrors)
+    public partial class RootForm : Form
     {
 
-      Console.WriteLine("SSL Certificate validate results: {0}({1})", (int)sslPolicyErrors, sslPolicyErrors);
-      Console.WriteLine("SSL acceptedSslPolicyErrors:      {0}", acceptedSslPolicyErrors);
+        ConcurrentDictionary<int, object> form_table;
+        string server_ip;
+        int server_port;
 
-      if ((sslPolicyErrors &(~acceptedSslPolicyErrors)) == 0)
-        return true;
+        TcpClient client = null;
+        ClientHandler client_handle;
+        WindowsProxy proxy;
+        SslStream sslStream;
+        public String passcode;
+        const SslPolicyErrors acceptedSslPolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch // we do not check server host name
+                                                      | SslPolicyErrors.RemoteCertificateChainErrors; // for test certificate we ignore chain error
+        private static log4net.ILog log = log4net.LogManager.GetLogger("Proxy");
 
-      // Do not allow this client to communicate with unauthenticated servers.
-      return false;
-    }
-
-    private void Connect(object sender , EventArgs e) {
-      // connect
-      try
-      {
-        server_ip = this.textBoxIP.Text;
-        server_port = int.Parse(textBoxPort.Text);
-        Console.WriteLine("connecting to server {0}:{1}", server_ip, server_port);
-        client = new TcpClient(server_ip, server_port);
-      }
-      catch (SocketException ex)
-      {
-        Console.WriteLine("SocketException: {0}", ex);
-        MessageBox.Show("Not able to reach sinter server");
-        return;
-      }
-
-      if (client != null) {
-        proxy = new WindowsProxy(this);
-        
-
-        /* implements SSL */
-        sslStream = new SslStream(
-                client.GetStream(),
-                false,
-                new RemoteCertificateValidationCallback(ValidateServerCertificate),
-                null
-                );
-        try
+        // constructor
+        public RootForm()
         {
-          sslStream.AuthenticateAsClient(@"SinterServer"); 
+            using (XmlReader reader = new XmlTextReader("proxyconfig.xml"))
+            {
+                reader.MoveToContent();
+                string logfolder = Environment.ExpandEnvironmentVariables(reader.GetAttribute("logfolder"));
+                string logfilepath = Path.Combine(logfolder, reader.GetAttribute("logfile")); //log file path
+                string xmlfilepath = Path.Combine(logfolder, reader.GetAttribute("xml_logfile")); //xml log file path
+                log4net.GlobalContext.Properties["LogFileName"] = logfilepath;
+                log4net.GlobalContext.Properties["XMLFileName"] = xmlfilepath;
+                Console.WriteLine("logfile: {0}", logfilepath);
+                Console.WriteLine("xmlfile: {0}", xmlfilepath);
+            }
+
+
+            InitializeComponent();
+            form_table = new ConcurrentDictionary<int, object>();
         }
-        catch (AuthenticationException ee)
+
+        public void DisplayDialog(dynamic form, int pid)
         {
-          Console.WriteLine("SSL AuthenticationException: {0}", ee.Message);
-          if (ee.InnerException != null)
-          {
-            Console.WriteLine("SSL Inner exception: {0}", ee.InnerException.Message);
-          }
-          Console.WriteLine("SSL Authentication failed - closing the connection.");
-          client.Close();
-          return;
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(() => this.DisplayDialog(form, pid)));
+                return;
+            }
+
+            try
+            {
+                form_table.TryAdd(pid, form);
+                form.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+            }
         }
-        catch (InvalidOperationException ee)
+
+        public void DisplayProxy(dynamic form, int pid)
         {
-          Console.WriteLine("InvalidOperationException: {0}", ee.Message);
-          if (ee.InnerException != null)
-          {
-            Console.WriteLine("InvalidOperationException Inner exception: {0}", ee.InnerException.Message);
-          }
-          Console.WriteLine("closing the connection.");
-          client.Close();
-          return;
+            // Before rendering check whether we are in the UI thread 
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(() => this.DisplayProxy(form, pid)));
+                return;
+            }
+
+            try
+            {
+                form_table.TryAdd(pid, form);
+                form.Show();
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+            }
         }
-        Console.WriteLine("SSL Authentication successful!!");
 
-        //client_handle = new ClientHandler(proxy, client, "WinProxy Client");
-        client_handle = new ClientHandler(proxy, client, "WinProxy Client", sslStream);
+        public void PopulateGridView(List<Entity> new_processes)
+        {
+            /* Before rendering check whether we are in the UI thread */
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(() => PopulateGridView(new_processes)));
+                return;
+            }
 
-        passcode = this.textBoxPasscode.Text;
-        proxy.execute_verify_passcode_req(null);
-      }
+            try
+            {
+                remoteProcessesView.Rows.Clear();
+                remoteProcessesView.Refresh();
+                foreach (Entity proc in new_processes)
+                {
+                    DataGridViewRow row = (DataGridViewRow)remoteProcessesView.Rows[0].Clone();
+                    row.Tag = proc;
+                    row.Cells[0].Value = proc.Name;
+                    remoteProcessesView.Rows.Add(row);
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+            }
+        }
+
+
+        public void ShowConnected()
+        {
+            /* Before rendering check whether we are in the UI thread */
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(() => ShowConnected()));
+                return;
+            }
+
+            try
+            {
+                this.ls_button.Visible = true;
+                this.remoteProcessesView.Visible = false;
+                this.connect_button.Enabled = false;
+                this.disconnect_button.Enabled = true;
+                this.textBoxPasscode.Enabled = false;
+                this.textBoxIP.Enabled = false;
+                this.textBoxPort.Enabled = false;
+
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+            }
+        }
+
+        // The following method is invoked by the RemoteCertificateValidationDelegate.
+        public static bool ValidateServerCertificate(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
+        {
+
+            log.InfoFormat("SSL Certificate validate results: {0}({1})", (int)sslPolicyErrors, sslPolicyErrors);
+            log.InfoFormat("SSL acceptedSslPolicyErrors:      {0}", acceptedSslPolicyErrors);
+
+            if ((sslPolicyErrors & (~acceptedSslPolicyErrors)) == 0)
+                return true;
+
+            // Do not allow this client to communicate with unauthenticated servers.
+            return false;
+        }
+
+        private void Connect(object sender, EventArgs e)
+        {
+            // connect
+            try
+            {
+                server_ip = this.textBoxIP.Text;
+                server_port = int.Parse(textBoxPort.Text);
+                log.InfoFormat("connecting to server {0}:{1}", server_ip, server_port);
+                if (client != null)
+                {
+                    sslStream.Close();
+                    client.Close();
+                }
+                client = new TcpClient(server_ip, server_port);
+            }
+            catch (SocketException ex)
+            {
+                log.Error("SocketException: {0}", ex);
+                MessageBox.Show("Not able to reach sinter server");
+                return;
+            }
+
+            if (client != null)
+            {
+                proxy = new WindowsProxy(this);
+
+
+                /* implements SSL */
+                sslStream = new SslStream(
+                        client.GetStream(),
+                        false,
+                        new RemoteCertificateValidationCallback(ValidateServerCertificate),
+                        null
+                        );
+                try
+                {
+                    sslStream.AuthenticateAsClient(@"SinterServer");
+                }
+                catch (AuthenticationException ee)
+                {
+                    log.ErrorFormat("SSL AuthenticationException: {0}", ee.Message);
+                    if (ee.InnerException != null)
+                    {
+                        log.ErrorFormat("SSL Inner exception: {0}", ee.InnerException.Message);
+                    }
+                    log.Error("SSL Authentication failed - closing the connection.");
+                    client.Close();
+                    return;
+                }
+                catch (InvalidOperationException ee)
+                {
+                    log.ErrorFormat("InvalidOperationException: {0}", ee.Message);
+                    if (ee.InnerException != null)
+                    {
+                        log.ErrorFormat("InvalidOperationException Inner exception: {0}", ee.InnerException.Message);
+                    }
+                    log.Error("closing the connection.");
+                    client.Close();
+                    return;
+                }
+                log.Info("SSL Authentication successful!!");
+
+                //client_handle = new ClientHandler(proxy, client, "WinProxy Client");
+                client_handle = new ClientHandler(proxy, client, "WinProxy Client", sslStream);
+
+                passcode = this.textBoxPasscode.Text;
+                proxy.execute_verify_passcode_req(null);
+            }
+        }
+
+        private void FetchRemoteProcesses(object sender, EventArgs e)
+        {
+            proxy.execute_ls_req(null);
+            this.remoteProcessesView.Visible = true;
+        }
+
+        private void LoadRemoteProcess(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView grid = sender as DataGridView;
+            Entity entity = (Entity)grid.SelectedRows[0].Tag;
+
+            proxy.RequestedProcessId = int.Parse(entity.Process);
+            proxy.RemoteProcessName = (string)grid.SelectedRows[0].Cells[0].Value;
+            proxy.execute_ls_l_req(null);
+        }
+
+        private void RootForm_Load(object sender, EventArgs e)
+        {
+            using (XmlReader reader = new XmlTextReader("proxyconfig.xml"))
+            {
+                reader.MoveToContent();
+                server_ip = reader.GetAttribute("server_ip");
+                this.textBoxIP.Text = server_ip.ToString();
+                server_port = int.Parse(reader.GetAttribute("server_port"));
+                this.textBoxPort.Text = server_port.ToString();
+            }
+        }
+
+        public ConcurrentDictionary<int, object> Form_table
+        {
+            get { return form_table; }
+        }
+
+        public void Remove_Dict_Item(int key)
+        {
+            form_table.TryRemove(key, out object dummy);
+        }
+
+        public void Disconnect(object sender, EventArgs e)
+        {
+            /* Before rendering check whether we are in the UI thread */
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(() => Disconnect(sender, e)));
+                return;
+            }
+
+            try
+            {
+                if (client_handle != null)
+                    client_handle.StopHandling();
+
+                this.ls_button.Visible = false;
+                this.remoteProcessesView.Visible = false;
+                this.connect_button.Enabled = true;
+                this.disconnect_button.Enabled = false;
+                this.textBoxPasscode.Enabled = true;
+                this.textBoxIP.Enabled = true;
+                this.textBoxPort.Enabled = true;
+
+                this.proxy.CloseAllForms();
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.ToString());
+            }
+        }
+
     }
-
-    private void FetchRemoteProcesses(object sender, EventArgs e)
-    {
-      proxy.execute_ls_req(null);
-      this.remoteProcessesView.Visible = true;
-    }
-
-    private void LoadRemoteProcess(object sender , DataGridViewCellEventArgs e) {
-      DataGridView grid = sender as DataGridView;
-      Entity entity = (Entity)grid.SelectedRows[0].Tag;
-
-      proxy.RequestedProcessId = int.Parse(entity.Process);
-      proxy.RemoteProcessName = (string)grid.SelectedRows[0].Cells[0].Value;
-      proxy.execute_ls_l_req(null);
-    }
-
-    private void RootForm_Load(object sender , EventArgs e) {
-      using (XmlReader reader = new XmlTextReader("config.xml"))
-      {
-        reader.ReadToFollowing("server");
-        reader.MoveToFirstAttribute();
-        server_ip = reader.Value;
-        this.textBoxIP.Text = server_ip.ToString();
-        reader.MoveToNextAttribute();
-        server_port = int.Parse(reader.Value);
-        this.textBoxPort.Text = server_port.ToString();
-      }
-    }
-
-    public ConcurrentDictionary<int , object> Form_table {
-      get { return form_table; }
-    }
-
-    public void Remove_Dict_Item(int key) {
-      form_table.TryRemove(key, out object dummy);
-    }
-
-    public void Disconnect(object sender, EventArgs e)
-    {
-      /* Before rendering check whether we are in the UI thread */
-      if (InvokeRequired)
-      {
-        BeginInvoke(new MethodInvoker(() => Disconnect(sender, e)));
-        return;
-      }
-
-      try
-      {
-        if (client_handle != null)
-          client_handle.StopHandling();
-
-        this.ls_button.Visible = false;
-        this.remoteProcessesView.Visible = false;
-        this.connect_button.Enabled = true;
-        this.disconnect_button.Enabled = false;
-        this.textBoxPasscode.Enabled = true;
-        this.textBoxIP.Enabled = true;
-        this.textBoxPort.Enabled = true;
-
-        this.proxy.close_forms();
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.ToString());
-      }
-    }
-
-  }
 }

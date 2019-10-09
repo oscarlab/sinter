@@ -41,8 +41,17 @@ int gPasscode;
 @synthesize scrapers;
 @synthesize ClientConnectionDidCloseNotification;
 
+static NSString* certPasscode;
+static NSString *certificatePath;
+
 + (void) initialize {
     identifier = 0;
+	
+    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];
+    certPasscode = [settings objectForKey:@"certificate_passcode"];
+    NSString* certfile = [settings objectForKey:@"certificate_filename"];
+    NSArray* strings = [certfile componentsSeparatedByString:@"."];
+    certificatePath = [[NSBundle mainBundle] pathForResource:strings[0] ofType:@"p12"];
 }
 
 - (id)init {
@@ -85,8 +94,9 @@ int gPasscode;
         ClientHandler * connection = [[ClientHandler alloc]
                                          initForServerSocketWithtInputStream:(__bridge NSInputStream *)readStream
                                          outputStream:(__bridge NSOutputStream *)writeStream
-                                         andId:identifier];
-        
+                                         andId:identifier
+                                      certificatePath:certificatePath
+                                         certPasscode:certPasscode];
         Scraper * scraper = [[Scraper alloc] initWithId:identifier andClientHandler:connection] ;
         [scrapers setObject:scraper forKey:[NSNumber numberWithInt: identifier]];
         [connections addObject:connection];
@@ -123,7 +133,7 @@ static void EchoServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType ty
     [server acceptConnection:*(CFSocketNativeHandle *)data];
 }
 
-- (BOOL)start {
+- (BOOL)start:(int)port{
     assert(_ipv4socket == NULL);       // don't call -start twice!
 
     CFSocketContext socketCtxt = {0, (__bridge void *) self, NULL, NULL, NULL};
@@ -142,7 +152,7 @@ static void EchoServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType ty
     memset(&addr4, 0, sizeof(addr4));
     addr4.sin_len = sizeof(addr4);
     addr4.sin_family = AF_INET;
-    addr4.sin_port = htons(SERVER_PORT); //0, 6832; //;
+    addr4.sin_port = htons(port);
     addr4.sin_addr.s_addr = htonl(INADDR_ANY);
     if (kCFSocketSuccess != CFSocketSetAddress(_ipv4socket, (__bridge CFDataRef) [NSData dataWithBytes:&addr4 length:sizeof(addr4)])) {
         [self stop];
@@ -153,8 +163,6 @@ static void EchoServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType ty
     NSData *addr = (__bridge_transfer NSData *)CFSocketCopyAddress(_ipv4socket);
     assert([addr length] == sizeof(struct sockaddr_in));
     self.port = ntohs(((const struct sockaddr_in *)[addr bytes])->sin_port);
-    //self.port = 6832;
-
 
     // Set up the run loop sources for the sockets.
     CFRunLoopSourceRef source4 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _ipv4socket, 0);

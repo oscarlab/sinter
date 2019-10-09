@@ -23,55 +23,60 @@ using System.Net.Security;
 
 namespace Sintering
 {
-  public enum NodeType{
+    public enum NodeType
+    {
         Server,
         Client,
     }
 
-    public class ClientHandler {
-
-    ConnectionHandler connectionHandler;
-    CommandHandler    commandHandler;
-
-    private ConcurrentQueue<Sinter> _messageQueue = new ConcurrentQueue<Sinter>();
-    BlockingCollection<Sinter> messageQueue = null;
-
-    IWinCommands actuator;
-
-    public ClientHandler(IWinCommands actuator, TcpClient client, string clientId) {
-      messageQueue = new BlockingCollection<Sinter>(_messageQueue);
-       this.actuator = actuator;
-     
-      connectionHandler = new ConnectionHandler(client , clientId, messageQueue);
-      commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
-
-      this.actuator.connection = connectionHandler;
-
-      connectionHandler.StartConnectionHandling();
-      commandHandler.StartCommandHandling();
-    }
-
-    public ClientHandler(IWinCommands actuator, TcpClient client, string clientId, SslStream sslStream)
+    public class ClientHandler
     {
-      messageQueue = new BlockingCollection<Sinter>(_messageQueue);
-      this.actuator = actuator;
 
-      connectionHandler = new ConnectionHandler(client, clientId, messageQueue, sslStream);
-      commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
+        ConnectionHandler connectionHandler;
+        CommandHandler commandHandler;
 
-      this.actuator.connection = connectionHandler;
+        private ConcurrentQueue<Sinter> _messageQueue = new ConcurrentQueue<Sinter>();
+        BlockingCollection<Sinter> messageQueue = null;
 
-      connectionHandler.StartConnectionHandling();
-      commandHandler.StartCommandHandling();
+        IWinCommands actuator;
+
+        public ClientHandler(IWinCommands actuator, TcpClient client, string clientId)
+        {
+            messageQueue = new BlockingCollection<Sinter>(_messageQueue);
+            this.actuator = actuator;
+
+            connectionHandler = new ConnectionHandler(client, clientId, messageQueue);
+            commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
+
+            this.actuator.connection = connectionHandler;
+
+            connectionHandler.StartConnectionHandling();
+            commandHandler.StartCommandHandling();
+        }
+
+        public ClientHandler(IWinCommands actuator, TcpClient client, string clientId, SslStream sslStream)
+        {
+            messageQueue = new BlockingCollection<Sinter>(_messageQueue);
+            this.actuator = actuator;
+
+            connectionHandler = new ConnectionHandler(client, clientId, messageQueue, sslStream);
+            commandHandler = new CommandHandler(connectionHandler, messageQueue, this.actuator);
+
+            this.actuator.connection = connectionHandler;
+
+            connectionHandler.StartConnectionHandling();
+            commandHandler.StartCommandHandling();
+        }
+
+        public void SendMessage(Sinter sinter)
+        {
+            connectionHandler.SendMessage(sinter);
+        }
+
+        public void StopHandling()
+        {
+            commandHandler.StopCommandHandling();
+            connectionHandler.StopConnectionHandling();
+        }
     }
-
-    public void SendMessage(Sinter sinter) {
-      connectionHandler.SendMessage(sinter);
-    }
-
-    public void StopHandling() {
-      commandHandler.StopCommandHandling();
-      connectionHandler.StopConnectionHandling();
-    }
-  }
 }

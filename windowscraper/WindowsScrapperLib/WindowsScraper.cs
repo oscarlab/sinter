@@ -29,7 +29,7 @@ using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Sintering;
 using LinqAndTrie;
-
+using System.Xml;
 using System.Linq;
 using WindowsScraper.Util;
 
@@ -38,6 +38,7 @@ namespace WindowsScraper
 
     public class WindowsScraper : IWinCommands
     {
+        private static log4net.ILog log = log4net.LogManager.GetLogger("Scraper");
         private Thread ThreadFocusThrottler = null;
         private ConcurrentStack<RepeatedRequest> _repeatedRequestStack = new ConcurrentStack<RepeatedRequest>();
         BlockingCollection<RepeatedRequest> repeatedRequestStack = null;
@@ -55,16 +56,15 @@ namespace WindowsScraper
 
         Condition listItemCondition;
 
-        private static readonly log4net.ILog log = Logger.Create();
-
         TimeSpan DEFAULT_WAIT_TIME = new TimeSpan(0, 0, 0, 0, 5);
 
         Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
-      	Dictionary<int, string> sendKeysCodes;
+        Dictionary<int, string> sendKeysCodes;
 
         private string passcode;
         public bool bPasscodeVerified { get; private set; }
+        private string[] supportedProcesses;
 
         public WindowsScraper(string passcode)
         {
@@ -94,15 +94,23 @@ namespace WindowsScraper
             }
             else
             {
-                Console.WriteLine("Unable to load service_code dictionary");
+                log.Error("Unable to load service_code dictionary");
             }
 
             Dictionary<string, object> keyCodesTemp = Config.getConfig("send_key_codes");
 
-        	  if (keyCodesTemp != null)
-        	  {
-            		sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
-        	  }
+            if (keyCodesTemp != null)
+            {
+                sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
+            }
+
+            using (XmlTextReader reader = new XmlTextReader("Scraper_config.xml"))
+            {
+                reader.MoveToContent();
+                supportedProcesses = reader.GetAttribute("program_type").Split();
+                log.Info("Support program types: ");
+                log.Info(supportedProcesses);
+            }
         }
 
         public void LogTime(string arg)
@@ -110,8 +118,7 @@ namespace WindowsScraper
             TimerLog.stopwatch.Stop();
             string logStr = String.Format("\t{0}  update detection time {1}", arg,
               TimerLog.stopwatch.ElapsedMilliseconds);
-            log.Info(logStr);
-            Console.WriteLine(logStr);
+            log.Debug(logStr);
         }
 
         private static bool bDesktopHookAdded = false;
@@ -208,7 +215,7 @@ namespace WindowsScraper
             }
             catch (Exception)
             {
-                // System.Console.WriteLine("In GetAnchorElement: " + exception.Message);
+                // log.Debug("In GetAnchorElement: " + exception.Message);
             }
 
             return null;
@@ -235,18 +242,18 @@ namespace WindowsScraper
                 AutomationElement element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
                 if (element != null)
                 {
-                    Console.WriteLine("Focus {0}", element);
+                    log.DebugFormat("Focus {0}", element);
                     element.SetFocus();
                     if (element.TryGetCurrentPattern(SelectionItemPatternIdentifiers.Pattern, out object selectionPattern))
                     {
                         ((SelectionItemPattern)selectionPattern).Select();
-                        //Console.WriteLine("Done setting focus {0}", runtimeId);
+                        log.DebugFormat("Done setting focus {0}", runtimeId);
                     }
                 }
             }
             catch
             {
-                Console.WriteLine("problem with SetFocus {0}", runtimeId);
+                log.ErrorFormat("problem with SetFocus {0}", runtimeId);
             }
         }
         public void executeSetText(string runtimeId, string text = "")
@@ -278,7 +285,7 @@ namespace WindowsScraper
             }
             catch
             {
-                Console.WriteLine("problem with SetText {0}", runtimeId);
+                log.ErrorFormat("problem with SetText {0}", runtimeId);
             }
         }
 
@@ -294,7 +301,7 @@ namespace WindowsScraper
             }
             catch
             {
-                Console.WriteLine("problem with SetText {0}", runtimeId);
+                log.ErrorFormat("problem with SetText {0}", runtimeId);
             }
         }
 
@@ -303,7 +310,7 @@ namespace WindowsScraper
             try
             {
                 AutomationElement element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
-                Console.WriteLine("Execute Focus {0}", element);
+                log.DebugFormat("Execute Focus {0}", element);
                 if (element != null && element.Current.ControlType != ControlType.Window)
                 {
                     element.SetFocus();
@@ -325,7 +332,7 @@ namespace WindowsScraper
             }
             catch
             {
-                Console.WriteLine("problem with DeltaFocus {0}", runtimeId);
+                log.ErrorFormat("problem with DeltaFocus {0}", runtimeId);
             }
         }
 
@@ -337,11 +344,11 @@ namespace WindowsScraper
             if (element != null)
             {
                 Automation.AddStructureChangedEventHandler(element, TreeScope.Subtree, new StructureChangedEventHandler(OnStructureChangedLocal));
-                Console.WriteLine("successfully registered structureChangeNotification");
+                log.Debug("successfully registered structureChangeNotification");
             }
             else
             {
-                Console.WriteLine("registration of structureChangeNotification failed");
+                log.Debug("registration of structureChangeNotification failed");
             }
         }
         */
@@ -351,18 +358,18 @@ namespace WindowsScraper
             AutomationElement element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
             if (element == null)
             {
-                Console.WriteLine("Unable to get Automation Element");
+                log.ErrorFormat("Unable to get Automation Element");
                 return;
             }
             TextPattern textPattern = element.GetCurrentPattern(TextPattern.Pattern) as TextPattern;
             if (textPattern == null)
             {
-                Console.WriteLine("Unable to get TextPattern");
+                log.ErrorFormat("Unable to get TextPattern");
                 return;
             }
             if (textPattern.SupportedTextSelection == SupportedTextSelection.None)
             {
-                Console.WriteLine("No SupportedTextSelection");
+                log.ErrorFormat("No SupportedTextSelection");
                 return;
             }
 
@@ -388,7 +395,7 @@ namespace WindowsScraper
             AutomationElement element = (AutomationElement)obj;
             if (element.Current.ProcessId == requestedProcessId)
             {
-                System.Console.WriteLine("Window Opened " + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
+                log.Info("OnWindowOpened()" + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
                 desktopDictionary.TryAdd(SinterUtil.GetRuntimeId(element), true);
 
                 // @todo: fix synchronization between this one and structure changed callback
@@ -406,18 +413,31 @@ namespace WindowsScraper
         private void OnWindowOpenedLocal(object obj, AutomationEventArgs e)
         {
             AutomationElement element = (AutomationElement)obj;
-            if (element.Current.ProcessId == requestedProcessId)
+            int[] runtimeId = element.GetRuntimeId();
+            if (automationElementTrie.TryGetValue(runtimeId, out Entity oldEntity))
             {
-                Console.WriteLine("Window Opened " + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
+                log.Debug("OnWindowOpenedLocal() " + oldEntity.Type + " " + oldEntity.Name + " " + runtimeId[1].ToString());
+            }
 
-                // send an LS_WINDOW msg as if it were a new window
-                Sinter sinter = new Sinter
+            try
+            {
+                if (element.Current.ProcessId == requestedProcessId)
                 {
-                    HeaderNode = MsgUtil.BuildHeader(serviceCodes["ls_l_res"], serviceCodes["ls_l_res_dialog"]),
-                    EntityNode = UIAElement2EntityRecursive(element),
-                };
+                    log.Info("OnWindowOpenedLocal()" + SinterUtil.GetRuntimeId(element) + " " + element.Current.Name + " " + element.Current.LocalizedControlType);
 
-                connection.SendMessage(sinter);
+                    // send an LS_WINDOW msg as if it were a new window
+                    Sinter sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(serviceCodes["ls_l_res"], serviceCodes["ls_l_res_dialog"]),
+                        EntityNode = UIAElement2EntityRecursive(element),
+                    };
+
+                    connection.SendMessage(sinter);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
             }
         }
 
@@ -427,12 +447,12 @@ namespace WindowsScraper
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
 
-            if (automationElementTrie.ContainsKey(runtimeId))
+            if (automationElementTrie.TryGetValue(runtimeId, out Entity entity))
             {
                 //DeltaForClose(stringRuntimeId);
                 DeltaForClose(null); // targetID = 'null' will make client close all windows of the processID. 
                                      // this is different from OnWindowClosed(), which close only specific targetID.
-                Console.WriteLine("Window Closed Locally " + runtimeId);
+                log.Debug("Window Closed Locally " + runtimeId);
             }
         }
 
@@ -443,24 +463,22 @@ namespace WindowsScraper
             int[] runtimeId = e.GetRuntimeId();
             string stringRuntimeId = SinterUtil.SerializedRuntimeId(e.GetRuntimeId());
 
-
-
             if (automationElementTrie.ContainsKey(runtimeId))
             {
                 if (automationElementTrie.TryGetValue(runtimeId, out Entity entity))
                 {
                     if (entity.Type == "Pane")
                     {
-                        Console.WriteLine(entity);
+                        log.Debug("Window Closed Globally: " + entity.Type);
                         foreach (Entity child in entity.Children)
                         {
-                            Console.WriteLine("Window Closed Globally: " + child.Type);
+                            log.Debug("Window Closed Globally: " + child.Type);
                             DeltaForClose(child.UniqueID);
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Window Closed Globally: " + entity.Type);
+                        log.Debug("Window Closed Globally: " + entity.Type + " " + stringRuntimeId);
                         DeltaForClose(stringRuntimeId);
                     }
                 }
@@ -469,7 +487,7 @@ namespace WindowsScraper
 
         private void OnMenuOpened(object obj, AutomationEventArgs e)
         {
-            Console.WriteLine("Opened Menu");
+            log.Debug("OnMenuOpened()");
             AutomationElement element = (AutomationElement)obj;
             Sinter xmlDoc = null;
             try
@@ -482,7 +500,7 @@ namespace WindowsScraper
                     if (element.Current.Name == "Context")
                     {
                         header = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_subtree_context_menu"]);
-                        Console.WriteLine("OnContextMenuOpened " + element.Current.Name + " " + element.Current.LocalizedControlType);
+                        log.Debug("OnContextMenuOpened " + element.Current.Name + " " + element.Current.LocalizedControlType);
                     }
                     else if (element.Current.LocalizedControlType == "menu" && lastActiveMenu != null)
                     {
@@ -511,7 +529,7 @@ namespace WindowsScraper
             }
             catch
             {
-                Console.WriteLine("Problem in MenuOpened");
+                log.Error("Problem in MenuOpened");
             }
         }
 
@@ -522,18 +540,18 @@ namespace WindowsScraper
             /*
             bool outValue;
             if (rid != null && desktopDictionary.TryRemove(rid, out outValue)) {
-              System.Console.WriteLine("OnMenuClosed " + rid);
+              log.Debug("OnMenuClosed " + rid);
               //DeltaForClose(rid, "child_removed");
             }
             */
         }
         private void OnFocusChanged(object src, AutomationFocusChangedEventArgs e)
         {
-        /*    AutomationElement element = (AutomationElement)src;
-            if (element.Current.ProcessId != requestedProcessId)
-            {
-                return;
-            } */
+            /*    AutomationElement element = (AutomationElement)src;
+                if (element.Current.ProcessId != requestedProcessId)
+                {
+                    return;
+                } */
             /*
           if (element.Current.ControlType == ControlType.Text) {
               DeltaGeneric(element);
@@ -544,7 +562,14 @@ namespace WindowsScraper
         {
             AutomationElement element = (AutomationElement)sender;
 
-            //Console.WriteLine("On Property Change {0}", e.Property.ProgrammaticName);
+            if (element.Current.ControlType == ControlType.Window
+                && e.Property == AutomationElement.IsEnabledProperty)
+            {
+                DeltaGenericWindowPropChange(element);
+                return;
+            }
+
+            //log.Debug("On Property Change {0}", e.Property.ProgrammaticName);
 
             // Property: IsOffScreen
             if (e.Property == AutomationElement.IsOffscreenProperty)
@@ -554,32 +579,38 @@ namespace WindowsScraper
             // Property: BoundingRectangle
             else if (e.Property == AutomationElement.BoundingRectangleProperty)
             {
-                Console.WriteLine("Properties {0} {1} {2}", element.Current.ControlType.ProgrammaticName, element.Current.Name, e.Property.ProgrammaticName);
-                //Console.WriteLine("New Value Width {0} Height {1} X {2} Y {3} {4}", element.Current.BoundingRectangle.Width, element.Current.BoundingRectangle.Height, element.Current.BoundingRectangle.X, element.Current.BoundingRectangle.Y, e.NewValue);
+                //log.Debug("PropertyChange event {0} {1} {2}", element.Current.ControlType.ProgrammaticName, element.Current.Name, e.Property.ProgrammaticName);
+                //log.Debug("New Value Width {0} Height {1} X {2} Y {3} {4}", element.Current.BoundingRectangle.Width, element.Current.BoundingRectangle.Height, element.Current.BoundingRectangle.X, element.Current.BoundingRectangle.Y, e.NewValue);
                 // Subproperty: List
-                if (element.Current.ControlType == ControlType.List)
+                try
                 {
-                    DeltaSpecialList(element);
-                } //  Subproperty: ComboBox
-                  //else if (element.Current.ControlType == ControlType.ComboBox) {
-                  //Console.WriteLine("box: {0} {1} ", element.Current.ControlType.ProgrammaticName, element.Current.Name);
-                  //DeltaComboBox(element);
-                  //} //  Subproperty: Breadcrumb , Toolbar
-                  //else if (element.Current.ControlType == ControlType.Window) {
-                  //  DeltaGenericWindow(element);
-                  //}
-                else if (element.Current.ControlType == ControlType.ToolBar)
-                {
-                    Console.WriteLine("EXECUTING");
-                    DeltaGeneric(element);
+                    if (element.Current.ControlType == ControlType.List)
+                    {
+                        DeltaSpecialList(element);
+                    } //  Subproperty: ComboBox
+                      //else if (element.Current.ControlType == ControlType.ComboBox) {
+                      //log.Debug("box: {0} {1} ", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+                      //DeltaComboBox(element);
+                      //} //  Subproperty: Breadcrumb , Toolbar
+                      //else if (element.Current.ControlType == ControlType.Window) {
+                      //  DeltaGenericWindow(element);
+                      //}
+                    else if (element.Current.ControlType == ControlType.ToolBar)
+                    {
+                        DeltaGeneric(element);
+                    }
+                    else if (element.Current.ControlType == ControlType.Window)
+                    {
+                        DeltaGenericWindowPropChange(element);
+                    }
+                    else
+                    {
+                        // not required
+                    }
                 }
-                else if (element.Current.ControlType == ControlType.Window)
+                catch (Exception ex)
                 {
-                    DeltaGenericWindowSize(element);
-                }
-                else
-                {
-                    // not required
+                    log.Error(ex);
                 }
             }
             // Property: ExpandCollapseState
@@ -598,20 +629,20 @@ namespace WindowsScraper
             // Property: ValueChanged
             else if (e.Property == ValuePattern.ValueProperty)
             {
-                Console.WriteLine("valueChanged {0} {1}", element.Current.Name, e.NewValue);
+                log.DebugFormat("valueChanged {0} {1}", element.Current.Name, e.NewValue);
                 DeltaGenericHash(element);
                 //MarkUpdateRequired(element);
             }//update required
             else if (e.Property == RangeValuePattern.ValueProperty)
             {
-                Console.WriteLine("RangeValuePattern value {0} {1}", element.Current.Name, e.NewValue);
+                log.DebugFormat("RangeValuePattern value {0} {1}", element.Current.Name, e.NewValue);
                 DeltaGenericHash(element, e.NewValue.ToString());
             }
             else if (e.Property == AutomationElement.NameProperty &&
                 (element.Current.ControlType == ControlType.Text ||
                 element.Current.ControlType == ControlType.Button))
             {
-                //Console.WriteLine("NameChanged {0} {1}", element.Current.Name, e.NewValue);
+                log.DebugFormat("NameChanged {0} {1}", element.Current.Name, e.NewValue);
                 DeltaGenericHash(element);
             }
             if (e.Property == SelectionItemPattern.IsSelectedProperty)
@@ -627,20 +658,20 @@ namespace WindowsScraper
         private void OnPropertyChangeGlobal(object sender, AutomationPropertyChangedEventArgs e)
         {
             AutomationElement element = (AutomationElement)sender;
-            // Console.WriteLine("Property Change Global");
+            // log.Debug("Property Change Global");
 
             // Property: BoundingRectangle
-            // Console.WriteLine("Global Box, {0}", element.Current.ControlType.ProgrammaticName);
-            // Console.WriteLine("Properties {0} {1} {2} {3}", element.Current.ControlType, e.Property, element.Current.Name, e.ToString());
+            // log.Debug("Global Box, {0}", element.Current.ControlType.ProgrammaticName);
+            // log.Debug("Properties {0} {1} {2} {3}", element.Current.ControlType, e.Property, element.Current.Name, e.ToString());
             if (e.Property == AutomationElement.BoundingRectangleProperty)
             {
                 // Subproperty: List
-              /*  if (element.Current.ControlType == ControlType.List)
-                {
-                    Console.WriteLine("PropertyChange: Delta");
-                    DeltaSpecialList(element);
+                /*  if (element.Current.ControlType == ControlType.List)
+                  {
+                      log.Debug("PropertyChange: Delta");
+                      DeltaSpecialList(element);
 
-                } */ //  Subproperty: ComboBox
+                  } */ //  Subproperty: ComboBox
             }
         }
 
@@ -670,21 +701,21 @@ namespace WindowsScraper
             //return;
             //}
 
-            //Console.WriteLine("Structure Changed Global");
+            //log.Debug("Structure Changed Global");
             AutomationElement element = (AutomationElement)sender;
-            Console.WriteLine("Struct changed global {0}", element.Current.ControlType.ProgrammaticName);
+            log.DebugFormat("Struct changed global {0}", element.Current.ControlType.ProgrammaticName);
 
             //if (element.Current.ControlType == ControlType.List) {
             // DeltaList(element);
             //}
             if (element.Current.ClassName == "Auto-Suggest Dropdown")
             {
-                Console.WriteLine("Auto-Suggest Dropdown created {0} {1}", element.Current.ControlType.ProgrammaticName, e.StructureChangeType);
+                log.DebugFormat("Auto-Suggest Dropdown created {0} {1}", element.Current.ControlType.ProgrammaticName, e.StructureChangeType);
                 DeltaSpecialList(element);
             }
         }
 
-        
+
         private void OnStructureChangedLocal(object sender, StructureChangedEventArgs e)
         {
             if (e.StructureChangeType != StructureChangeType.ChildAdded)
@@ -692,28 +723,33 @@ namespace WindowsScraper
                 return;
             }
 
-            Console.WriteLine("OnStructureChangedLocal");
             AutomationElement element = (AutomationElement)sender;
             AutomationElementCollection elementCollection = element.FindAll(TreeScope.Children, Condition.TrueCondition);
 
-            // Console.WriteLine("Local Structure {0}", element.Current.ControlType);
-            //Console.WriteLine("my {0} {1}", element.Current.ControlType.ProgrammaticName, element.Current.Name);
+            try
+            {
+                log.DebugFormat("OnStructureChangedLocal {0}, {1}", element.Current.Name, element.Current.ControlType.ProgrammaticName);
 
-            if (element.Current.ControlType == ControlType.SplitButton)
-            {
-                DeltaGenericAnchor(element);
-            }
-            if (element.Current.ControlType == ControlType.ProgressBar)
-            {
-                DeltaGenericImmediate(element);
-            }
-
-            if (element.Current.Name != "View")
-            {
-                if (element.Current.LocalizedControlType != "text") //already sent the msg 511 (delta_prop_change_value)
+                if (element.Current.ControlType == ControlType.SplitButton)
                 {
-                    DeltaGeneric(element);
+                    DeltaGenericAnchor(element);
                 }
+                if (element.Current.ControlType == ControlType.ProgressBar)
+                {
+                    DeltaGenericImmediate(element);
+                }
+
+                if (element.Current.Name != "View")
+                {
+                    if (element.Current.LocalizedControlType != "text") //already sent the msg 511 (delta_prop_change_value)
+                    {
+                        DeltaGeneric(element);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
             }
 
         }
@@ -800,7 +836,7 @@ namespace WindowsScraper
                 return;
 
             //if (anchor.Current.ControlType != ControlType.Pane)
-              //  return;
+            //  return;
 
             if (!IsCached(element))
                 anchor = GetAnchorElementFromCache(element);
@@ -808,7 +844,7 @@ namespace WindowsScraper
             //always sends update
             if (anchor != null)
             {
-                Console.WriteLine("DeltaGeneric");
+                log.Debug("DeltaGeneric");
                 SinterUtil.ScreenSize(out int width, out int height);
 
                 Header header = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_subtree_replace"]);
@@ -823,9 +859,9 @@ namespace WindowsScraper
                     EntityNode = UIAElement2EntityRecursive(anchor),
                 };
 
-                //Console.WriteLine("Chillins");
-                //Console.WriteLine("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
-                PrintChildrenNodes(sinter.EntityNode);
+                //log.Debug("Chillins");
+                //log.Debug("{0} {1}", sinter.EntityNode.Type, sinter.EntityNode.Name);
+                //PrintChildrenNodes(sinter.EntityNode);
 
                 // send
                 connection.SendMessage(sinter);
@@ -838,7 +874,7 @@ namespace WindowsScraper
             {
                 foreach (Entity child_entity in node.Children)
                 {
-                    Console.WriteLine("PrintChildrenNodes {0} {1}", child_entity.Type, child_entity.Name);
+                    log.DebugFormat("PrintChildrenNodes {0} {1}", child_entity.Type, child_entity.Name);
                     PrintChildrenNodes(child_entity);
                 }
             }
@@ -846,7 +882,7 @@ namespace WindowsScraper
 
         private void DeltaGenericHash(AutomationElement element, string hash = "")
         {
-            Console.WriteLine("DeltaGenericHash");
+            log.Debug("DeltaGenericHash");
             if (string.IsNullOrEmpty(hash))
             {
                 object value = element.GetCurrentPropertyValue(ValuePattern.ValueProperty, true);
@@ -871,7 +907,7 @@ namespace WindowsScraper
                     int subCode = 0;
                     if (element.Current.ControlType == ControlType.Text)
                     {
-                        Console.WriteLine("delta_prop_change_value");
+                        log.Debug("delta_prop_change_value");
                         subCode = serviceCodes["delta_prop_change_value"];
                     }
                     else
@@ -888,7 +924,7 @@ namespace WindowsScraper
                     vInfo.Hash = hash;
 
                     //send delta
-                    Console.WriteLine("Sending from DeltaGenericHash");
+                    log.Debug("Sending from DeltaGenericHash");
                     connection.SendMessage(sinter);
                 }
             }
@@ -918,45 +954,38 @@ namespace WindowsScraper
                         vInfo.version = Sintering.Version.None;
 
                         // send
-                        Console.WriteLine("Sending new Window");
+                        log.Debug("Sending new Window");
                         connection.SendMessage(sinter);
                     }
                 }
             }
         }
 
-        private void DeltaGenericWindowSize(AutomationElement element)
+        private void DeltaGenericWindowPropChange(AutomationElement element)
         {
-            Console.WriteLine("Generic Window");
+            log.Debug("Generic Window");
             if (IsCached(element))
             {
                 string id = SinterUtil.GetRuntimeId(element);
                 int[] runtimeId = element.GetRuntimeId();
                 Entity entity;
-                VersionInfo vInfo;
 
                 if ((id == requestedProcessRuntimeId) && automationElementTrie.TryGetValue(runtimeId, out entity))
                 {
-                    Console.WriteLine("Got Id");
-                    vInfo = entity.versionInfo;
-                    //if (vInfo.version == Sintering.Version.Updated)
-                    //{
-                        Sinter sinter = new Sinter
-                        {
-                            HeaderNode = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_prop_change_value"]),
-                            EntityNode = UIAElement2EntityRecursive(element),
-                        };
+                    Sinter sinter = null;
 
-                        //vInfo.version = Sintering.Version.None;
+                    log.Debug("Sending new Window including children");
+                    sinter = new Sinter
+                    {
+                        HeaderNode = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_prop_change_value"]),
+                        EntityNode = UIAElement2EntityRecursive(element),
+                    };
 
-                        // send
-                        Console.WriteLine("Sending new Window");
-                        if ((sinter.EntityNode.States & States.DISABLED) != 0)
-                        {
-                            return; //'DISABLE' states confuses proxy. if it is disabled, scraper no need to send size change anyway 
-                        }
-                        connection.SendMessage(sinter);
-                    //}
+                    if ((sinter.EntityNode.States & States.DISABLED) != 0)
+                    {
+                        return; //'DISABLE' states confuses proxy. if it is disabled, scraper no need to send size change anyway 
+                    }
+                    connection.SendMessage(sinter);
                 }
             }
         }
@@ -984,7 +1013,7 @@ namespace WindowsScraper
                     vInfo.Hash = anchor.Current.Name;
 
                     // generate sinter message
-                    Console.WriteLine("DeltaGenericAnchor");
+                    log.Debug("DeltaGenericAnchor");
                     Sinter sinter = new Sinter
                     {
                         HeaderNode = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_subtree_replace"]),
@@ -1021,7 +1050,7 @@ namespace WindowsScraper
         {
             Header header = null;
 
-            Console.WriteLine("DeltaSpecialList");
+            log.Debug("DeltaSpecialList");
             if (IsCached(element))
             {
                 // if the list is sent before
@@ -1042,19 +1071,19 @@ namespace WindowsScraper
             else // not in cache
             {
                 // list item created at the Desktop-level
-                Console.WriteLine("DeltaSpecialList: Not in Cache");
+                log.Debug("DeltaSpecialList: Not in Cache");
                 AutomationElement anchor = GetAnchorElementFromCache(element);
                 if (anchor != null)
                 {
                     // build header
-                    Console.WriteLine("DeltaSpecialList: No anchor");
+                    log.Debug("DeltaSpecialList: No anchor");
                     header = MsgUtil.BuildHeader(serviceCodes["delta"], serviceCodes["delta_subtree_add"]);
                 }
                 else
                 {
                     if (element.Current.ProcessId == requestedProcessId)
                     {
-                        Console.WriteLine("DeltaSpecialList: Process Id");
+                        log.Debug("DeltaSpecialList: Process Id");
                         anchor = AutomationElement.FocusedElement;
                         string anchorId = SinterUtil.GetRuntimeId(anchor);
                         // build header
@@ -1254,17 +1283,17 @@ namespace WindowsScraper
 
             AutomationElement.AutomationElementInformation current = element.Current;
 
-            Console.WriteLine("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
+            //log.Debug("Form Entity for {0}/{1}/{2}", element.Current.ControlType.ProgrammaticName, element.Current.ClassName, element.Current.Name);
 
             String uniqueId;
 
-           /* if (element.Current.ControlType == ControlType.Button || element.Current.ControlType == ControlType.RadioButton)
-            {
-                uniqueId = SinterUtil.GetRuntimeId(element, true, true);
-            } else
-            {*/
-                uniqueId = SinterUtil.GetRuntimeId(element, true);
-           // }
+            /* if (element.Current.ControlType == ControlType.Button || element.Current.ControlType == ControlType.RadioButton)
+             {
+                 uniqueId = SinterUtil.GetRuntimeId(element, true, true);
+             } else
+             {*/
+            uniqueId = SinterUtil.GetRuntimeId(element, true);
+            // }
 
             int[] runtimeId = element.GetRuntimeId();
             if (uniqueId == null)
@@ -1303,16 +1332,17 @@ namespace WindowsScraper
             // entity.Type = current.ClassName;//.ToLower();
             //else //sizeof("ControlType.") = 11
             entity.Type = current.ControlType.ProgrammaticName.Substring(12);//.ToLower();
-            
+
             if (current.ControlType == ControlType.Window && current.LocalizedControlType.Equals("Dialog"))
             {
                 entity.Type = current.LocalizedControlType.ToString();
             }
-            
+
 
             if (current.ControlType == ControlType.Pane && current.ClassName.Equals("SysDateTimePick32"))
             {
                 entity.Type = "DateTimePicker";
+                entity.Name = DateTime.Now.ToShortDateString(); //dummy until we can read from LegacyIAccessible pattern
             }
 
             // name, value
@@ -1368,12 +1398,12 @@ namespace WindowsScraper
                 }
             }
 
-            
+
             /* //Debug
            AutomationPattern[] patterns = element.GetSupportedPatterns();
-           Console.WriteLine("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
+           log.Debug("name {0} {1}", current.Name, current.ControlType.ProgrammaticName);
            foreach (AutomationPattern p in patterns) {
-             Console.WriteLine("\t{0}", p.ProgrammaticName);
+             log.Debug("\t{0}", p.ProgrammaticName);
            }
            */
             // checked
@@ -1425,7 +1455,12 @@ namespace WindowsScraper
             if (current.ControlType == ControlType.MenuItem ||
                 current.ControlType == ControlType.Menu)
             {
+                //Assign shortcut keys (ex Alt+V) to value of Menuitem/Menubar 
                 entity.Value = current.AcceleratorKey;
+                if (entity.Value == "" && current.AccessKey.Contains("+"))
+                {
+                    entity.Value = current.AccessKey;
+                }
             }
             /*
           //special treatment for menu, alter the 'value' field
@@ -1555,7 +1590,7 @@ namespace WindowsScraper
             #endregion
 
             //log.Info(String.Format("\t\t {0}  --> {1}", xmlDoc.Name.Length > 15 ? xmlDoc.Name.Substring(0, 15) : xmlDoc.Name.PadLeft(15), uiStopwatch.ElapsedMilliseconds));
-            //Console.WriteLine("\t\t {0}  --> {1}", xmlDoc.Name.Length > 15 ? xmlDoc.Name.Substring(0, 15): xmlDoc.Name.PadLeft(15), uiStopwatch.ElapsedMilliseconds);
+            //log.Debug("\t\t {0}  --> {1}", xmlDoc.Name.Length > 15 ? xmlDoc.Name.Substring(0, 15): xmlDoc.Name.PadLeft(15), uiStopwatch.ElapsedMilliseconds);
             return xmlDoc;
         }
 
@@ -1585,14 +1620,14 @@ namespace WindowsScraper
                     }
                     catch (Exception exception)
                     {
-                        Console.WriteLine("In AppendChildren: " + exception.Message);
+                        log.Error("In AppendChildren 1: " + exception.Message);
                     }
                     childElement = treeWalker.GetNextSibling(childElement);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("In AppendChildren " + ex.Message);
+                log.Error("In AppendChildren 2:" + ex.Message);
             }
         }
 
@@ -1628,6 +1663,7 @@ namespace WindowsScraper
 
         public void execute_stop_scraping()
         {
+            Automation.RemoveAllEventHandlers();
             bDesktopHookAdded = false;
         }
 
@@ -1635,49 +1671,60 @@ namespace WindowsScraper
         {
             /* handles verify_passcode_req */
             string clientPasscode = sinter.HeaderNode.ParamsInfo.Data1;
-            //Console.WriteLine("client passcode: {0}", clientPasscode);
+            log.DebugFormat("client passcode: {0}", clientPasscode);
 
             bool result = false;
-            if(clientPasscode == this.passcode)
+            if (clientPasscode == this.passcode)
             {
-              result = true;
-              Console.WriteLine("client passcode match.");
-              this.bPasscodeVerified = true;
+                result = true;
+                log.Info("client passcode match.");
+                this.bPasscodeVerified = true;
             }
+            log.InfoFormat("OSVersion: {0}", Environment.OSVersion.ToString());
 
             Header header = MsgUtil.BuildHeader(serviceCodes["verify_passcode"], serviceCodes["verify_passcode_res"]);
             header.ParamsInfo = new Params
             {
-              Data1 = result.ToString(),
+                Data1 = result.ToString(),
+                Data2 = Environment.OSVersion.ToString(),
             };
 
             Sinter sintermsg = new Sinter()
             {
-              HeaderNode = header,
+                HeaderNode = header,
             };
 
             connection.SendMessage(sintermsg);
 
 
-            if(result == false)
+            if (result == false)
             {
-              Console.WriteLine("client passcode not match!");
-              connection.StopConnectionHandling();
+                log.Error("client passcode not match!");
+                connection.StopConnectionHandling();
+            }
+            else
+            {
+                log.Warn("passcode match - accept client!");
             }
 
         }
 
         public void execute_ls_req(Sinter _)
         {
-            // demo: only fetch explorer app for now
-            string[] supportedProcesses = { "Calculator", "calc1", "calc", "Notepad", "explorer", "WINWORD", "Word", "wordpad"};
-
             Dictionary<string, string> processes = new Dictionary<string, string>();
             foreach (string pname in supportedProcesses)
             {
                 Process[] p = Process.GetProcessesByName(pname);
                 if (p.Length > 0)
                     processes[p[0].Id.ToString()] = pname;
+            }
+
+            string metro_support;
+            using (XmlTextReader reader = new XmlTextReader("Scraper_config.xml"))
+            {
+                reader.MoveToContent();
+                metro_support = reader.GetAttribute("metro_support");
+                log.Info("metro_support = " + metro_support);
             }
 
             List<Entity> entityNodes = new List<Entity>();
@@ -1691,14 +1738,19 @@ namespace WindowsScraper
                     if (node == null)
                         continue;
 
-                    if (processes.ContainsKey(node.Process) || processes.ContainsValue(node.Name))
+                    foreach (var process in processes)
                     {
-                        //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes. 
-                        if (!(processes.ContainsValue(node.Name))) 
+                        if (process.Key.Equals(node.Process))
                         {
-                            node.Name = String.Format("{0} --{1}", processes[node.Process], node.Name);
+                            entityNodes.Add(node);
+                            break;
                         }
-                        entityNodes.Add(node);
+                        else if (metro_support.Equals("true") && process.Value.Equals(node.Name))
+                        {
+                            //windows 10 Calculator (metro app) windows pid is different from app pid and not a key in Dictionary processes
+                            entityNodes.Add(node);
+                            break;
+                        }
                     }
                 }
                 element = treeWalker.GetNextSibling(element);
@@ -1747,6 +1799,7 @@ namespace WindowsScraper
                     ValuePattern.ValueProperty,
                     SelectionItemPattern.IsSelectedProperty,
                     RangeValuePattern.ValueProperty,
+                    AutomationElement.IsEnabledProperty,
                     /*AutomationElement.IsOffscreenProperty*/
                     /*AutomationElement.ControlTypeProperty*/
             });
@@ -1762,7 +1815,7 @@ namespace WindowsScraper
 
             // register global desktop hook
             RegisterDesktopHooks();
-            Console.WriteLine("isScreenReader {0}", ScreenReaderFlag);
+            log.DebugFormat("isScreenReader {0}", ScreenReaderFlag);
 
             //Sinter message generation
             SinterUtil.ScreenSize(out int width, out int height);
@@ -1798,31 +1851,32 @@ namespace WindowsScraper
             // To Do
         }
 
-    public void execute_kbd(Sinter sinter)
-    {
-	  /*link: https://msdn.microsoft.com/en-us/library/system.windows.forms.sendkeys.send(v=vs.110).aspx*/
-	  //Modifier values indicate if control, shift, or alt has been pressed
-	  string runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
-	  char key;
-	  SetFocus(runtimeId);
-	  //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
-	  Thread.Sleep(10);
-	  key = sinter.HeaderNode.ParamsInfo.KeyPress;
+        public void execute_kbd(Sinter sinter)
+        {
+            /*link: https://msdn.microsoft.com/en-us/library/system.windows.forms.sendkeys.send(v=vs.110).aspx*/
+            //Modifier values indicate if control, shift, or alt has been pressed
+            string runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
+            char key;
+            SetFocus(runtimeId);
+            //Allow time for focus to be moved to active application, probably can reduce from doing this every key press
+            Thread.Sleep(10);
+            key = sinter.HeaderNode.ParamsInfo.KeyPress;
             if (key != 0)
             {
                 string keyPress = key.ToString();
-                Console.WriteLine(key);
+                log.Debug("execute_kbd " + key);
                 SendKeys.SendWait(keyPress);
             }
-            else{
-                Console.WriteLine(sinter.HeaderNode.ParamsInfo.Data1);
+            else
+            {
+                log.Debug("execute_kbd " + sinter.HeaderNode.ParamsInfo.Data1);
                 SendKeys.SendWait(sinter.HeaderNode.ParamsInfo.Data1);
             }
-    }
+        }
 
         public void execute_mouse(Sinter sinter)
         {
-            Console.WriteLine("received mouse message (code:{0} subCode:{1})", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+            log.WarnFormat("received mouse message (code:{0} subCode:{1})", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
 
             int subCode = sinter.HeaderNode.SubCode;
 
@@ -1878,7 +1932,7 @@ namespace WindowsScraper
             string runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
             RepeatedRequest focus = new RepeatedRequest(runtimeId, DateTime.Now);
             repeatedRequestStack.Add(focus);
-            //Console.WriteLine("items in repeated stack {0}", repeatedRequestStack.Count);
+            //log.Debug("items in repeated stack {0}", repeatedRequestStack.Count);
         }
 
         public void execute_action(Sinter sinter)
@@ -1890,7 +1944,7 @@ namespace WindowsScraper
 
             if (sinter.HeaderNode.ParamsInfo != null)
             {
-                Console.WriteLine("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
+                log.DebugFormat("execute_action {0}", sinter.HeaderNode.ParamsInfo.TargetId);
                 runtimeId = sinter.HeaderNode.ParamsInfo.TargetId;
             }
             else
@@ -1909,30 +1963,33 @@ namespace WindowsScraper
                 // extract the automation element pointed by runtimeId
                 try
                 {
-                    //Console.WriteLine("execute_action: Get RuntimeId = {0}", runtimeId);
+                    log.DebugFormat("execute_action: Get RuntimeId = {0}", runtimeId);
                     if (runtimeId != null)
                     {
                         element = SinterUtil.GetAutomationElementFromId(runtimeId, IdType.RuntimeId);
                         if (element == null)
+                        {
+                            log.Error("[ERROR] AutomationElement not found");
                             return;
+                        }
                     }
 
                     int[] id = element.GetRuntimeId();
                     if (automationElementTrie.TryGetValue(id, out Entity entity))
                     {
                         entity.versionInfo.version = Sintering.Version.Updated;
-                        // Console.WriteLine("Version from AutoElement Dict {0}", vInfo.runtimeID);
+                        // log.Debug("Version from AutoElement Dict {0}", vInfo.runtimeID);
                     }
                 }
                 catch
                 {
-                    Console.WriteLine("problem with extracting {0}", runtimeId);
+                    log.DebugFormat("problem with extracting {0}", runtimeId);
                 }
             }
 
             if (serviceCodesRev.TryGetValue(sinter.HeaderNode.SubCode, out _subCode))
             {
-                Console.WriteLine("execute_action: Got subCode = {0}", _subCode);
+                log.InfoFormat("execute_action: {0}", _subCode);
                 switch (_subCode)
                 {
                     case "action_default":
@@ -1970,12 +2027,7 @@ namespace WindowsScraper
                         executeSetProcessToForeground(sinter.HeaderNode.Process);
                         break;
                     case "action_expand_and_select":
-                        Console.WriteLine("Case action_expand_and_select");
-                        if(sinter.HeaderNode.ParamsInfo.TargetIdList != null)
-                        {
-                            //Console.WriteLine("{0}", sinter.HeaderNode.ParamsInfo.TargetId.GetType());
-                            UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId.ToString(), uint.Parse(sinter.HeaderNode.ParamsInfo.Data1), sinter.HeaderNode.ParamsInfo.TargetIdList);
-                        }
+                        UIAction.PerformExpandAndSelectAction(sinter.HeaderNode.ParamsInfo.TargetId, sinter.HeaderNode.ParamsInfo.TargetIdList);
                         break;
                     //case "structureChangeNotification":
                     //    RegisterStructureChangedNotification(element);
