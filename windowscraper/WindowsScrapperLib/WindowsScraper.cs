@@ -905,7 +905,8 @@ namespace WindowsScraper
                 if (vInfo != null && (vInfo.version == Sintering.Version.Init || vInfo.Hash != hash))
                 {
                     int subCode = 0;
-                    if (element.Current.ControlType == ControlType.Text)
+                    if ( (element.Current.ControlType == ControlType.Text)
+                        || (element.Current.ControlType == ControlType.Edit) )
                     {
                         log.Debug("delta_prop_change_value");
                         subCode = serviceCodes["delta_prop_change_value"];
