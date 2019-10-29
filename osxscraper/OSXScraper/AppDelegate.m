@@ -28,43 +28,55 @@
 #import "ScraperServer.h"
 #import "AccAPI.h"
 
-
-
 @implementation AppDelegate
 @synthesize passcodeTextField;
+@synthesize portTextField;
+@synthesize startButton;
+@synthesize stopButton;
+@synthesize server;
+@synthesize settings;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    settings = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];
+    
+    server = [[ScraperServer alloc] init];
+    
+    [passcodeTextField setStringValue:@""];
+    [portTextField setStringValue:[[settings objectForKey:@"port"] stringValue]];
+    stopButton.enabled = NO;
+}
 
-    ScraperServer * server = [[ScraperServer alloc] init];
-    if ( [server start] ) {
-        NSLog(@"Started server on port %zu.", (size_t) [server port]);
-        
+- (IBAction)startScraper:(id)sender {
+    int port =[[portTextField stringValue] intValue];
+    if ( [server start:port] ) {
+        NSLog(@"Started server on port %d.", port);
+        [portTextField setStringValue:[NSString stringWithFormat:@"%d", port]];
 #ifndef DEBUG
         gPasscode = arc4random_uniform(1000000);
 #else
-        gPasscode = 123456; //for testing
+        gPasscode = [[settings objectForKey:@"default_passcode"] intValue]; //for testing
 #endif
         NSString *passcodeStr = [NSString stringWithFormat:@"%d", gPasscode];
         [passcodeTextField setStringValue:passcodeStr];
-        
-        [[NSRunLoop currentRunLoop] run];
+        startButton.enabled = NO;
+        stopButton.enabled = YES;
     } else {
         NSLog(@"Error starting server");
-        NSString *passcodeStr = @"<Empty>";
+        NSString *passcodeStr = @"";
         [passcodeTextField setStringValue:passcodeStr];
         
-        [[NSRunLoop currentRunLoop] run];
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Please check your port setting"];
+        [alert runModal];
     }
-
-//   // debug
-//    ClientConnection * client = [[ClientConnection alloc] init] ;
-//    pid_t pid = 262;//224; //
-//    NSString * command = [NSString stringWithFormat:@"<sinter><header> <service_code value='3'/>  <timestamp>10-4-2015 10:23 pm </timestamp> </header> <application id='%i'/> </sinter>", pid];
-//
-//    NSLog(@"%@", command);
-//    [client execute:command];
-//    
-
 }
+
+- (IBAction)StopScraper:(id)sender {
+    [server stop];
+    [passcodeTextField setStringValue:@""];
+    startButton.enabled = YES;
+    stopButton.enabled = NO;
+}
+
 @end

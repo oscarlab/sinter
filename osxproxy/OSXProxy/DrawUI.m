@@ -696,7 +696,7 @@ static  ClientHandler  * sharedConnection;
     label = [[CustomLabel alloc] initWithFrame:frame andConnection:sharedConnection];
     [label setLabel:model.name];
     [label setStrValue: model.value];
-    
+    [label setHidden:(model.states & STATE_INVISIBLE)?YES:NO];
     // check if it is not numeric string
     if (![self isNumericString:model.name]){
         [label setStrValue: model.name];
@@ -705,7 +705,9 @@ static  ClientHandler  * sharedConnection;
     [[label window] makeFirstResponder:label];
     [label setAutoresizesSubviews:TRUE];
     if (![parent isKindOfClass:[NSMenu class]]) //to avoid exception thrown
-    { [parent addSubview:label]; }
+    {
+        [parent addSubview:label];
+    }
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
@@ -860,6 +862,13 @@ static  ClientHandler  * sharedConnection;
     }
 }
 
+- (NSView *) drawEmptyView: (Model*) control frame:(NSRect)frame parentView:(NSView *) parent {
+    NSView * view = [[NSView alloc] initWithFrame:frame];
+    [view setIdentifier:control.unique_id];
+    [view setNeedsDisplay:YES];
+    [self addToScreenMapTable:control];
+    return view;
+}
 
 #pragma mark NSButton
 - (NSButton * ) drawButton:(Model*) control frame:(NSRect)frame parentView:(NSView *) parent{
