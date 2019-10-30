@@ -5,6 +5,6 @@
 	<key>port</key>
 	<real>6832</real>
 	<key>server_ip</key>
-	<string>192.168.125.191</string>
+	<string>192.168.28.128</string>
 </dict>
 </plist>
