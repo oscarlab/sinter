@@ -96,10 +96,11 @@
 @property  (assign) int prev_selected_menu_index, prev_menu_x, prev_menu_y,prev_action_x,prev_action_y;
 
 @property (assign) BOOL shouldClose;
+@property (assign) BOOL closeCancelled;
 
 - (id) initWithWindowNibName:(NSString *)windowNibName fromEntity:(Entity *) entity havingProcessID:(NSString*) processId moreEntities:(NSArray *)entities;
 
 - (NSView *) renderDOM:(Model *) current anchor:(id) anchor;
 
-
+- (void) comeIntoView;
 @end

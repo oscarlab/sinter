@@ -75,8 +75,6 @@
     return config;
 }
 
-
-
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *) sender{
     return YES;
 }
@@ -158,7 +156,6 @@
     [self disconnect];
     NSLog(@"Disconnect by user");
 }
-
 
 - (void) removeWindowWithPID:(NSString*) _pid andUniqueId:(NSString*) _uniqueId{
     //< pid, [wind_id1, win_id2, win_id3...]>
@@ -315,6 +312,9 @@
                rmWinController = [[CustomWindowController alloc]
                                   initWithWindowNibName:@"RemoteWindowController" fromEntity:entity havingProcessID:processId moreEntities:sinter.entities];
                [self addWindow:rmWinController havingPID:processId];
+        }
+        else if([rmWinController shouldClose]) {
+            [rmWinController comeIntoView];
         }
     }
     else if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
