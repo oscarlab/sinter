@@ -696,7 +696,7 @@ static  ClientHandler  * sharedConnection;
     label = [[CustomLabel alloc] initWithFrame:frame andConnection:sharedConnection];
     [label setLabel:model.name];
     [label setStrValue: model.value];
-    
+    [label setHidden:(model.states & STATE_INVISIBLE)?YES:NO];
     // check if it is not numeric string
     if (![self isNumericString:model.name]){
         [label setStrValue: model.name];
@@ -705,7 +705,9 @@ static  ClientHandler  * sharedConnection;
     [[label window] makeFirstResponder:label];
     [label setAutoresizesSubviews:TRUE];
     if (![parent isKindOfClass:[NSMenu class]]) //to avoid exception thrown
-    { [parent addSubview:label]; }
+    {
+        [parent addSubview:label];
+    }
     
     [label setIdentifier:model.unique_id];
     [idToUITable setObject:label forKey:label.identifier];
@@ -716,7 +718,7 @@ static  ClientHandler  * sharedConnection;
             [label setNeedsDisplay:YES];
         }else{
             if (![model.name isEqualToString:@"Running History"] && ![model.name isEqualToString:@"Memory"]){
-                [label setHidden:YES];//ignore the other result text field from windows calculator
+                //[label setHidden:YES];//ignore the other result text field from windows calculator
             }
             if ([model.name isEqualToString:@"Memory"]){
                 [label setStrValue:@""]; /* tweak for windows calculator @"Calc" */
@@ -860,6 +862,13 @@ static  ClientHandler  * sharedConnection;
     }
 }
 
+- (NSView *) drawEmptyView: (Model*) control frame:(NSRect)frame parentView:(NSView *) parent {
+    NSView * view = [[NSView alloc] initWithFrame:frame];
+    [view setIdentifier:control.unique_id];
+    [view setNeedsDisplay:YES];
+    [self addToScreenMapTable:control];
+    return view;
+}
 
 #pragma mark NSButton
 - (NSButton * ) drawButton:(Model*) control frame:(NSRect)frame parentView:(NSView *) parent{
@@ -883,6 +892,7 @@ static  ClientHandler  * sharedConnection;
     [button setTarget:self];
     [button setAction:@selector(sendAction:)];
     [button setIdentifier:control.unique_id];
+    [button setEnabled: (control.states & STATE_DISABLED) == STATE_DISABLED? NO : YES];
     //[button setFont: [NSFont systemFontOfSize: 10]];
     [parent addSubview:button];
     

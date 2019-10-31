@@ -393,6 +393,7 @@ int L, mask;
                                                 screenMapTable: self->screenMapTable
                                             havingRemoteRootUI:self->rmUiRoot
                                                andWindow:[self window]];
+            [[self.window contentView] setNeedsDisplay:YES];
             [self renderDOM:self->rmUiRoot anchor:self.window.contentView];
             
             /* from OSXScraper, find the menubar */
@@ -766,8 +767,8 @@ bool isHeader = FALSE;
             current_view = [self renderDOM:anchor anchor:current];
         }
     }
-    //else if ([current.type isEqualToString:@"button"]) {
-    else if ([current.type rangeOfString:@"button"].location != NSNotFound) {
+    else if ([current.type isEqualToString:@"button"]) {
+    //else if ([current.type rangeOfString:@"button"].location != NSNotFound) {
         current_view = [renderer drawButton:current frame:uiFrame parentView:anchor];
     }
     else if ([current.type isEqualToString:@"radiobutton"]) {
@@ -849,6 +850,10 @@ bool isHeader = FALSE;
     }
     else { // go down recursively for children
         NSLog(@"type not rendered: %@", current.type);
+        if ([current.type isEqualToString:@"group"]) {
+            current_view = [renderer drawEmptyView:current frame:uiFrame parentView: anchor];
+        }
+        
         for (Model* child in current.children) {
             [self renderDOM:child anchor:anchor];
         }

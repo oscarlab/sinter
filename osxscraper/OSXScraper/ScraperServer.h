@@ -18,14 +18,12 @@
 */
 
 #import <Foundation/Foundation.h>
-#define SERVER_PORT 6833
 
 extern int gPasscode;
 
 @interface ScraperServer : NSObject<NSStreamDelegate>{
     CFSocketRef             _ipv4socket;
     CFSocketRef             _ipv6socket;
-    
 }
 
 @property (nonatomic, assign, readwrite) NSUInteger         port;
@@ -35,7 +33,7 @@ extern int gPasscode;
 
 @property (nonatomic, strong) NSString * ClientConnectionDidCloseNotification;
 
-- (BOOL) start;
+- (BOOL) start:(int)port;
 - (void) stop;
 
 @end

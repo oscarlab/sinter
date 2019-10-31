@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08172FA42317198C00897851 /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 08172FA32317198B00897851 /* osxsinter.p12 */; };
+		08172FA6231724DA00897851 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08172FA5231724DA00897851 /* Settings.plist */; };
 		08791EB622331CB2009EB201 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB322331CB2009EB201 /* Word.m */; };
 		08791EB722331CB2009EB201 /* Params.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB522331CB2009EB201 /* Params.m */; };
 		08791EC022331EA3009EB201 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EBE22331EA2009EB201 /* XMLTags.m */; };
 		08866A4822398052006F3473 /* RoleMapping.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08866A4722398052006F3473 /* RoleMapping.plist */; };
-		08E6D9C3222087690057A290 /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 08E6D9C2222087690057A290 /* osxsinter.p12 */; };
 		0D6C19C11DB7B742004DFB3F /* Scraper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D6C19C01DB7B742004DFB3F /* Scraper.m */; };
 		0DB4CA4C20D75AE200FFFD23 /* ClientHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4B20D75AE200FFFD23 /* ClientHandler.m */; };
 		0DB4CA4F20D75B0D00FFFD23 /* Serializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA4E20D75B0D00FFFD23 /* Serializer.m */; };
@@ -52,6 +53,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		08172FA32317198B00897851 /* osxsinter.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = osxsinter.p12; sourceTree = "<group>"; };
+		08172FA5231724DA00897851 /* Settings.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Settings.plist; sourceTree = "<group>"; };
 		08791EB222331CB2009EB201 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Word.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.h; sourceTree = "<group>"; };
 		08791EB322331CB2009EB201 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Word.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Word.m; sourceTree = "<group>"; };
 		08791EB422331CB2009EB201 /* Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Params.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.h; sourceTree = "<group>"; };
@@ -59,7 +62,6 @@
 		08791EBE22331EA2009EB201 /* XMLTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLTags.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.m; sourceTree = "<group>"; };
 		08791EBF22331EA3009EB201 /* XMLTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLTags.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.h; sourceTree = "<group>"; };
 		08866A4722398052006F3473 /* RoleMapping.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = RoleMapping.plist; path = ../common/RoleMapping.plist; sourceTree = "<group>"; };
-		08E6D9C2222087690057A290 /* osxsinter.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = osxsinter.p12; sourceTree = "<group>"; };
 		0D6C19BF1DB7B742004DFB3F /* Scraper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scraper.h; sourceTree = "<group>"; };
 		0D6C19C01DB7B742004DFB3F /* Scraper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scraper.m; sourceTree = "<group>"; };
 		0DB4CA4A20D75AE200FFFD23 /* ClientHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClientHandler.h; path = ../common/AppleConnection/AppleConnection/ClientHandler.h; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
+				08172FA5231724DA00897851 /* Settings.plist */,
 				9CFE59551BCB00D100BEAC79 /* documentation.rtf */,
 				9CFE59561BCB00D100BEAC79 /* AccAPI.h */,
 				9CFE59571BCB00D100BEAC79 /* AccAPI.m */,
@@ -227,10 +230,10 @@
 				7BC447C91AA390B0006C2146 /* Keymapping.m */,
 				9CFA67AC1AA018D1007E84ED /* ScraperServer.h */,
 				9CFA67AD1AA018D1007E84ED /* ScraperServer.m */,
-				08E6D9C2222087690057A290 /* osxsinter.p12 */,
 				9CFA67881AA01865007E84ED /* AppDelegate.h */,
 				9CFA67891AA01865007E84ED /* AppDelegate.m */,
 				9CFA678B1AA01865007E84ED /* MainMenu.xib */,
+				08172FA32317198B00897851 /* osxsinter.p12 */,
 				9CFA678E1AA01865007E84ED /* Images.xcassets */,
 				9CFA677D1AA01865007E84ED /* Supporting Files */,
 				0D6C19BF1DB7B742004DFB3F /* Scraper.h */,
@@ -347,11 +350,12 @@
 			files = (
 				9CFA67811AA01865007E84ED /* InfoPlist.strings in Resources */,
 				08866A4822398052006F3473 /* RoleMapping.plist in Resources */,
+				08172FA6231724DA00897851 /* Settings.plist in Resources */,
 				9CFA678F1AA01865007E84ED /* Images.xcassets in Resources */,
 				9CFA67871AA01865007E84ED /* Credits.rtf in Resources */,
 				9CFE595B1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist in Resources */,
+				08172FA42317198C00897851 /* osxsinter.p12 in Resources */,
 				9CFA678D1AA01865007E84ED /* MainMenu.xib in Resources */,
-				08E6D9C3222087690057A290 /* osxsinter.p12 in Resources */,
 				9CFE59581BCB00D100BEAC79 /* documentation.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

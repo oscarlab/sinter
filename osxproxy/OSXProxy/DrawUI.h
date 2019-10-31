@@ -80,6 +80,7 @@
 - (NSTextField*)    drawText:(Model*)           model frame:(NSRect)frame parentView:(NSView*)  parent;
 - (NSTextField*)    drawLabel:(Model*)           model frame:(NSRect)frame parentView:(NSView*)  parent;
 - (NSTextView *)    drawSimpleEditText:(Model*) model frame:(NSRect)frame parentView:(NSView *) parent;
+- (NSView *)        drawEmptyView: (Model*)    control frame:(NSRect)frame parentView:(NSView *) parent;
 - (NSButton * )     drawButton:(Model*)         control frame:(NSRect)frame parentView:(NSView*)parent;
 - (NSView * )       drawRadioButton:(Model*)    control frame:(NSRect)frame parentView:(NSView *) parent;
 - (NSButton * )     drawCheckBox:(Model*)       control frame:(NSRect)frame parentView:(NSView *) parent;
