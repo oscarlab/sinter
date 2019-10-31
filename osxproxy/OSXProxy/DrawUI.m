@@ -892,6 +892,7 @@ static  ClientHandler  * sharedConnection;
     [button setTarget:self];
     [button setAction:@selector(sendAction:)];
     [button setIdentifier:control.unique_id];
+    [button setEnabled: (control.states & STATE_DISABLED) == STATE_DISABLED? NO : YES];
     //[button setFont: [NSFont systemFontOfSize: 10]];
     [parent addSubview:button];
     
