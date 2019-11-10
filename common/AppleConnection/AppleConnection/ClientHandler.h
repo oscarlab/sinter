@@ -83,7 +83,7 @@
 /* sendActionMsg to replace old sendActionAt, sendFocusAt, appendTextAt */
 - (void) sendActionMsg:(NSString *)processId targetId:(NSString*)targetId actionType:(NSString*)action data:(NSString*)data;
 - (void) sendBtingFG:(NSString*) uniqueId;
-- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text;
+- (void) setTextAt:(NSString*) uniqueId text:(NSString*) text processId: (NSString *) processId;
 
 - (void) sendKeystorkesAt:(NSString*) processId strokes:(NSString*) strokes;
 /*
