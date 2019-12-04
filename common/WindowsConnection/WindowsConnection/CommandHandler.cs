@@ -27,7 +27,7 @@ using System.Threading;
 
 namespace Sintering
 {
-    class CommandHandler
+    public class CommandHandler
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Command");
         Dictionary<string, object> serviceCodes;
@@ -37,7 +37,7 @@ namespace Sintering
         ConnectionHandler connectionHandler;
         BlockingCollection<Sinter> messageQueue;
 
-        IWinCommands actuator; // could be a server or a client
+        public IWinCommands actuator; // could be a server or a client
 
         public CommandHandler(ConnectionHandler connectionHandler, BlockingCollection<Sinter> messageQueue, IWinCommands actuator)
         {
@@ -81,43 +81,51 @@ namespace Sintering
 
         private volatile bool _shouldStop = false;
 
-        private void CommandExecutor()
+
+        public bool CommandExecSinter(Sinter sinter)
         {
             string requested_service, invoking_method_name;
             MethodInfo invoking_method;
 
+            log.InfoFormat("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+            if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out requested_service))
+            {
+                invoking_method_name = "execute_" + requested_service.Trim();
+                if (actuator.bPasscodeVerified == true
+                    || requested_service.Equals(@"verify_passcode"))
+                {
+                    invoking_method = type.GetMethod(invoking_method_name);
+                    if (invoking_method != null)
+                    {
+                        invoking_method.Invoke(actuator, new Sinter[] { sinter });
+                        return true;
+                    }
+                    else
+                    {
+                        log.Error("invoke error: " + invoking_method_name + " doesn't exist");
+                    }
+                }
+                else
+                {
+                    log.Warn("passcode not verified yet, ignore the msg!");
+                }
+            }
+            else
+            {
+                log.Error("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
+            }
+            invoking_method = null;
+            return false;
+        }
+
+        private void CommandExecutor()
+        {
             while (!_shouldStop)
             {
                 try
                 {
                     Sinter sinter = messageQueue.Take();
-                    log.InfoFormat("[Sinter recv] service code/sub_code = {0}/{1} ", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
-                    if (serviceCodesRev.TryGetValue(sinter.HeaderNode.ServiceCode, out requested_service))
-                    {
-                        invoking_method_name = "execute_" + requested_service.Trim();
-                        if (actuator.bPasscodeVerified == true
-                            || requested_service.Equals(@"verify_passcode"))
-                        {
-                            invoking_method = type.GetMethod(invoking_method_name);
-                            if (invoking_method != null)
-                            {
-                                invoking_method.Invoke(actuator, new Sinter[] { sinter });
-                            }
-                            else
-                            {
-                                log.Error("invoke error: " + invoking_method_name + " doesn't exist");
-                            }
-                        }
-                        else
-                        {
-                            log.Warn("passcode not verified yet, ignore the msg!");
-                        }
-                    }
-                    else
-                    {
-                        log.Error("invoke error: " + sinter.HeaderNode.ServiceCode + " doesn't exist");
-                    }
-                    invoking_method = null;
+                    CommandExecSinter(sinter);
                 }
                 catch (Exception ex)
                 {

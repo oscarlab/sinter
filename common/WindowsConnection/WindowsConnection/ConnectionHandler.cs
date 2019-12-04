@@ -34,6 +34,7 @@ namespace Sintering
     {
         public TcpClient clientSocket;
         public Stream networkStream; //SSL Implementation
+        //public string unittest_filename;
         string clientId;
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger("Connect");
         private static readonly log4net.ILog xmlLogger = log4net.LogManager.GetLogger("XML");
@@ -86,6 +87,16 @@ namespace Sintering
             serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
         }
 
+        public ConnectionHandler()
+        {
+            // dummy constructor for unittest
+            // initialize xml writer
+            networkStream = null;
+            ns.Add("", "");
+            serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
+        }
+
         Thread ctThread;
         public void StartConnectionHandling()
         {
@@ -101,7 +112,7 @@ namespace Sintering
 
         public int RequestedProcessId { get; set; }
 
-        public void SendMessage(Sinter sinter)
+        public virtual void SendMessage(Sinter sinter)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -124,25 +135,33 @@ namespace Sintering
                 string filestring = Encoding.ASCII.GetString(bytesToFile);
                 xmlLogger.Debug(filestring);
 
-                try
-                {
-                    networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
-                }
-                catch (Exception e)
-                {
+                if (networkStream != null) {
+                    try
+                    {
+                        networkStream.Write(ms.GetBuffer(), 0, (int)ms.Length);
+                    }
+                    catch (Exception e)
+                    {
 #if DEBUG
-                    log.ErrorFormat("Exception: {0}", e);
+                        log.ErrorFormat("Exception: {0}", e);
 #endif
-                    this.StopConnectionHandling();
-                    return;
+                        this.StopConnectionHandling();
+                        return;
+                    }
+                    networkStream.Flush();
                 }
-                networkStream.Flush();
+                /*
+                else
+                {   //this is Unit-Test;
+                    File.WriteAllText(unittest_filename, filestring);
+                }
+                */
 
                 // Debug statement
                 log.Debug("sent: " + (int)ms.Length + " bytes");
                 log.InfoFormat("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
             }
-
+            
             // Debug statement
             //SaveMessageInTextFile(sinter);
         }

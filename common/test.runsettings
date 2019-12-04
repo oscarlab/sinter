@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <MSTest>
+    <!-- set False to following will always keep the log -->
+    <DeleteDeploymentDirectoryAfterTestRunIsComplete>True</DeleteDeploymentDirectoryAfterTestRunIsComplete>
+  </MSTest>
+</RunSettings>

@@ -220,7 +220,7 @@ namespace WindowsScraper
 
         }
 
-        class SinterUtil
+        public class SinterUtil
         {
             static log4net.ILog log = log4net.LogManager.GetLogger("SinterUtil");
             public static Dictionary<string, string> UIAutomationToARIA =
