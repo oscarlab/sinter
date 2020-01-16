@@ -17,9 +17,15 @@ pipeline {
         bat '''
         echo "Set VS path..."
         PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Team Tools\\Performance Tools;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.6.1 Tools\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\bin;C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\windows\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\OpenAFS\\Client\\Program;C:\\Program Files (x86)\\OpenAFS\\Client\\Program;C:\\Program Files\\Heimdal\\bin\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Git\\cmd;C:\\Users\\srv.oscar\\AppData\\Local\\Microsoft\\WindowsApps;
-         
+        
         echo "Prepare to build windowscraper..."
         cd windowscraper
+        mkdir packages
+        copy ScraperTests\\packages.config packages\\
+        cd packages
+        copy C:\\Jenkins\\nuget.exe .
+        nuget.exe Install
+        cd ..
         
         echo "Check project for VS upgrade..."
         devenv WindowsScraper.sln /upgrade
@@ -28,8 +34,14 @@ pipeline {
         devenv WindowsScraper.sln /build
 
         echo "Prepare to build windowsproxy..."
-        cd ..\\windowsproxy
-        mkdir src\bin\\Debug
+        cd packages
+        mkdir ..\\..\\windowsproxy\\packages
+        copy packages.config ..\\..\\windowsproxy\\packages
+        cd ..\\..\\windowsproxy\\packages
+        copy C:\\Jenkins\\nuget.exe .
+        nuget.exe Install
+        cd ..
+        mkdir src\\bin\\Debug
         xcopy C:\\jenkins\\Gma.System.MouseKeyHook.dll src\\bin\\Debug\\ /y
        
         echo "Check project for VS upgrade..."
@@ -46,7 +58,12 @@ pipeline {
       steps {
         timeout(time: 1, unit: 'HOURS'){
           bat '''
-            echo "Test(s) go here"
+          PATH=C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Team Tools\\Performance Tools;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\;C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v10.0A\\bin\\NETFX 4.6.1 Tools\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\bin;C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\windows\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\OpenAFS\\Client\\Program;C:\\Program Files (x86)\\OpenAFS\\Client\\Program;C:\\Program Files\\Heimdal\\bin\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Git\\cmd;C:\\Users\\srv.oscar\\AppData\\Local\\Microsoft\\WindowsApps;
+          echo "Running VSTest..."
+          cd windowscraper\\ScraperTests\\bin\\debug
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\VSTest.Console.exe" ScraperTests.dll /ResultsDirectory:%TEMP% /Settings:..\\..\\..\\..\\common\\test.runsettings
+          cd ..\\..\\..\\..\\windowsproxy\\ProxyTests\\bin\\debug
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\VSTest.Console.exe" ProxyTests.dll /ResultsDirectory:%TEMP% /Settings:..\\..\\..\\..\\common\\test.runsettings
           '''
         }
       }
