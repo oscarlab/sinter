@@ -68,5 +68,11 @@ pipeline {
         }
       }
     }
-  }
+    
+    post {
+      always {
+        findText regexp: 'Failed:.*[1-9]', alsoCheckConsoleOutput: true, unstableIfFound: true
+      }
+    }
+  }  
 }
