@@ -619,7 +619,14 @@ namespace WindowsProxy
                 mi.DropDownClosed += Control_MenuItem_Collapsed;
                 ((MenuStrip)control).Items.Add(mi);
                 menuHashMenuItem.TryAdd(mi.Name, mi);
-                mi.ShortcutKeys = ParseShortcutKeys(child_entity.Value);
+                try
+                {
+                    mi.ShortcutKeys = ParseShortcutKeys(child_entity.Value);
+                }
+                catch ( Exception e)
+                {
+
+                }
 
                 /* OSX server sends whole menu in DOM at the first beginning */
                 if (child_entity.Children.Count > 0)
