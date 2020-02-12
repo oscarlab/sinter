@@ -64,7 +64,7 @@ namespace WindowsScraper
 
         private string passcode;
         public bool bPasscodeVerified { get; set; }
-        private string[] supportedProcesses;
+        public string[] supportedProcesses;
 
         public WindowsScraper(string passcode)
         {

@@ -67,13 +67,16 @@ pipeline {
           '''
         }
       }
+      post {
+        always {
+            bat '''
+            taskkill.exe /IM "calc1.exe" /F /FI "STATUS eq RUNNING"
+            '''
+          findText regexp: 'Failed:.*[1-9]', alsoCheckConsoleOutput: true, unstableIfFound: true
+        }
+      }
     }
   }
   
-  post {
-    always {
-      findText regexp: 'Failed:.*[1-9]', alsoCheckConsoleOutput: true, unstableIfFound: true
-    }
-  }
   
 }

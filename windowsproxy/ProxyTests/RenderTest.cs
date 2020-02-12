@@ -177,7 +177,7 @@ namespace WindowsProxy.Tests
             Dictionary<string, Entity> dicProxy = new Dictionary<string, Entity>();
             bool ret = Render(xmlfilePattern, dicScraper, dicProxy);
             Assert.IsTrue(ret);
-            ret = VerifyItems(dicScraper, dicProxy, "Button", "Value");
+            ret = VerifyItems(dicScraper, dicProxy, type, attribute);
             return ret;
         } 
 
@@ -239,15 +239,16 @@ namespace WindowsProxy.Tests
             Assert.IsTrue(ret1 & ret2);
         }
 
-        /* this case fails
+        /* this case sometimes fails when running in batch
         [TestMethod]
         public void Test403_Win7_Calc_Statistics_CheckBox()
         {
-            bool ret1 = GeneralCheck("Win7_Calc_Statistics.xml", "Button", "Value");
-            bool ret2 = true;// GeneralCheck("Win7_Calc_Statistics.xml", "CheckBox", "States");
+            bool ret1 = GeneralCheck("Win7_Calc_Statistics.xml", "CheckBox", "Value");
+            bool ret2 = GeneralCheck("Win7_Calc_Statistics.xml", "CheckBox", "States");
             Assert.IsTrue(ret1 & ret2);
         }
         */
+
 
     }
 }
