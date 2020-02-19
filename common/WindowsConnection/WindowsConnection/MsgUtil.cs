@@ -22,6 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using log4net.Config;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Text;
 
 namespace Sintering
 {
@@ -74,6 +77,7 @@ namespace Sintering
                 log.Error("Unable to load service_code dictionary");
             }
         }
+        
 
         public static void StartLogger()
         {
@@ -136,4 +140,77 @@ namespace Sintering
         #endregion
 
     }
+
+    /* DummyConnection: use for unittest, writing to filepath instead since there is no active connection */
+    public class DummyConnection: ConnectionHandler
+    {
+        public string filepath;
+        XmlSerializer serializer = new XmlSerializer(typeof(Sinter));
+        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+        XmlWriterSettings settings = new XmlWriterSettings()
+        {
+            Encoding = new System.Text.UTF8Encoding(false),
+            OmitXmlDeclaration = true,
+            Indent = true,
+        };
+
+        public DummyConnection()
+        {
+            // initialize xml writer
+            ns.Add("", "");
+            serializer.UnknownNode += new XmlNodeEventHandler(Serializer_UnknownNode);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(Serializer_UnknownAttribute);
+        }
+
+        public override void SendMessage(Sinter sinter)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (XmlWriter writer = XmlWriter.Create(ms, settings))
+                {
+
+                    // add timestamp
+                    sinter.HeaderNode.Timestamp = DateTime.Now.ToShortTimeString();
+
+                    // add process id
+                    sinter.HeaderNode.Process = RequestedProcessId.ToString();
+
+                    // serialize
+                    serializer.Serialize(writer, sinter, ns);
+                }
+
+                byte[] bytesToFile = ms.ToArray();
+                string filestring = Encoding.ASCII.GetString(bytesToFile);
+
+                File.WriteAllText(filepath, filestring);
+
+                // Debug statement
+                Console.WriteLine("[Sinter sent] service code/sub_code = {0}/{1}", sinter.HeaderNode.ServiceCode, sinter.HeaderNode.SubCode);
+            }
+        }
+
+        public Sinter GetSinterFromFile(string dir, string pattern)
+        {
+            DirectoryInfo TestLogDir = new DirectoryInfo(dir);
+            FileInfo[] files = TestLogDir.GetFiles("*" + pattern + "*");
+
+            if (files.Length > 0)
+            {
+                serializer = new XmlSerializer(typeof(Sinter));
+                Console.WriteLine(files[0].FullName);
+                return (Sinter)serializer.Deserialize(new XmlTextReader(files[0].FullName));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Sinter GetSinterFromFile(string filepath)
+        {
+            serializer = new XmlSerializer(typeof(Sinter));
+            return (Sinter)serializer.Deserialize(new XmlTextReader(filepath));
+        }
+    }
 }
+ 

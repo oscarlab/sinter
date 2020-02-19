@@ -65,6 +65,11 @@ namespace WindowsProxy
         RootForm root;
         AppForm form;
 
+        public AppForm Form
+        {
+            get => form;
+        }
+
         Point rootPoint;
         Entity root_entity;
 
@@ -93,7 +98,7 @@ namespace WindowsProxy
         Dictionary<int, string> serviceCodesRev;
         //Dictionary<int, string> sendKeysCodes;
 
-        public bool bPasscodeVerified { get; private set; }
+        public bool bPasscodeVerified { get; set; }
         public Sinter baseXML { get; set; }
 
         Timer timer;
@@ -106,7 +111,7 @@ namespace WindowsProxy
         ConcurrentDictionary<string, Entity> comboBoxEntities = new ConcurrentDictionary<string, Entity>();
 
         private readonly ConcurrentDictionary<string, Form> dictSubForms = new ConcurrentDictionary<string, Form>();
-        private readonly ConcurrentDictionary<Form, string[]> dictFormCtrlButtons = new ConcurrentDictionary<Form, string[]>();
+        public readonly ConcurrentDictionary<Form, string[]> dictFormCtrlButtons = new ConcurrentDictionary<Form, string[]>();
         private readonly ConcurrentDictionary<Form, FormWindowState> dictFormWindowStatePrev = new ConcurrentDictionary<Form, FormWindowState>();
 
         //Boolean mainWindowOpened = false; // May need to change to accomodate more windows, use the names to distinguish the windows
@@ -614,7 +619,14 @@ namespace WindowsProxy
                 mi.DropDownClosed += Control_MenuItem_Collapsed;
                 ((MenuStrip)control).Items.Add(mi);
                 menuHashMenuItem.TryAdd(mi.Name, mi);
-                mi.ShortcutKeys = ParseShortcutKeys(child_entity.Value);
+                try
+                {
+                    mi.ShortcutKeys = ParseShortcutKeys(child_entity.Value);
+                }
+                catch ( Exception e)
+                {
+
+                }
 
                 /* OSX server sends whole menu in DOM at the first beginning */
                 if (child_entity.Children.Count > 0)

@@ -58,13 +58,13 @@ namespace WindowsScraper
 
         TimeSpan DEFAULT_WAIT_TIME = new TimeSpan(0, 0, 0, 0, 5);
 
-        Dictionary<string, int> serviceCodes;
+        public Dictionary<string, int> serviceCodes;
         Dictionary<int, string> serviceCodesRev;
         Dictionary<int, string> sendKeysCodes;
 
         private string passcode;
-        public bool bPasscodeVerified { get; private set; }
-        private string[] supportedProcesses;
+        public bool bPasscodeVerified { get; set; }
+        public string[] supportedProcesses;
 
         public WindowsScraper(string passcode)
         {
@@ -110,6 +110,43 @@ namespace WindowsScraper
                 supportedProcesses = reader.GetAttribute("program_type").Split();
                 log.Info("Support program types: ");
                 log.Info(supportedProcesses);
+            }
+        }
+
+        public WindowsScraper()
+        {
+            this.bPasscodeVerified = true;
+
+            // construct DOM tree walker except this application
+            //Condition condition1 = new PropertyCondition(AutomationElement.IsControlElementProperty, true);
+            treeWalker = new TreeWalker(Automation.ControlViewCondition);
+
+            // initialize some utiity stacks
+            repeatedRequestStack = new BlockingCollection<RepeatedRequest>(_repeatedRequestStack);
+
+            // initialize list-condition for faster list serialization
+            listItemCondition = new OrCondition(
+              new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Header),
+              new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)
+            );
+
+            // loading the service_code dictionary
+            Dictionary<string, object> serviceCodesTemp = Config.getConfig("service_code");
+            if (serviceCodesTemp != null)
+            {
+                serviceCodes = serviceCodesTemp.ToDictionary(pair => pair.Key, pair => (int)pair.Value);
+                serviceCodesRev = serviceCodes.ToDictionary(pair => pair.Value, pair => pair.Key);
+            }
+            else
+            {
+                log.Error("Unable to load service_code dictionary");
+            }
+
+            Dictionary<string, object> keyCodesTemp = Config.getConfig("send_key_codes");
+
+            if (keyCodesTemp != null)
+            {
+                sendKeysCodes = keyCodesTemp.ToDictionary(pair => Int32.Parse(pair.Key), pair => (string)pair.Value);
             }
         }
 
@@ -1717,7 +1754,10 @@ namespace WindowsScraper
             {
                 Process[] p = Process.GetProcessesByName(pname);
                 if (p.Length > 0)
+                {
                     processes[p[0].Id.ToString()] = pname;
+                    //Console.WriteLine(pname);
+                }
             }
 
             string metro_support;
@@ -1743,6 +1783,7 @@ namespace WindowsScraper
                     {
                         if (process.Key.Equals(node.Process))
                         {
+                            //Console.WriteLine(process.Key);
                             entityNodes.Add(node);
                             break;
                         }
@@ -1756,7 +1797,7 @@ namespace WindowsScraper
                 }
                 element = treeWalker.GetNextSibling(element);
             }
-
+            
             // constructing sinter message
             Sinter sinter = new Sinter
             {
@@ -1775,48 +1816,63 @@ namespace WindowsScraper
             if (element == null)
                 return;
 
-            applicationRootElement = element;
-            requestedProcessId = element.Current.ProcessId;
-            requestedProcessRuntimeId = SinterUtil.GetRuntimeId(element);
+            if (this.connection.networkStream != null)
+            {
+                //below code will be ignore when running unittest
+                applicationRootElement = element;
+                requestedProcessId = element.Current.ProcessId;
+                requestedProcessRuntimeId = SinterUtil.GetRuntimeId(element);
 
-            // update instance in connection
-            connection.RequestedProcessId = requestedProcessId;
+                // update instance in connection
+                connection.RequestedProcessId = requestedProcessId;
 
-            // register listeners
-            Automation.AddStructureChangedEventHandler(element, TreeScope.Subtree, new StructureChangedEventHandler(OnStructureChangedLocal));
+                // register listeners
+                Automation.AddStructureChangedEventHandler(element, TreeScope.Subtree, new StructureChangedEventHandler(OnStructureChangedLocal));
 
-            //window_opened, closed event
-            Automation.AddAutomationEventHandler(WindowPatternIdentifiers.WindowOpenedEvent, element, TreeScope.Subtree, new AutomationEventHandler(OnWindowOpenedLocal));
+                //window_opened, closed event
+                Automation.AddAutomationEventHandler(WindowPatternIdentifiers.WindowOpenedEvent, element, TreeScope.Subtree, new AutomationEventHandler(OnWindowOpenedLocal));
 
-            Automation.AddAutomationEventHandler(WindowPatternIdentifiers.WindowClosedEvent, element, TreeScope.Subtree, new AutomationEventHandler(OnWindowClosedLocal));
+                Automation.AddAutomationEventHandler(WindowPatternIdentifiers.WindowClosedEvent, element, TreeScope.Subtree, new AutomationEventHandler(OnWindowClosedLocal));
 
-            //propertyChanged listener
-            Automation.AddAutomationPropertyChangedEventHandler(element, TreeScope.Subtree,
-              new AutomationPropertyChangedEventHandler(OnPropertyChange),
-                new AutomationProperty[] {
-            ExpandCollapsePattern.ExpandCollapseStateProperty,
-            AutomationElement.BoundingRectangleProperty,
-            AutomationElement.NameProperty,
+                //propertyChanged listener
+                Automation.AddAutomationPropertyChangedEventHandler(element, TreeScope.Subtree,
+                  new AutomationPropertyChangedEventHandler(OnPropertyChange),
+                    new AutomationProperty[] {
+                    ExpandCollapsePattern.ExpandCollapseStateProperty,
+                    AutomationElement.BoundingRectangleProperty,
+                    AutomationElement.NameProperty,
                     ValuePattern.ValueProperty,
                     SelectionItemPattern.IsSelectedProperty,
                     RangeValuePattern.ValueProperty,
                     AutomationElement.IsEnabledProperty,
-                    /*AutomationElement.IsOffscreenProperty*/
-                    /*AutomationElement.ControlTypeProperty*/
-            });
+                        /*AutomationElement.IsOffscreenProperty*/
+                        /*AutomationElement.ControlTypeProperty*/
+                });
 
-            // initialize cache dictionary
-            // automationElementDictionary = new AutomationElementDictionary(ref treeWalker, ref applicationRootElement);
-            automationElementTrie = new Trie<int[], Entity, int>();
+                // initialize cache dictionary
+                // automationElementDictionary = new AutomationElementDictionary(ref treeWalker, ref applicationRootElement);
+                automationElementTrie = new Trie<int[], Entity, int>();
 
-            // bring the current app window to foreground
-            int SHOW_DEFAULT = 10;
-            Win32.ShowWindow((IntPtr)element.Current.NativeWindowHandle, SHOW_DEFAULT);
-            Win32.SetForegroundWindow((IntPtr)element.Current.NativeWindowHandle);
+                // bring the current app window to foreground
+                int SHOW_DEFAULT = 10;
+                Win32.ShowWindow((IntPtr)element.Current.NativeWindowHandle, SHOW_DEFAULT);
+                Win32.SetForegroundWindow((IntPtr)element.Current.NativeWindowHandle);
 
-            // register global desktop hook
-            RegisterDesktopHooks();
-            log.DebugFormat("isScreenReader {0}", ScreenReaderFlag);
+                // register global desktop hook
+                RegisterDesktopHooks();
+                log.DebugFormat("isScreenReader {0}", ScreenReaderFlag);
+
+                //start recycle element thread
+                // automationElementDictionary.StartManagerThread();
+
+                // start some threads
+                ThreadFocusThrottler = new Thread(new ThreadStart(HandlerFocusThrottler));
+                ThreadFocusThrottler.Start();
+
+                // start structureChange thread
+                //StructureChangedManagerThread = new Thread(new ThreadStart(this.StructureChangeHandler));
+                //StructureChangedManagerThread.Start();
+            }
 
             //Sinter message generation
             SinterUtil.ScreenSize(out int width, out int height);
@@ -1832,17 +1888,6 @@ namespace WindowsScraper
                 HeaderNode = header,
                 EntityNode = UIAElement2EntityRecursive(element),
             };
-
-            //start recycle element thread
-            // automationElementDictionary.StartManagerThread();
-
-            // start some threads
-            ThreadFocusThrottler = new Thread(new ThreadStart(HandlerFocusThrottler));
-            ThreadFocusThrottler.Start();
-
-            // start structureChange thread
-            //StructureChangedManagerThread = new Thread(new ThreadStart(this.StructureChangeHandler));
-            //StructureChangedManagerThread.Start();
 
             connection.SendMessage(sinterRes);
         }
@@ -2040,14 +2085,14 @@ namespace WindowsScraper
         }
 
 
-        #endregion
+#endregion
 
-        #region Important Doc. links
+#region Important Doc. links
         // https://msdn.microsoft.com/en-us/library/system.windows.automation.textpattern(v=vs.110).aspx
         // https://msdn.microsoft.com/en-us/library/system.windows.automation.textpattern.fontnameattribute(v=vs.110).aspx
         // https://blogs.msdn.microsoft.com/oldnewthing/20150216-00/?p=44673
 
-        #endregion
+#endregion
 
     }
 }
