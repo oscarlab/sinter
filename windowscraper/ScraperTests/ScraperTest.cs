@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Win32;
 
 namespace WindowsScraper.Tests
 {
@@ -95,9 +96,9 @@ namespace WindowsScraper.Tests
         [TestMethod]
         public void Test002_ls_l_Win7_Calc_Standard()
         {
+            const string keyName = "HKEY_CURRENT_USER\\Software\\Microsoft\\Calc";
+            Registry.SetValue(keyName, "layout", 1); //switch to Standard mode
             Process calc = bringupApp(path_win7_calc);
-            SendKeys.SendWait("%1"); // Key ALT+1 switch to Standard mode
-            Thread.Sleep(2000);
 
             /* create an input "ls_l_req" and execute it */
             Sinter sinter_ls_l_req = new Sinter
@@ -114,9 +115,9 @@ namespace WindowsScraper.Tests
         [TestMethod]
         public void Test003_ls_l_Win7_Calc_Scientific()
         {
+            const string keyName = "HKEY_CURRENT_USER\\Software\\Microsoft\\Calc";
+            Registry.SetValue(keyName, "layout", 0); //switch to Scientific mode
             Process calc = bringupApp(path_win7_calc);
-            SendKeys.SendWait("%2"); // Key ALT+2 switch to Scientific mode
-            Thread.Sleep(2000);
 
             /* create an input "ls_l_req" and execute it */
             Sinter sinter_ls_l_req = new Sinter
@@ -133,9 +134,9 @@ namespace WindowsScraper.Tests
         [TestMethod]
         public void Test004_ls_l_Win7_Calc_Programmer()
         {
+            const string keyName = "HKEY_CURRENT_USER\\Software\\Microsoft\\Calc";
+            Registry.SetValue(keyName, "layout", 2); //switch to Programmer mode
             Process calc = bringupApp(path_win7_calc);
-            SendKeys.SendWait("%3"); // Key ALT+3 switch to Programmer mode
-            Thread.Sleep(2000);
 
             /* create an input "ls_l_req" and execute it */
             Sinter sinter_ls_l_req = new Sinter
@@ -152,9 +153,9 @@ namespace WindowsScraper.Tests
         [TestMethod]
         public void Test005_ls_l_Win7_Calc_Statistics()
         {
+            const string keyName = "HKEY_CURRENT_USER\\Software\\Microsoft\\Calc";
+            Registry.SetValue(keyName, "layout", 3); //switch to Statistics mode
             Process calc = bringupApp(path_win7_calc);
-            SendKeys.SendWait("%4"); // Key ALT+4 switch to Statistics mode
-            Thread.Sleep(2000);
 
             /* create an input "ls_l_req" and execute it */
             Sinter sinter_ls_l_req = new Sinter
