@@ -174,6 +174,25 @@ static ClientHandler* shared       = nil;
 - (void) sendMessage: (NSString *) message {
     static NSData *last_data;
     
+#ifdef DEBUG
+    NSDictionary * instanceSetting = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];
+    NSString * logfolder = [instanceSetting objectForKey:@"xml_logfolder"];
+    NSString * filename = nil;
+    if ((logfolder != Nil ) && ([logfolder length] != 0)) {
+        if (_isServerSocket == YES) {
+            filename = [NSString stringWithFormat:@"%@/scraper_%@.xml", logfolder, [NSDate date]];
+        }
+        else {
+            filename = [NSString stringWithFormat:@"%@/proxy_%@.xml", logfolder, [NSDate date]];
+        }
+        NSError * error = NULL;
+        if([message writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:&error])
+        {
+            NSLog( @"xml saving to %@", filename);
+        }
+    }
+#endif
+    
     NSData *data = [[NSData alloc] initWithData:[message dataUsingEncoding:NSUTF8StringEncoding]];
     if ([last_data isEqualToData:data]) {
         NSLog(@"Same data being sent repeatedly.Skipping send...\n");
