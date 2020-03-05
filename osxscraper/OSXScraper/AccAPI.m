@@ -36,7 +36,7 @@
 
 
 static NSDictionary * roleMappings;
-static NSArray* valid_apps;
+static NSMutableArray* valid_apps;
 
 @implementation AccAPI
 
@@ -89,21 +89,29 @@ static NSArray* valid_apps;
     return entity;
 }
 
++ (void) addValidApp: (NSString*) appName {
+    [valid_apps addObject:appName];
+}
+
 // ls command
 + (Sinter *) getListOfApplications {
     Sinter * sinter = [[Sinter alloc] initWithEntities];
     sinter.header.service_code = [serviceCodes objectForKey:STRLsRes];
     sinter.header.sub_code = [serviceCodes objectForKey:STRLsRes];
     
+    int nProcessAbleToSee = 0;
+    
     NSArray * processes =  [self getAllProcessesIDs];
     for ( NSNumber * process_id in processes){
         Entity * e = [self getEntityForApp: (pid_t) [process_id integerValue]];
         if(e != nil){
-            if([valid_apps containsObject:e.name])
+            nProcessAbleToSee ++;
+            if([valid_apps containsObject:e.name]) {
                 [sinter.entities addObject:e];
+            }
         }
     }
-    
+    NSLog(@"nProcessAbleToSee = %i", nProcessAbleToSee);
     return sinter;
 }
 

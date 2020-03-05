@@ -42,6 +42,11 @@
     serviceCodes = [Config getServiceCodes];
 }
 
++ (BOOL) isUnitTesting {
+    NSDictionary* environment = [[NSProcessInfo processInfo] environment];
+    return (environment[@"XCTestConfigurationFilePath"] != nil);
+}
+
 Scraper * refToSelf;
 
 - (id) initWithId:(int) identifier andClientHandler:(ClientHandler *) clientHandler {
@@ -51,6 +56,9 @@ Scraper * refToSelf;
         [self setIdentifier:identifier];
         [self setClientHandler:clientHandler];
         _isPasscodeVerified = false;
+        if ([[self class] isUnitTesting]){
+            _isPasscodeVerified = true;
+        }
         
         appCache = [[NSMutableDictionary alloc] init];
         appObservers = [[NSMutableDictionary alloc] init];
@@ -103,7 +111,7 @@ Scraper * refToSelf;
     }
 }
 
-- (void) execute: (Sinter *) cmdSinter {
+- (Sinter *) execute: (Sinter *) cmdSinter {
     NSNumber * service_code = cmdSinter.header.service_code;
     Sinter * sinterToSend = nil;
     if ([service_code isEqualToNumber: [serviceCodes objectForKey:STRVerifyPasscode]]) {
@@ -162,10 +170,16 @@ Scraper * refToSelf;
     
     }
     
+    if ([[self class] isUnitTesting]){
+        //if unit-testing, just return.
+        return sinterToSend;
+    }
+    
     // send sinter response
     if (sinterToSend) {
         [_clientHandler sendSinter:sinterToSend];
     }
+    return nil;
 }
 
 
@@ -298,7 +312,15 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
 }
 
 - (bool) checkAccessibilityAPI {
-    NSDictionary *options = @{(__bridge id) kAXTrustedCheckOptionPrompt: @YES };
+    NSDictionary *options;
+    if ([[self class] isUnitTesting]){
+        // do not user-prompt when autotesting
+        options = @{(__bridge id) kAXTrustedCheckOptionPrompt: @NO };
+    }
+    else {
+        options = @{(__bridge id) kAXTrustedCheckOptionPrompt: @YES };
+    }
+        
     if(!AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options)){
         NSLog(@"Accessibility API not enabled");
     }else{

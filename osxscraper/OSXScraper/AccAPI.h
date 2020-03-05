@@ -32,7 +32,7 @@
 + (void) initialize;
 + (NSArray *) getAllProcessesIDs;
 + (Entity *) getEntityForApp:(pid_t) pid;
-
++ (void) addValidApp: (NSString*) appName;
 + (Sinter *) getListOfApplications;
 + (Sinter *) getDomOf:(pid_t) pid
              andReturnRef:(AXUIElementRef*) elemRef

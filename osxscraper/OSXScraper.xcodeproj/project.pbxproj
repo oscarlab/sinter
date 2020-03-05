@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		08172FA42317198C00897851 /* osxsinter.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 08172FA32317198B00897851 /* osxsinter.p12 */; };
 		08172FA6231724DA00897851 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08172FA5231724DA00897851 /* Settings.plist */; };
+		084181B82406D5E300371637 /* Sinter.h in Sources */ = {isa = PBXBuildFile; fileRef = 0DB4CA5920D75B4900FFFD23 /* Sinter.h */; };
 		08791EB622331CB2009EB201 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB322331CB2009EB201 /* Word.m */; };
 		08791EB722331CB2009EB201 /* Params.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB522331CB2009EB201 /* Params.m */; };
 		08791EC022331EA3009EB201 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EBE22331EA2009EB201 /* XMLTags.m */; };
@@ -220,8 +221,8 @@
 		9CFA677C1AA01865007E84ED /* OSXScraper */ = {
 			isa = PBXGroup;
 			children = (
-				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
 				08172FA5231724DA00897851 /* Settings.plist */,
+				9CFE595A1BCB01AD00BEAC79 /* AccessibilityDefinitions.plist */,
 				9CFE59551BCB00D100BEAC79 /* documentation.rtf */,
 				9CFE59561BCB00D100BEAC79 /* AccAPI.h */,
 				9CFE59571BCB00D100BEAC79 /* AccAPI.m */,
@@ -329,6 +330,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -401,6 +403,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				084181B82406D5E300371637 /* Sinter.h in Sources */,
 				9CFA67A11AA01865007E84ED /* OSXScraperTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -557,10 +560,10 @@
 				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "$(SRCROOT)/OSXScraper/OSXScraper-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lxml2";
-				PRODUCT_BUNDLE_IDENTIFIER = SBU.OSXScraper;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.unc.OSXScraper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -575,10 +578,10 @@
 				GCC_PREFIX_HEADER = "OSXScraper/OSXScraper-Prefix.pch";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "$(SRCROOT)/OSXScraper/OSXScraper-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lxml2";
-				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.unc.OSXScraper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
