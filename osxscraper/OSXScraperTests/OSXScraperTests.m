@@ -41,6 +41,7 @@
 
 NSString * OSXScraperName;
 Scraper * scraper;
+NSTask * CalcTask;
 
 - (void)setUp
 {
@@ -53,12 +54,18 @@ Scraper * scraper;
     /* create a scraper with no connection */
     scraper = [[Scraper alloc] initWithId:1 andClientHandler:nil] ;
     
+    NSError *err;
+    CalcTask = [[NSTask alloc] init];
+    [CalcTask setLaunchPath:@"/Applications/Calculator.app/Contents/MacOS/Calculator"];
+    [CalcTask setArguments:[NSArray arrayWithObjects:@"/bin/bash", nil]];
+    [CalcTask launchAndReturnError:&err];
 }
 
 - (void)tearDown
 {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
+    [CalcTask terminate];
 }
 
 - (void) testLS
@@ -67,12 +74,14 @@ Scraper * scraper;
     Sinter * sinterInput = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
     Sinter * sinterOutput = [scraper execute:sinterInput];
     XCTAssertNotNil(sinterOutput);
+    XCTAssertTrue([sinterOutput.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]);
     XCTAssertTrue(sinterOutput.entities.count >= 1);
     BOOL bFoundSelf = NO;
     for (Entity* e in sinterOutput.entities){
+        NSLog(@"%s %@, %@", __PRETTY_FUNCTION__, e.name, e.process_id);
         if ([e.name isEqualToString:OSXScraperName]){
             bFoundSelf = YES;
-            NSLog(@"%s %@, %@", __PRETTY_FUNCTION__, e.name, e.process_id);
+            NSLog(@"%s %@ in STRLsRes", __PRETTY_FUNCTION__, e.name);
             break;
         }
     }
