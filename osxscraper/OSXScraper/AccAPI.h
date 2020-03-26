@@ -30,6 +30,7 @@
 @interface AccAPI : NSObject
 
 + (void) initialize;
++ (BOOL) isUnitTesting;
 + (NSArray *) getAllProcessesIDs;
 + (Entity *) getEntityForApp:(pid_t) pid;
 + (void) addValidApp: (NSString*) appName;

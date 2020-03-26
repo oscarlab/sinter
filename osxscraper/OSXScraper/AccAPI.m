@@ -47,10 +47,14 @@ static NSMutableArray* valid_apps;
     valid_apps = [settings objectForKey:@"support_apps"];
 }
 
++ (BOOL) isUnitTesting {
+    NSDictionary* environment = [[NSProcessInfo processInfo] environment];
+    return (environment[@"XCTestConfigurationFilePath"] != nil);
+}
+
 + (NSArray *) getAllProcessesIDs {
     CFArrayRef appList = CGWindowListCopyWindowInfo((kCGWindowListOptionOnScreenOnly), kCGNullWindowID);
     int num_process = (int) CFArrayGetCount(appList);
-    NSLog(@"Process Count = %i", num_process);
     
     NSMutableArray * processes = [[NSMutableArray alloc] initWithCapacity:num_process];
     for (NSMutableDictionary* win in (__bridge NSArray*) appList){
@@ -90,7 +94,10 @@ static NSMutableArray* valid_apps;
 }
 
 + (void) addValidApp: (NSString*) appName {
-    [valid_apps addObject:appName];
+    if(![valid_apps containsObject:appName]){
+        [valid_apps addObject:appName];
+        NSLog(@"%s valid apps: %@", __PRETTY_FUNCTION__, valid_apps);
+    }
 }
 
 // ls command
@@ -99,19 +106,20 @@ static NSMutableArray* valid_apps;
     sinter.header.service_code = [serviceCodes objectForKey:STRLsRes];
     sinter.header.sub_code = [serviceCodes objectForKey:STRLsRes];
     
-    int nProcessAbleToSee = 0;
-    
     NSArray * processes =  [self getAllProcessesIDs];
+    
+    int nProcessAbleToSee = 0;
     for ( NSNumber * process_id in processes){
         Entity * e = [self getEntityForApp: (pid_t) [process_id integerValue]];
         if(e != nil){
             nProcessAbleToSee ++;
+            if ([AccAPI isUnitTesting]) NSLog(@"%s ableToSee: %@", __PRETTY_FUNCTION__, e.name);
             if([valid_apps containsObject:e.name]) {
                 [sinter.entities addObject:e];
             }
         }
     }
-    NSLog(@"nProcessAbleToSee = %i", nProcessAbleToSee);
+    if ([AccAPI isUnitTesting]) NSLog(@"%s nProcessAbleToSee = %i", __PRETTY_FUNCTION__, nProcessAbleToSee);
     return sinter;
 }
 

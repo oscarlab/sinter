@@ -59,6 +59,7 @@ NSTask * CalcTask;
     [CalcTask setLaunchPath:@"/Applications/Calculator.app/Contents/MacOS/Calculator"];
     [CalcTask setArguments:[NSArray arrayWithObjects:@"/bin/bash", nil]];
     [CalcTask launchAndReturnError:&err];
+    NSLog(@"err: %@", err.localizedDescription);
 }
 
 - (void)tearDown
@@ -66,9 +67,10 @@ NSTask * CalcTask;
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
     [CalcTask terminate];
+
 }
 
-- (void) testLS
+- (void) test001LS
 {
     //test 'list of applications', should see itself (OSXScraper)
     Sinter * sinterInput = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
@@ -76,23 +78,41 @@ NSTask * CalcTask;
     XCTAssertNotNil(sinterOutput);
     XCTAssertTrue([sinterOutput.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]);
     XCTAssertTrue(sinterOutput.entities.count >= 1);
+    
     BOOL bFoundSelf = NO;
+    NSLog(@"%s entities count: %ld", __PRETTY_FUNCTION__, [sinterOutput.entities count]);
     for (Entity* e in sinterOutput.entities){
         NSLog(@"%s %@, %@", __PRETTY_FUNCTION__, e.name, e.process_id);
         if ([e.name isEqualToString:OSXScraperName]){
             bFoundSelf = YES;
-            NSLog(@"%s %@ in STRLsRes", __PRETTY_FUNCTION__, e.name);
-            break;
         }
     }
     XCTAssertTrue(bFoundSelf);
 }
 
-- (void) testLongLS
+- (void) test001LSCalc
 {
-    //first get the process_id of itself, then test long LS (scrape it and output a response sinter
+    //test 'list of applications', should see itself (OSXScraper)
     Sinter * sinterInput = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
-    [scraper execute:sinterInput];
+    Sinter * sinterOutput = [scraper execute:sinterInput];
+    XCTAssertNotNil(sinterOutput);
+    XCTAssertTrue([sinterOutput.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]);
+    XCTAssertTrue(sinterOutput.entities.count >= 1);
+    
+    BOOL bFound = NO;
+    NSLog(@"%s entities count: %ld", __PRETTY_FUNCTION__, [sinterOutput.entities count]);
+    for (Entity* e in sinterOutput.entities){
+        NSLog(@"%s %@, %@", __PRETTY_FUNCTION__, e.name, e.process_id);
+        if ([e.name isEqualToString:@"Calculator"]){
+            bFound = YES;
+        }
+    }
+    XCTAssertTrue(bFound);
+}
+
+- (void) test002LongLS
+{
+    // first get the process_id of itself, then test long LS (scrape it and output a response sinter)
     Sinter * sinterOutput = [AccAPI getListOfApplications];
     NSString* process_id;
     for (Entity* e in sinterOutput.entities){
@@ -102,6 +122,7 @@ NSTask * CalcTask;
             break;
         }
     }
+    // create a sinterInput2 with process_id to test
     Sinter * sinterInput2 = [[Sinter alloc] init];
     sinterInput2.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsLongReq]
                                                       subCode:[serviceCodes objectForKey:STRLsLongReq]

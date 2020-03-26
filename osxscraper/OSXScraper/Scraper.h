@@ -36,7 +36,6 @@
 @property (nonatomic, strong ) NSMutableDictionary* appCache;
 @property (nonatomic, strong ) NSMutableDictionary* appObservers;
 
-+ (BOOL) isUnitTesting;
 - (id) initWithId:(int) identifier andClientHandler:(ClientHandler *) clientHandler;
 - (Sinter *) execute: (Sinter *) cmdSinter;
 

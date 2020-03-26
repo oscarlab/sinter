@@ -42,11 +42,6 @@
     serviceCodes = [Config getServiceCodes];
 }
 
-+ (BOOL) isUnitTesting {
-    NSDictionary* environment = [[NSProcessInfo processInfo] environment];
-    return (environment[@"XCTestConfigurationFilePath"] != nil);
-}
-
 Scraper * refToSelf;
 
 - (id) initWithId:(int) identifier andClientHandler:(ClientHandler *) clientHandler {
@@ -56,7 +51,7 @@ Scraper * refToSelf;
         [self setIdentifier:identifier];
         [self setClientHandler:clientHandler];
         _isPasscodeVerified = false;
-        if ([[self class] isUnitTesting]){
+        if ([AccAPI isUnitTesting]){
             _isPasscodeVerified = true;
         }
         
@@ -170,7 +165,7 @@ Scraper * refToSelf;
     
     }
     
-    if ([[self class] isUnitTesting]){
+    if ([AccAPI isUnitTesting]){
         //if unit-testing, just return.
         return sinterToSend;
     }
@@ -313,7 +308,7 @@ void structureChangeHandler(AXObserverRef obsever, AXUIElementRef element, CFStr
 
 - (bool) checkAccessibilityAPI {
     NSDictionary *options;
-    if ([[self class] isUnitTesting]){
+    if ([AccAPI isUnitTesting]){
         // do not user-prompt when autotesting
         options = @{(__bridge id) kAXTrustedCheckOptionPrompt: @NO };
     }
