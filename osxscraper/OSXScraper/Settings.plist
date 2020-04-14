@@ -14,5 +14,9 @@
 	<string>osxsinter.p12</string>
 	<key>certificate_passcode</key>
 	<string>123456</string>
+	<key>xml_logfolder</key>
+	<string></string>
+	<key>jenkins_output_dir</key>
+	<string>/Users/jenkins/workspace/sinter-mac/testoutput</string>
 </dict>
 </plist>

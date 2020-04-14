@@ -31,6 +31,7 @@
 #import "Config.h"
 #import "XMLTags.h"
 #import "Scraper.h"
+#import "Serializer.h"
 
 
 @interface OSXScrapperTests : XCTestCase
@@ -70,7 +71,25 @@ NSTask * CalcTask;
 
 }
 
-- (void) test001LS
+- (int) exportSinter:(Sinter *) sinter {
+    NSString * message = [Serializer objectToXml:sinter];
+    NSDictionary * instanceSetting = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];
+    NSString * logfolder = [instanceSetting objectForKey:@"jenkins_output_dir"];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    BOOL isDir;
+    if ([fileManager fileExistsAtPath:logfolder isDirectory:&isDir] && isDir){
+        NSString * filename = [NSString stringWithFormat:@"%@/%@.xml", logfolder, self.name];
+        NSError * error = NULL;
+        if([message writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:&error])
+        {
+            NSLog( @"xml saving to %@", filename);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+- (void) test001_LS_Self
 {
     //test 'list of applications', should see itself (OSXScraper)
     Sinter * sinterInput = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
@@ -78,7 +97,7 @@ NSTask * CalcTask;
     XCTAssertNotNil(sinterOutput);
     XCTAssertTrue([sinterOutput.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]);
     XCTAssertTrue(sinterOutput.entities.count >= 1);
-    
+
     BOOL bFoundSelf = NO;
     NSLog(@"%s entities count: %ld", __PRETTY_FUNCTION__, [sinterOutput.entities count]);
     for (Entity* e in sinterOutput.entities){
@@ -90,15 +109,15 @@ NSTask * CalcTask;
     XCTAssertTrue(bFoundSelf);
 }
 
-- (void) test001LSCalc
+- (void) test001_LS_Calc
 {
-    //test 'list of applications', should see itself (OSXScraper)
+    //test 'list of applications', should see Calculator
     Sinter * sinterInput = [[Sinter alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsReq]];
     Sinter * sinterOutput = [scraper execute:sinterInput];
     XCTAssertNotNil(sinterOutput);
     XCTAssertTrue([sinterOutput.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsRes]]);
     XCTAssertTrue(sinterOutput.entities.count >= 1);
-    
+
     BOOL bFound = NO;
     NSLog(@"%s entities count: %ld", __PRETTY_FUNCTION__, [sinterOutput.entities count]);
     for (Entity* e in sinterOutput.entities){
@@ -110,7 +129,7 @@ NSTask * CalcTask;
     XCTAssertTrue(bFound);
 }
 
-- (void) test002LongLS
+- (void) test002_LongLS_Self
 {
     // first get the process_id of itself, then test long LS (scrape it and output a response sinter)
     Sinter * sinterOutput = [AccAPI getListOfApplications];
@@ -133,6 +152,37 @@ NSTask * CalcTask;
     XCTAssertTrue([sinterOutput2.header.process_id isEqualToString:process_id]);
     XCTAssertTrue([sinterOutput2.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongRes]]);
     XCTAssertNotNil(sinterOutput2.entity);
+    XCTAssertTrue([self exportSinter:sinterOutput2] == 0);
+}
+
+- (void) test002_LongLS_Calc
+{
+    // first get the process_id of itself, then test long LS (scrape it and output a response sinter)
+    Sinter * sinterOutput = [AccAPI getListOfApplications];
+    NSString* process_id;
+    for (Entity* e in sinterOutput.entities){
+        if ([e.name isEqualToString:@"Calculator"]){
+            NSLog(@"%s %@, %@", __PRETTY_FUNCTION__, e.name, e.process_id);
+            process_id = e.process_id;
+            break;
+        }
+    }
+    XCTAssertNotNil(process_id);
+
+    // create a sinterInput2 with process_id to test
+    if (process_id != nil) {
+        Sinter * sinterInput2 = [[Sinter alloc] init];
+        sinterInput2.header = [[Header alloc] initWithServiceCode:[serviceCodes objectForKey:STRLsLongReq]
+                                                          subCode:[serviceCodes objectForKey:STRLsLongReq]
+                                                        processId:process_id
+                                                       parameters:nil];
+        Sinter * sinterOutput2 = [scraper execute:sinterInput2];
+        XCTAssertNotNil(sinterOutput2);
+        XCTAssertTrue([sinterOutput2.header.process_id isEqualToString:process_id]);
+        XCTAssertTrue([sinterOutput2.header.service_code isEqualToNumber: [serviceCodes objectForKey:STRLsLongRes]]);
+        XCTAssertNotNil(sinterOutput2.entity);
+        XCTAssertTrue([self exportSinter:sinterOutput2] == 0);
+    }
 }
 
 @end
