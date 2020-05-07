@@ -33,12 +33,12 @@ pipeline {
       steps {
         timeout(time: 1, unit: 'HOURS'){
           sh '''
-            echo "Test(s) go here"
+            echo "[OSXScraper] Start testing"
             mkdir -p testoutput
             cd osxscraper
             /Applications/Calculator.app/Contents/MacOS/Calculator &
 
-            echo "build-for-testing"
+            echo "[OSXScraper] build-for-testing"
             xcodebuild build-for-testing -project OSXScraper.xcodeproj -scheme OSXScraper
 
             echo "clean the TCC.db"
@@ -47,7 +47,7 @@ pipeline {
             sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" "delete from access where client='edu.unc.OSXScraper' and service='kTCCServiceAccessibility'"
             sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" 'select * from access'
 
-            echo "test-without-building, run 1 case to enable Accessibility access magically"
+            echo "[OSXScraper] test-without-building, run 1 case to enable Accessibility access magically"
             xcodebuild test-without-building -project OSXScraper.xcodeproj -scheme OSXScraper -only-testing:OSXScraperTests/OSXScrapperTests/test001_LS_Self
 
             echo "enable the allow access in TCC.db"
@@ -56,9 +56,22 @@ pipeline {
             sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" 'UPDATE access SET allowed = "1";'
             sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" 'select * from access'
 
-            echo "test-without-building, run the testcases"
+            echo "[OSXScraper] test-without-building, run the testcases"
             xcodebuild test-without-building -project OSXScraper.xcodeproj -scheme OSXScraper
-            ls -lht ../testoutput/
+            cd -
+            ls -lht testoutput/
+            echo "[OSXScraper] Testing Done"
+
+            echo "[OSXProxy] Start testing"
+            cd osxproxy
+
+            echo "[OSXProxy] build-for-testing"
+            xcodebuild build-for-testing -project OSXProxy.xcodeproj -scheme OSXProxy
+
+            echo "[OSXProxy] test-without-building, run the testcases"
+            xcodebuild test-without-building -project OSXProxy.xcodeproj -scheme OSXProxy
+
+            echo "[OSXProxy] Testing Done"
           '''
         }
       }
