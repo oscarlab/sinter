@@ -14,6 +14,7 @@
 		0894254424637F0E0065C587 /* test001_ServiceCode2_empty.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254124637F0E0065C587 /* test001_ServiceCode2_empty.xml */; };
 		0894254524637F0E0065C587 /* test002_testServiceCode2.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254224637F0E0065C587 /* test002_testServiceCode2.xml */; };
 		0894254624637F0E0065C587 /* test003_ServiceCode4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254324637F0E0065C587 /* test003_ServiceCode4.xml */; };
+		08942547246463AA0065C587 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C93FD3A198ADBD700227E47 /* Cocoa.framework */; };
 		0DB105901DBC2E18004289E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB1058E1DBC2E18004289E7 /* AppDelegate.m */; };
 		0DB105921DBC2E30004289E7 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105911DBC2E30004289E7 /* Settings.plist */; };
 		0DB105941DBC2FB4004289E7 /* RemoteExplorerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105931DBC2FB4004289E7 /* RemoteExplorerWindowController.xib */; };
@@ -197,6 +198,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08942547246463AA0065C587 /* Cocoa.framework in Frameworks */,
 				9C93FD3B198ADBD700227E47 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -482,19 +484,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1110;
-				ORGANIZATIONNAME = "Stony Brook University";
-				TargetAttributes = {
-					08418249240706DF00371637 = {
-						CreatedOnToolsVersion = 11.1;
-						ProvisioningStyle = Manual;
-						TestTargetID = 9C93FD36198ADBD700227E47;
-					};
-					088E61992448BE01007C4AE5 = {
-						CreatedOnToolsVersion = 11.1;
-						ProvisioningStyle = Automatic;
-						TestTargetID = 9C93FD36198ADBD700227E47;
-					};
-				};
+				ORGANIZATIONNAME = "University of North Carolina";
 			};
 			buildConfigurationList = 9C93FD32198ADBD700227E47 /* Build configuration list for PBXProject "OSXProxy" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -675,7 +665,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
@@ -687,7 +677,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = OSXProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OSXProxy.app/Contents/MacOS/OSXProxy";
 			};
 			name = Debug;
@@ -702,10 +691,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = OSXProxyTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -714,7 +701,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = OSXProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OSXProxy.app/Contents/MacOS/OSXProxy";
 			};
 			name = Release;
@@ -729,9 +715,10 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = OSXProxyUITests/Info.plist;
@@ -760,7 +747,6 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -808,6 +794,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -827,7 +814,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -873,7 +860,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -883,13 +870,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OSXProxy/OSXProxy-Prefix.pch";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "OSXProxy/OSXProxy-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "-lxml2";
-				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.unc.OSXProxy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -904,9 +892,9 @@
 				GCC_PREFIX_HEADER = "OSXProxy/OSXProxy-Prefix.pch";
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				INFOPLIST_FILE = "OSXProxy/OSXProxy-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "-lxml2";
-				PRODUCT_BUNDLE_IDENTIFIER = "SBU.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.unc.OSXProxy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
