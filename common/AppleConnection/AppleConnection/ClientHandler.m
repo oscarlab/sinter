@@ -86,6 +86,13 @@ static ClientHandler* shared       = nil;
 - (void) initForClientSocket {
     _isServerSocket = NO;
     
+    if ( [[NSProcessInfo processInfo] environment][@"isUITest"] )
+    {
+        isConnected = true;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectedInd" object:self];
+        return;
+    }
+    
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)ipAddress, _port, &readStream, &writeStream);
@@ -173,6 +180,11 @@ static ClientHandler* shared       = nil;
 
 - (void) sendMessage: (NSString *) message {
     static NSData *last_data;
+    
+  if ( [[NSProcessInfo processInfo] environment][@"isUITest"] )
+  {
+      return;
+  }
     
 #ifdef DEBUG
     NSDictionary * instanceSetting = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"plist"]];

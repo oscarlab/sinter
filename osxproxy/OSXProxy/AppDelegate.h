@@ -25,6 +25,7 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import "Sinter.h"
 
 
 @class Model;
@@ -56,6 +57,7 @@
 
 - (void) selectRemoteProcess:(id) process_id;
 - (void) disconnect;
+- (void) takeActionForXML:(Sinter *) sinter;
 - (IBAction) connect:(id) sender;
 - (IBAction) fetchRemoteProcesses:(id) sender;
 - (IBAction) disconnectButtonClicked:(id) sender;

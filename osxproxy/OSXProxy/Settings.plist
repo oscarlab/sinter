@@ -6,5 +6,9 @@
 	<real>6832</real>
 	<key>server_ip</key>
 	<string>192.168.28.128</string>
+	<key>xml_logfolder</key>
+	<string></string>
+	<key>jenkins_output_dir</key>
+	<string>/Users/jenkins/workspace/sinter-mac/testoutput</string>
 </dict>
 </plist>
