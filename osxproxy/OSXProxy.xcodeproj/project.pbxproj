@@ -7,8 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0841824D240706DF00371637 /* OSXProxyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0841824C240706DF00371637 /* OSXProxyTests.m */; };
 		08791EBA22331D0C009EB201 /* Params.m in Sources */ = {isa = PBXBuildFile; fileRef = 08791EB822331D0B009EB201 /* Params.m */; };
 		08866A4B223981B3006F3473 /* XMLTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 08866A49223981B3006F3473 /* XMLTags.m */; };
+		088E62A92448E3D2007C4AE5 /* OSXProxyUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 088E62A82448E3D2007C4AE5 /* OSXProxyUITests.m */; };
+		0894254424637F0E0065C587 /* test001_ServiceCode2_empty.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254124637F0E0065C587 /* test001_ServiceCode2_empty.xml */; };
+		0894254524637F0E0065C587 /* test002_testServiceCode2.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254224637F0E0065C587 /* test002_testServiceCode2.xml */; };
+		0894254624637F0E0065C587 /* test003_ServiceCode4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0894254324637F0E0065C587 /* test003_ServiceCode4.xml */; };
 		0DB105901DBC2E18004289E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB1058E1DBC2E18004289E7 /* AppDelegate.m */; };
 		0DB105921DBC2E30004289E7 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105911DBC2E30004289E7 /* Settings.plist */; };
 		0DB105941DBC2FB4004289E7 /* RemoteExplorerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0DB105931DBC2FB4004289E7 /* RemoteExplorerWindowController.xib */; };
@@ -57,11 +62,37 @@
 		9C93FD3B198ADBD700227E47 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C93FD3A198ADBD700227E47 /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0841824F240706DF00371637 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C93FD2F198ADBD700227E47 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9C93FD36198ADBD700227E47;
+			remoteInfo = OSXProxy;
+		};
+		088E619F2448BE01007C4AE5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C93FD2F198ADBD700227E47 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9C93FD36198ADBD700227E47;
+			remoteInfo = OSXProxy;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		0841824A240706DF00371637 /* OSXProxyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OSXProxyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0841824C240706DF00371637 /* OSXProxyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSXProxyTests.m; sourceTree = "<group>"; };
+		0841824E240706DF00371637 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		08791EB822331D0B009EB201 /* Params.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Params.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.m; sourceTree = "<group>"; };
 		08791EB922331D0B009EB201 /* Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Params.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/Models/Params.h; sourceTree = "<group>"; };
 		08866A49223981B3006F3473 /* XMLTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLTags.m; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.m; sourceTree = "<group>"; };
 		08866A4A223981B3006F3473 /* XMLTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLTags.h; path = ../common/AppleXMLSerializer/AppleXMLSerializer/src/GDataXML/XMLTags.h; sourceTree = "<group>"; };
+		088E619A2448BE01007C4AE5 /* OSXProxyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OSXProxyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		088E619E2448BE01007C4AE5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		088E62A82448E3D2007C4AE5 /* OSXProxyUITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSXProxyUITests.m; sourceTree = "<group>"; };
+		0894254124637F0E0065C587 /* test001_ServiceCode2_empty.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test001_ServiceCode2_empty.xml; sourceTree = "<group>"; };
+		0894254224637F0E0065C587 /* test002_testServiceCode2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test002_testServiceCode2.xml; sourceTree = "<group>"; };
+		0894254324637F0E0065C587 /* test003_ServiceCode4.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test003_ServiceCode4.xml; sourceTree = "<group>"; };
 		0DB1058E1DBC2E18004289E7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = OSXProxy/AppDelegate.m; sourceTree = "<group>"; };
 		0DB1058F1DBC2E18004289E7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = OSXProxy/AppDelegate.h; sourceTree = "<group>"; };
 		0DB105911DBC2E30004289E7 /* Settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Settings.plist; path = OSXProxy/Settings.plist; sourceTree = "<group>"; };
@@ -148,6 +179,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		08418247240706DF00371637 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		088E61972448BE01007C4AE5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C93FD34198ADBD700227E47 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -159,6 +204,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0841824B240706DF00371637 /* OSXProxyTests */ = {
+			isa = PBXGroup;
+			children = (
+				0841824C240706DF00371637 /* OSXProxyTests.m */,
+				0894254124637F0E0065C587 /* test001_ServiceCode2_empty.xml */,
+				0894254224637F0E0065C587 /* test002_testServiceCode2.xml */,
+				0894254324637F0E0065C587 /* test003_ServiceCode4.xml */,
+				0841824E240706DF00371637 /* Info.plist */,
+			);
+			path = OSXProxyTests;
+			sourceTree = "<group>";
+		};
+		088E619B2448BE01007C4AE5 /* OSXProxyUITests */ = {
+			isa = PBXGroup;
+			children = (
+				088E62A82448E3D2007C4AE5 /* OSXProxyUITests.m */,
+				088E619E2448BE01007C4AE5 /* Info.plist */,
+			);
+			path = OSXProxyUITests;
+			sourceTree = "<group>";
+		};
 		0D15B1801C5DA681001A0EEF /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -262,17 +328,19 @@
 		9C93FD2E198ADBD700227E47 = {
 			isa = PBXGroup;
 			children = (
+				0DB105911DBC2E30004289E7 /* Settings.plist */,
 				0DB4CA8B20D7793500FFFD23 /* OSXProxy-Prefix.pch */,
 				0DB4CA6B20D7768100FFFD23 /* RoleMapping.plist */,
 				0DB105E51DBC3497004289E7 /* CustomWindowController.xib */,
 				0DB105E71DBC3497004289E7 /* MainMenu.xib */,
 				0DB105951DBC2FDC004289E7 /* Images.xcassets */,
-				0DB105911DBC2E30004289E7 /* Settings.plist */,
 				0DB1058E1DBC2E18004289E7 /* AppDelegate.m */,
 				0DB1058F1DBC2E18004289E7 /* AppDelegate.h */,
 				0DAF71341DB825A5002BE0A1 /* Connection */,
 				0D6C19831DB70E55004DFB3F /* AppleXMLSerializer */,
 				9C93FD40198ADBD700227E47 /* OSXProxy */,
+				0841824B240706DF00371637 /* OSXProxyTests */,
+				088E619B2448BE01007C4AE5 /* OSXProxyUITests */,
 				9C93FD39198ADBD700227E47 /* Frameworks */,
 				9C93FD38198ADBD700227E47 /* Products */,
 			);
@@ -282,6 +350,8 @@
 			isa = PBXGroup;
 			children = (
 				9C93FD37198ADBD700227E47 /* OSXProxy.app */,
+				0841824A240706DF00371637 /* OSXProxyTests.xctest */,
+				088E619A2448BE01007C4AE5 /* OSXProxyUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -352,6 +422,42 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		08418249240706DF00371637 /* OSXProxyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08418251240706DF00371637 /* Build configuration list for PBXNativeTarget "OSXProxyTests" */;
+			buildPhases = (
+				08418246240706DF00371637 /* Sources */,
+				08418247240706DF00371637 /* Frameworks */,
+				08418248240706DF00371637 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				08418250240706DF00371637 /* PBXTargetDependency */,
+			);
+			name = OSXProxyTests;
+			productName = OSXProxyTests;
+			productReference = 0841824A240706DF00371637 /* OSXProxyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		088E61992448BE01007C4AE5 /* OSXProxyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 088E61A12448BE01007C4AE5 /* Build configuration list for PBXNativeTarget "OSXProxyUITests" */;
+			buildPhases = (
+				088E61962448BE01007C4AE5 /* Sources */,
+				088E61972448BE01007C4AE5 /* Frameworks */,
+				088E61982448BE01007C4AE5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				088E61A02448BE01007C4AE5 /* PBXTargetDependency */,
+			);
+			name = OSXProxyUITests;
+			productName = OSXProxyUITests;
+			productReference = 088E619A2448BE01007C4AE5 /* OSXProxyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		9C93FD36198ADBD700227E47 /* OSXProxy */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9C93FD68198ADBD700227E47 /* Build configuration list for PBXNativeTarget "OSXProxy" */;
@@ -375,12 +481,24 @@
 		9C93FD2F198ADBD700227E47 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Stony Brook University";
+				TargetAttributes = {
+					08418249240706DF00371637 = {
+						CreatedOnToolsVersion = 11.1;
+						ProvisioningStyle = Manual;
+						TestTargetID = 9C93FD36198ADBD700227E47;
+					};
+					088E61992448BE01007C4AE5 = {
+						CreatedOnToolsVersion = 11.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 9C93FD36198ADBD700227E47;
+					};
+				};
 			};
 			buildConfigurationList = 9C93FD32198ADBD700227E47 /* Build configuration list for PBXProject "OSXProxy" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -392,11 +510,30 @@
 			projectRoot = "";
 			targets = (
 				9C93FD36198ADBD700227E47 /* OSXProxy */,
+				08418249240706DF00371637 /* OSXProxyTests */,
+				088E61992448BE01007C4AE5 /* OSXProxyUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		08418248240706DF00371637 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0894254524637F0E0065C587 /* test002_testServiceCode2.xml in Resources */,
+				0894254424637F0E0065C587 /* test001_ServiceCode2_empty.xml in Resources */,
+				0894254624637F0E0065C587 /* test003_ServiceCode4.xml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		088E61982448BE01007C4AE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C93FD35198ADBD700227E47 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -423,6 +560,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		08418246240706DF00371637 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0841824D240706DF00371637 /* OSXProxyTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		088E61962448BE01007C4AE5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				088E62A92448E3D2007C4AE5 /* OSXProxyUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C93FD33198ADBD700227E47 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -463,6 +616,19 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		08418250240706DF00371637 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9C93FD36198ADBD700227E47 /* OSXProxy */;
+			targetProxy = 0841824F240706DF00371637 /* PBXContainerItemProxy */;
+		};
+		088E61A02448BE01007C4AE5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9C93FD36198ADBD700227E47 /* OSXProxy */;
+			targetProxy = 088E619F2448BE01007C4AE5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		0DB105E51DBC3497004289E7 /* CustomWindowController.xib */ = {
 			isa = PBXVariantGroup;
@@ -499,10 +665,126 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		08418252240706DF00371637 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OSXProxyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = OSXProxyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OSXProxy.app/Contents/MacOS/OSXProxy";
+			};
+			name = Debug;
+		};
+		08418253240706DF00371637 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OSXProxyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = OSXProxyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OSXProxy.app/Contents/MacOS/OSXProxy";
+			};
+			name = Release;
+		};
+		088E61A22448BE01007C4AE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = OSXProxyUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/OSXProxyUITests",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = unc.OSXProxyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = OSXProxy;
+			};
+			name = Debug;
+		};
+		088E61A32448BE01007C4AE5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = OSXProxyUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/OSXProxyUITests",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = unc.OSXProxyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = OSXProxy;
+			};
+			name = Release;
+		};
 		9C93FD66198ADBD700227E47 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -554,7 +836,7 @@
 		9C93FD67198ADBD700227E47 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -633,6 +915,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		08418251240706DF00371637 /* Build configuration list for PBXNativeTarget "OSXProxyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08418252240706DF00371637 /* Debug */,
+				08418253240706DF00371637 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		088E61A12448BE01007C4AE5 /* Build configuration list for PBXNativeTarget "OSXProxyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				088E61A22448BE01007C4AE5 /* Debug */,
+				088E61A32448BE01007C4AE5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9C93FD32198ADBD700227E47 /* Build configuration list for PBXProject "OSXProxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
