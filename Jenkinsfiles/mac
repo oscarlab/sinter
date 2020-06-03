@@ -69,7 +69,7 @@ pipeline {
             xcodebuild build-for-testing -project OSXProxy.xcodeproj -scheme OSXProxy
 
             echo "[OSXProxy] test-without-building, run the testcases"
-            xcodebuild test-without-building -project OSXProxy.xcodeproj -scheme OSXProxy
+            xcodebuild test-without-building -project OSXProxy.xcodeproj -scheme OSXProxy -skip-testing:OSXProxyUITests
 
             echo "[OSXProxy] Testing Done"
           '''
